@@ -1,0 +1,1331 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>isx — Safe Machines for AI Agents</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+    :root {
+      --bg: #0f1729;
+      --surface: #182038;
+      --accent: #6da9e4;
+      --accent2: #d4a84b;
+      --accent3: #a78bda;
+      --danger: #d96070;
+      --success: #6dba80;
+      --text: #d8dce8;
+      --text-muted: #7d88a0;
+    }
+
+    .reveal {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+    }
+
+    .reveal .slides {
+      text-align: left;
+    }
+
+    .reveal .slides section {
+      padding: 20px 40px;
+      box-sizing: border-box;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .reveal h1 {
+      font-size: 2.6em;
+      line-height: 1.05;
+    }
+
+    .reveal h2 {
+      font-size: 1.8em;
+      line-height: 1.1;
+      margin-bottom: 0.4em;
+    }
+
+    .reveal h3 {
+      font-size: 1.2em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .reveal p, .reveal li {
+      font-size: 0.75em;
+      line-height: 1.5;
+    }
+
+    .reveal ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .reveal ul li {
+      padding: 0.2em 0;
+      padding-left: 1.4em;
+      position: relative;
+    }
+
+    .reveal ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .reveal code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .reveal pre {
+      width: 100%;
+      font-size: 0.48em;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      margin: 0.4em 0;
+    }
+
+    .reveal pre code {
+      padding: 0.8em 1.2em;
+      line-height: 1.4;
+      border-radius: 10px;
+      background: var(--surface);
+    }
+
+    .reveal .slides section .fragment.visible {
+      opacity: 1;
+    }
+
+    /* Title slide */
+    .title-slide h1 {
+      font-size: 3.2em;
+      margin-bottom: 0;
+    }
+
+    .title-slide .subtitle {
+      font-size: 1.2em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-top: 0.3em;
+    }
+
+    .title-slide .tagline {
+      font-size: 0.85em;
+      color: var(--text-muted);
+      margin-top: 1.5em;
+    }
+
+    /* Accent text */
+    .accent { color: var(--accent); }
+    .accent2 { color: var(--accent2); }
+    .accent3 { color: var(--accent3); }
+    .danger { color: var(--danger); }
+    .success { color: var(--success); }
+    .muted { color: var(--text-muted); }
+    .bold { font-weight: 700; }
+
+    /* Big statement slides */
+    .statement {
+      text-align: center !important;
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .statement h2 {
+      font-size: 2.2em;
+      line-height: 1.15;
+      max-width: 16em;
+    }
+
+    /* Diagrams */
+    .diagram {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 1.2em;
+      margin: 0.6em 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.52em;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .diagram .box {
+      display: inline-block;
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      padding: 0.4em 1em;
+      margin: 0.2em;
+    }
+
+    .diagram .box.danger-box {
+      border-color: var(--danger);
+    }
+
+    .diagram .box.success-box {
+      border-color: var(--success);
+    }
+
+    .diagram .arrow {
+      color: var(--text-muted);
+      margin: 0 0.5em;
+    }
+
+    /* Cards / feature boxes */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8em;
+      margin-top: 0.6em;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 0.8em 1em;
+      border-left: 4px solid var(--accent);
+    }
+
+    .feature-card.orange {
+      border-left-color: var(--accent2);
+    }
+
+    .feature-card.purple {
+      border-left-color: var(--accent3);
+    }
+
+    .feature-card.green {
+      border-left-color: var(--success);
+    }
+
+    .feature-card h4 {
+      font-size: 0.85em;
+      margin: 0 0 0.2em 0;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .feature-card.orange h4 { color: var(--accent2); }
+    .feature-card.purple h4 { color: var(--accent3); }
+    .feature-card.green h4 { color: var(--success); }
+
+    .feature-card p {
+      font-size: 0.65em;
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Comparison table */
+    .reveal table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      font-size: 0.6em;
+      margin: 0.6em 0;
+    }
+
+    .reveal table th {
+      background: var(--surface);
+      color: var(--accent);
+      font-weight: 700;
+      padding: 0.5em 0.8em;
+      text-align: left;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .reveal table td {
+      padding: 0.4em 0.8em;
+      border-bottom: 1px solid #222;
+    }
+
+    .reveal table tr:nth-child(even) td {
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* Section divider */
+    .section-divider {
+      text-align: center !important;
+    }
+
+    .section-divider h2 {
+      font-size: 2.2em;
+      margin-bottom: 0.2em;
+    }
+
+    .section-divider h3 {
+      font-size: 1em;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .section-number {
+      font-size: 3.5em;
+      font-weight: 700;
+      color: var(--accent);
+      opacity: 0.3;
+      line-height: 1;
+      margin-bottom: -0.2em;
+    }
+
+    /* Tree diagram */
+    .tree {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58em;
+      line-height: 1.8;
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 1em 1.5em;
+      margin: 0.6em 0;
+    }
+
+    /* Inline keyword highlight */
+    .kw {
+      background: rgba(109, 169, 228, 0.12);
+      color: var(--accent);
+      padding: 0.1em 0.4em;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9em;
+    }
+
+    /* Slide backgrounds */
+    .reveal .slide-background {
+      background: var(--bg);
+    }
+
+    /* Progress bar */
+    .reveal .progress {
+      color: var(--accent);
+      height: 4px;
+    }
+
+    /* Slide numbers */
+    .reveal .slide-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5em;
+      color: var(--text-muted);
+    }
+
+    /* Big stat */
+    .big-stat {
+      font-size: 3em;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin: 0.2em 0;
+    }
+
+    .big-stat.orange { color: var(--accent2); }
+    .big-stat.purple { color: var(--accent3); }
+
+    /* Flow diagram */
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8em;
+      margin: 1.5em 0;
+      flex-wrap: wrap;
+    }
+
+    .flow .step {
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      padding: 0.4em 0.8em;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5em;
+      text-align: center;
+    }
+
+    .flow .step.danger-step {
+      border-color: var(--danger);
+    }
+
+    .flow .step.success-step {
+      border-color: var(--success);
+    }
+
+    .flow .arrow-right {
+      color: var(--text-muted);
+      font-size: 1.5em;
+    }
+
+    /* Prevent overflow on code slides */
+    .reveal .slides section.code-slide {
+      padding: 15px 35px;
+    }
+
+    .reveal .slides section.code-slide h2 {
+      font-size: 1.5em;
+      margin-bottom: 0.3em;
+    }
+
+    /* Demo slide marker */
+    .demo-marker {
+      text-align: center !important;
+      background: linear-gradient(135deg, rgba(109, 169, 228, 0.08), rgba(167, 139, 218, 0.08));
+    }
+
+    .demo-marker h2 {
+      font-size: 2em;
+    }
+
+    .demo-marker p {
+      color: var(--text-muted);
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+  <!-- ============================================ -->
+  <!-- TITLE -->
+  <!-- ============================================ -->
+  <section class="title-slide" data-background-gradient="radial-gradient(ellipse at 30% 60%, rgba(109, 169, 228, 0.08) 0%, var(--bg) 70%)">
+    <h1>isx</h1>
+    <div class="subtitle">Safe machines for AI agents</div>
+    <p class="tagline">Give your agents their own workstations &mdash; not your credentials.</p>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- THE PROBLEM -->
+  <!-- ============================================ -->
+  <section class="statement" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(217, 96, 112, 0.06) 0%, var(--bg) 70%)">
+    <h2>You're about to hand an AI agent <span class="danger">a terminal</span></h2>
+  </section>
+
+  <section>
+    <h2>What that terminal can see</h2>
+    <ul>
+      <li class="fragment"><span class="danger bold">~/.ssh/</span> &mdash; every private key you own</li>
+      <li class="fragment"><span class="danger bold">~/.config/</span> &mdash; API tokens, cloud credentials</li>
+      <li class="fragment"><span class="danger bold">~/projects/</span> &mdash; every repo you have checked out</li>
+      <li class="fragment"><span class="danger bold">Your shell</span> &mdash; curl, git push, npm publish</li>
+    </ul>
+    <p class="fragment muted" style="margin-top: 1.5em; font-size: 0.8em;">
+      And anything it writes, your IDE and build tools will <span class="danger">happily execute</span>.
+    </p>
+  </section>
+
+  <section class="statement">
+    <h2>Your keys are <span class="danger">your identity</span></h2>
+    <p class="fragment" style="font-size: 0.9em; margin-top: 1em;">
+      With your GitHub token, an agent can push code, open PRs,<br>
+      approve reviews, and merge &mdash; <span class="danger bold">as you</span>.
+    </p>
+    <p class="fragment" style="font-size: 0.9em; margin-top: 0.6em;">
+      With your API keys, it can spin up cloud resources,<br>
+      send messages, make purchases &mdash; <span class="danger bold">as you</span>.
+    </p>
+    <p class="fragment muted" style="font-size: 0.85em; margin-top: 1em;">
+      You can't tell what the agent did from what <em>you</em> did.<br>
+      There is no audit trail. There is no boundary.
+    </p>
+  </section>
+
+  <section class="statement">
+    <h2>An agent on your laptop has <span class="danger">your full blast radius</span></h2>
+    <p class="fragment muted" style="font-size: 0.9em; margin-top: 1em;">
+      Same credentials. Same network. Same repos. Same consequences.
+    </p>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- WHY NOT DOCKER -->
+  <!-- ============================================ -->
+  <section>
+    <h2 style="margin-bottom: 0.2em;">Can't we just use <span class="muted">Docker?</span></h2>
+    <table style="font-size: 0.55em; margin: 0.3em 0;">
+      <thead>
+        <tr>
+          <th style="padding: 0.35em 0.6em;">Capability</th>
+          <th style="padding: 0.35em 0.6em;">Docker / Podman</th>
+          <th style="padding: 0.35em 0.6em;">isx</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">Init system (systemd)</td>
+          <td style="padding: 0.25em 0.6em;" class="danger">No</td>
+          <td style="padding: 0.25em 0.6em;" class="success">Yes</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">Real networking (ping, strace)</td>
+          <td style="padding: 0.25em 0.6em;" class="danger">No</td>
+          <td style="padding: 0.25em 0.6em;" class="success">Yes</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">Nested containers</td>
+          <td style="padding: 0.25em 0.6em;" class="danger">Fragile</td>
+          <td style="padding: 0.25em 0.6em;" class="success">Native</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">dnf / apt install</td>
+          <td style="padding: 0.25em 0.6em;" class="accent2">Limited</td>
+          <td style="padding: 0.25em 0.6em;" class="success">Full OS</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">CoW branching</td>
+          <td style="padding: 0.25em 0.6em;" class="danger">No</td>
+          <td style="padding: 0.25em 0.6em;" class="success">Instant</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">Composable tooling</td>
+          <td style="padding: 0.25em 0.6em;" class="danger">Dockerfile layers</td>
+          <td style="padding: 0.25em 0.6em;" class="success">Declarative YAML tools</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">Host integration</td>
+          <td style="padding: 0.25em 0.6em;" class="danger">DIY</td>
+          <td style="padding: 0.25em 0.6em;" class="success">ssh, git fetch, IDE &mdash; just work</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">Credential isolation</td>
+          <td style="padding: 0.25em 0.6em;" class="danger">Manual</td>
+          <td style="padding: 0.25em 0.6em;" class="success">Built-in</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="fragment muted" style="font-size: 0.65em; margin-top: 0.4em;">
+      Docker builds minimal images for deploying apps. isx builds full dev environments for agents to work in.
+    </p>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- THE ISX MODEL -->
+  <!-- ============================================ -->
+  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.06) 0%, var(--bg) 70%)">
+    <div class="section-number">01</div>
+    <h2>The <span class="accent">isx</span> model</h2>
+    <h3>Onboard agents like you'd onboard a teammate</h3>
+  </section>
+
+  <section>
+    <h2>Three pillars</h2>
+    <div class="feature-grid">
+      <div class="feature-card" style="grid-column: 1 / -1;">
+        <h4>A real machine of their own</h4>
+        <p>Full Linux workstation &mdash; own filesystem, init, networking, process tree. Everything works because it <em>is</em> a real system.
+           Sudo works without a password &mdash; the agent can install any package, start services, tune sysctl, run Docker Compose, use strace. Full autonomy, zero babysitting.</p>
+      </div>
+      <div class="feature-card orange">
+        <h4>Zero credential exposure</h4>
+        <p>API keys and tokens never enter the environment in any form. A host-side TLS proxy injects credentials upstream.</p>
+      </div>
+      <div class="feature-card purple">
+        <h4>Disposable in seconds</h4>
+        <p>Branch a template like you'd branch a repo &mdash; instant CoW clones. Use them, throw them away, branch again.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="statement" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 186, 128, 0.06) 0%, var(--bg) 70%)">
+    <h2><span class="success">Total freedom</span> inside the sandbox</h2>
+    <p class="fragment" style="font-size: 0.8em; margin-top: 0.8em;">
+      The agent has root. It can install anything, change anything, break anything.
+    </p>
+    <p class="fragment" style="font-size: 0.8em; margin-top: 0.4em;">
+      And there is <span class="accent bold">nothing of value to steal</span>.
+      <span class="muted">No real keys. No real tokens. No credentials worth selling.</span>
+    </p>
+    <p class="fragment" style="font-size: 0.8em; margin-top: 0.4em;">
+      The agent taints its own storage &mdash; but it's a <span class="accent3 bold">cheap CoW branch</span>.
+      <span class="muted">Destroy it. Branch a fresh one in seconds. The template stays clean.</span>
+    </p>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- CREDENTIAL ISOLATION -->
+  <!-- ============================================ -->
+  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(212, 168, 75, 0.06) 0%, var(--bg) 70%)">
+    <div class="section-number">02</div>
+    <h2>Credential <span class="accent2">Isolation</span></h2>
+    <h3>The standout feature</h3>
+  </section>
+
+  <section>
+    <h2>The problem with credentials</h2>
+    <ul>
+      <li class="fragment">Env vars? <span class="danger">Readable by any process</span></li>
+      <li class="fragment">Mounted files? <span class="danger">Cat-able, exfiltrable</span></li>
+      <li class="fragment">Credential helpers? <span class="danger">Agent can call them</span></li>
+      <li class="fragment">BASE_URL wrappers? <span class="danger">Agent can bypass them</span></li>
+    </ul>
+    <p class="fragment" style="margin-top: 1.5em;">
+      Every approach that puts credentials <em>inside</em> the container<br>
+      leaves an <span class="danger bold">attack surface inside the container</span>.
+    </p>
+  </section>
+
+  <section>
+    <h2>isx: credentials <span class="accent">never enter</span></h2>
+    <div class="diagram" style="font-size: 0.55em; text-align: center;">
+      <div style="margin-bottom: 1.2em;">
+        <span class="box danger-box" style="min-width: 12em;">
+          Container<br>
+          <span style="font-size: 0.85em; color: var(--text-muted);">holds only: <code>sk-ant-placeholder</code></span>
+        </span>
+      </div>
+      <div style="margin-bottom: 0.5em; color: var(--text-muted);">
+        &darr;&nbsp; HTTPS request with placeholder token
+      </div>
+      <div style="margin-bottom: 0.5em;">
+        <span class="box success-box" style="min-width: 14em;">
+          Host-side MITM Proxy<br>
+          <span style="font-size: 0.85em; color: var(--text-muted);">terminates TLS &bull; injects real credentials &bull; re-encrypts</span>
+        </span>
+      </div>
+      <div style="margin-bottom: 0.5em; color: var(--text-muted);">
+        &darr;&nbsp; Real auth header injected
+      </div>
+      <div>
+        <span class="box" style="min-width: 12em;">
+          Upstream API<br>
+          <span style="font-size: 0.85em; color: var(--text-muted);">api.anthropic.com, github.com, &hellip;</span>
+        </span>
+      </div>
+    </div>
+    <p class="muted" style="font-size: 0.7em; text-align: center;">
+      Real credentials are never given to the container &mdash; the injection happens entirely outside.
+    </p>
+  </section>
+
+  <section>
+    <h2>What works transparently</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>claude / pi / bob</h4>
+        <p>AI coding agents authenticate without knowing real keys</p>
+      </div>
+      <div class="feature-card orange">
+        <h4>gh / git push</h4>
+        <p>GitHub PAT injected on HTTPS git operations</p>
+      </div>
+      <div class="feature-card purple">
+        <h4>curl / any HTTPS</h4>
+        <p>Custom tools get proxy rules via YAML declarations</p>
+      </div>
+      <div class="feature-card green">
+        <h4>Vertex AI</h4>
+        <p>Automatic API format translation &mdash; no GCP creds in container</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- COW BRANCHING -->
+  <!-- ============================================ -->
+  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(167, 139, 218, 0.06) 0%, var(--bg) 70%)">
+    <div class="section-number">03</div>
+    <h2>Copy-on-Write <span class="accent3">Branching</span></h2>
+    <h3>The git metaphor for environments</h3>
+  </section>
+
+  <section>
+    <h2>You know <span class="muted">git worktrees</span></h2>
+    <p style="font-size: 0.85em; margin-bottom: 1em;">
+      Worktrees let you check out multiple branches side by side &mdash; each gets its own working directory. Great for parallel work on source code.
+    </p>
+    <p class="fragment" style="font-size: 0.85em; margin-bottom: 1em;">
+      But a worktree only isolates <span class="accent3 bold">files in the repo</span>. Everything else is shared:
+    </p>
+    <ul>
+      <li class="fragment"><span class="danger bold">Dependencies</span> &mdash; node_modules, ~/.m2, pip packages, SNAPSHOT JARs</li>
+      <li class="fragment"><span class="danger bold">Installed software</span> &mdash; JDK version, system libraries, CLI tools</li>
+      <li class="fragment"><span class="danger bold">Running services</span> &mdash; databases, Docker containers, dev servers</li>
+      <li class="fragment"><span class="danger bold">Ports &amp; networking</span> &mdash; port 8080 is port 8080 is port 8080</li>
+    </ul>
+  </section>
+
+  <section class="statement">
+    <h2>isx is <span class="accent3">branching for the entire machine</span></h2>
+    <p class="fragment" style="font-size: 0.9em; margin-top: 1em;">
+      Source code, dependencies, installed packages, running services,<br>
+      open ports, environment variables, the entire filesystem &mdash;<br>
+      <span class="accent3 bold">all isolated, all snapshotted, all instant</span>.
+    </p>
+  </section>
+
+  <section>
+    <h2>Build once, branch instantly</h2>
+    <div class="tree">
+      <span class="accent">tpl-java</span>  <span class="muted">(stopped template, ~2 GB)</span><br>
+      &nbsp;&nbsp;├── <span class="success">fix-nasty-bug</span>    <span class="muted">(running, ~50 MB extra)</span><br>
+      &nbsp;&nbsp;├── <span class="success">review-pr-423</span>    <span class="muted">(running, ~30 MB extra)</span><br>
+      &nbsp;&nbsp;└── <span class="muted">experiment</span>        <span class="muted">(stopped, ~10 MB extra)</span>
+    </div>
+    <ul>
+      <li class="fragment">Branch = instant CoW clone (btrfs/zfs/lvm)</li>
+      <li class="fragment">Each branch has its own independent filesystem</li>
+      <li class="fragment">Install packages, break things &mdash; destroy when done</li>
+      <li class="fragment">Template and other branches are <span class="accent bold">completely unaffected</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 style="margin-bottom: 0.2em;">Storage: <span class="accent3">shared, not copied</span> &mdash; but isolated</h2>
+    <div class="diagram" style="font-size: 0.48em; padding: 0.8em;">
+      <div style="margin-bottom: 0.6em;">
+        <span class="box" style="min-width: 18em;">
+          <span class="accent3">Shared base blocks</span> &mdash; stored <strong>once</strong> (~2 GB)
+        </span>
+      </div>
+      <div style="display: flex; justify-content: center; gap: 0.6em; flex-wrap: wrap;">
+        <span class="box success-box">fix-bug <span style="color: var(--text-muted);">~50 MB</span></span>
+        <span class="box success-box">review-pr <span style="color: var(--text-muted);">~30 MB</span></span>
+        <span class="box success-box">experiment <span style="color: var(--text-muted);">~10 MB</span></span>
+        <span class="box success-box">agent-4 <span style="color: var(--text-muted);">~40 MB</span></span>
+      </div>
+    </div>
+    <div class="feature-grid" style="margin-top: 0.5em;">
+      <div class="feature-card purple">
+        <h4>Without CoW</h4>
+        <p>10 branches &times; 2 GB = <span class="danger bold">20 GB</span></p>
+      </div>
+      <div class="feature-card green">
+        <h4>With CoW</h4>
+        <p>2 GB shared + deltas = <span class="success bold">~2.4 GB</span></p>
+      </div>
+    </div>
+    <p class="fragment muted" style="font-size: 0.6em; margin-top: 0.4em;">
+      Branches share unchanged data at the filesystem level. Each branch only stores its own modifications.
+  </section>
+
+  <section>
+    <h2>Getting work back out</h2>
+    <h3 style="margin-bottom: 0.8em;">Git push &amp; pull &mdash; directly to containers</h3>
+    <pre><code class="language-bash"># The agent works inside the container, makes commits...
+
+# On the host — just use git:
+git fetch fix-auth
+git diff main..fix-auth/main
+git cherry-pick fix-auth/main</code></pre>
+    <ul style="margin-top: 0.8em;">
+      <li class="fragment">isx manages the git remotes automatically &mdash; added on branch, removed on destroy</li>
+      <li class="fragment">You always review a <span class="accent bold">specific, immutable commit</span></li>
+      <li class="fragment">Review each agent's work as you would any teammate's PR</li>
+    </ul>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- TEMPLATES & TOOLS -->
+  <!-- ============================================ -->
+  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 186, 128, 0.06) 0%, var(--bg) 70%)">
+    <div class="section-number">04</div>
+    <h2>Templates <span class="success">&amp;</span> Tools</h2>
+    <h3>Composable, cacheable, declarative</h3>
+  </section>
+
+  <section class="code-slide">
+    <h2>Define a template in YAML</h2>
+    <pre><code class="language-yaml">name: tpl-agent
+description: Isolated dev environment with Claude Code
+parent: tpl-java
+tools:
+  - claude
+  - podman
+  - vscode-remote
+repos:
+  - url: https://github.com/myorg/myproject.git
+    path: ~/myproject
+    prime: mvn -B dependency:go-offline
+workdir: ~/myproject
+default-action: claude</code></pre>
+    <p class="muted" style="font-size: 0.7em;">
+      Templates inherit from parents. Tools compose independently. Downloads are cached on the host.
+    </p>
+  </section>
+
+  <section>
+    <h2>Built-in tools</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>AI Agents</h4>
+        <p>claude, pi, bob, codex</p>
+      </div>
+      <div class="feature-card orange">
+        <h4>Build Tools</h4>
+        <p>maven, mvnd, gradle, podman</p>
+      </div>
+      <div class="feature-card purple">
+        <h4>IDE Integration</h4>
+        <p>VS Code Remote, JetBrains Gateway</p>
+      </div>
+      <div class="feature-card green">
+        <h4>Dev Infra</h4>
+        <p>sshd, tmux, zmx, starship</p>
+      </div>
+    </div>
+    <p class="fragment muted" style="font-size: 0.75em; margin-top: 1em;">
+      Define your own tools as YAML &mdash; packages, downloads, proxy rules, TUI actions.
+    </p>
+  </section>
+
+  <section>
+    <h2>Host resources</h2>
+    <pre><code class="language-yaml">host-resources:
+  - source: ~/.gitconfig         # your aliases, identity, settings
+    mode: readonly               # default — safe, read-only
+  - source: ~/datasets/training
+    mode: overlay                # read-only base + writable layer</code></pre>
+    <div class="feature-grid" style="margin-top: 0.8em;">
+      <div class="feature-card">
+        <h4>readonly</h4>
+        <p>Read-only bind mount. Share config files, reference data.</p>
+      </div>
+      <div class="feature-card orange">
+        <h4>overlay</h4>
+        <p>Host data + ephemeral writable layer. Agent sees read-write; host is fully protected.</p>
+      </div>
+    </div>
+    <p class="fragment muted" style="font-size: 0.7em; margin-top: 0.8em;">
+      Share config, datasets, or large assets without copying into every branch.
+    </p>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- WORKFLOW -->
+  <!-- ============================================ -->
+  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.06) 0%, var(--bg) 70%)">
+    <div class="section-number">05</div>
+    <h2>The <span class="accent">Workflow</span></h2>
+    <h3>From setup to review</h3>
+  </section>
+
+  <section>
+    <h2>Day-to-day flow</h2>
+    <div class="diagram" style="font-size: 0.46em; padding: 0.6em 0.8em; text-align: left;">
+      <div style="display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.5em;">
+        <span style="color: var(--text-muted); min-width: 5em;">once</span>
+        <span class="box"><strong>isx build tpl-java</strong> <span style="color: var(--text-muted);">&mdash; install deps, clone repos, configure tools</span></span>
+      </div>
+      <div style="padding-left: 5.5em; color: var(--text-muted); margin-bottom: 0.3em;">&darr; branch as many times as you need</div>
+      <div style="display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.3em;">
+        <span style="color: var(--text-muted); min-width: 5em;">parallel</span>
+        <span class="box" style="min-width: 9em;"><strong>isx branch</strong> fix-auth</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="box success-box">agent codes &bull; tests &bull; commits</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="box">review</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="box danger-box">destroy</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.3em;">
+        <span style="min-width: 5em;"></span>
+        <span class="box" style="min-width: 9em;"><strong>isx branch</strong> add-tests</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="box success-box">agent codes &bull; tests &bull; commits</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="box">review</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="box danger-box">destroy</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5em;">
+        <span style="min-width: 5em;"></span>
+        <span class="box" style="min-width: 9em;"><strong>isx branch</strong> refactor</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="box success-box">agent codes &bull; tests &bull; commits</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="box">review</span>
+        <span style="color: var(--text-muted);">&rarr;</span>
+        <span class="box danger-box">destroy</span>
+      </div>
+    </div>
+    <p class="muted" style="font-size: 0.65em; margin-top: 0.5em;">
+      Dependencies are installed once in the template &mdash; every branch starts with them already in place.
+    </p>
+  </section>
+
+  <section>
+    <h2>Network modes</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Mode</th>
+          <th>Flag</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="success bold">Full internet</span></td>
+          <td><span class="muted">(default)</span></td>
+          <td>Unrestricted access, auth via proxy</td>
+        </tr>
+        <tr>
+          <td><span class="accent2 bold">Proxy only</span></td>
+          <td><span class="kw">--proxy-only</span></td>
+          <td>Traffic restricted to MITM proxy only</td>
+        </tr>
+        <tr>
+          <td><span class="danger bold">Airgapped</span></td>
+          <td><span class="kw">--airgap</span></td>
+          <td>Network device removed, total isolation</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Runtime modes</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Mode</th>
+          <th>Flag</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="success bold">Container</span></td>
+          <td><span class="muted">(default)</span></td>
+          <td>System container &mdash; shared kernel, near-native speed, instant startup</td>
+        </tr>
+        <tr>
+          <td><span class="accent2 bold">VM</span></td>
+          <td><span class="kw">--type vm</span></td>
+          <td>Full virtual machine &mdash; separate kernel, hardware-level isolation</td>
+        </tr>
+        <tr>
+          <td><span class="accent3 bold">KVM</span></td>
+          <td><span class="kw">--type kvm</span></td>
+          <td>VM with /dev/kvm passthrough &mdash; nested virtualization inside the VM</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="fragment muted" style="font-size: 0.65em; margin-top: 0.6em;">
+      Containers are the practical default &mdash; near-native performance, instant CoW branching, minimal overhead.
+      VMs add kernel-level separation as defense in depth &mdash; for higher security requirements or compliance mandates.
+    </p>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- FEATURE HIGHLIGHTS -->
+  <!-- ============================================ -->
+  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.06) 0%, var(--bg) 70%)">
+    <div class="section-number">06</div>
+    <h2>Feature <span class="accent">Highlights</span></h2>
+    <h3>The things that make daily use great</h3>
+  </section>
+
+  <section>
+    <h2>Git push &amp; pull <span class="accent">to containers</span></h2>
+    <p style="font-size: 0.85em; margin-bottom: 0.8em;">
+      Standard <span class="kw">git fetch</span>, <span class="kw">git push</span>, <span class="kw">git pull</span> &mdash; isx handles all the wiring.
+    </p>
+    <pre><code class="language-bash"># Agent commits inside the container...
+# On the host — review and cherry-pick, just like any teammate's work:
+git fetch fix-auth
+git diff main..fix-auth/main
+git cherry-pick fix-auth/main</code></pre>
+    <div class="feature-grid" style="margin-top: 1em;">
+      <div class="feature-card">
+        <h4>Fully managed</h4>
+        <p>Remotes are added on branch, removed on destroy &mdash; zero manual setup</p>
+      </div>
+      <div class="feature-card orange">
+        <h4>Immutable snapshots</h4>
+        <p>You act on a specific commit, not a live directory the agent can still change</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Prudent <span class="success">caching</span></h2>
+    <p style="font-size: 0.7em; margin-bottom: 0.4em;">
+      The same dependency is <span class="success bold">never downloaded twice</span>.
+      Ten branches pulling the same deps? One download.
+      But only artifacts we can guarantee are correct are cached &mdash; mutable data always passes through.
+    </p>
+    <table style="font-size: 0.55em; margin: 0.3em 0;">
+      <thead>
+        <tr>
+          <th style="padding: 0.3em 0.6em;">What</th>
+          <th style="padding: 0.3em 0.6em;">How it's verified</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">Maven &amp; Gradle artifacts</td>
+          <td style="padding: 0.25em 0.6em;">Only properly signed releases &mdash; SNAPSHOTs and metadata pass through</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">Container image layers</td>
+          <td style="padding: 0.25em 0.6em;">OCI content digest &mdash; immutable by design</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">Tool downloads</td>
+          <td style="padding: 0.25em 0.6em;">Verified against declared SHA256 checksum</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.25em 0.6em;">DNF packages</td>
+          <td style="padding: 0.25em 0.6em;">Host-side cache shared across builds</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>IDE integration: <span class="accent3">your editor, their machine</span></h2>
+    <div class="feature-grid">
+      <div class="feature-card purple">
+        <h4>VS Code Remote</h4>
+        <p>One-click from TUI (F9). VS Code downloads its server on first connect.</p>
+      </div>
+      <div class="feature-card orange">
+        <h4>JetBrains Gateway</h4>
+        <p>IntelliJ backend pre-installed. Full indexing, debugging, refactoring &mdash; inside.</p>
+      </div>
+    </div>
+    <p style="font-size: 0.7em; margin-top: 0.6em;">
+      SSH keys are fully managed &mdash; <span class="kw">ssh my-branch</span> just works, no passphrase prompt, no host key warning.
+    </p>
+  </section>
+
+  <section>
+    <h2>The <span class="accent">TUI</span></h2>
+    <p style="font-size: 0.85em; margin-bottom: 0.8em;">
+      Not a list command &mdash; an interactive interface you live in.
+    </p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>At a glance</h4>
+        <p>Templates, branches, status, per-row disk usage, storage gauge &mdash; all in one view</p>
+      </div>
+      <div class="feature-card orange">
+        <h4>Modal dialogs</h4>
+        <p>Branch, rename, build &mdash; with keyboard-driven UI and inline validation</p>
+      </div>
+      <div class="feature-card purple">
+        <h4>F-key actions</h4>
+        <p>F3 details &bull; F9 tool actions (open IDE, launch agent) &bull; C to reclaim space</p>
+      </div>
+      <div class="feature-card green">
+        <h4>Build status</h4>
+        <p><span class="kw">!</span> = different isx version &bull; <span class="kw">&#x25B3;</span> = definition changed since last build</p>
+      </div>
+    </div>
+    <p class="fragment muted" style="font-size: 0.7em; margin-top: 0.8em;">
+      Launch it with just <span class="kw">isx</span> &mdash; no arguments needed.
+    </p>
+  </section>
+
+  <section class="code-slide">
+    <h2 style="margin-bottom: 0.2em;">Custom proxy credentials <span class="accent2">for any service</span></h2>
+    <p style="font-size: 0.7em; margin-bottom: 0.3em;">
+      Declare a YAML tool &mdash; any HTTPS API gets transparent auth, no config inside containers.
+    </p>
+    <pre><code class="language-yaml">name: artifactory
+proxy:
+  config-namespace: artifactory
+  configuration:
+    token: { config-path: "token", secret: true }
+  auth:
+    - domains: [artifactory.internal.example.com]
+      type: bearer
+      token: "${token}"</code></pre>
+    <p class="muted" style="font-size: 0.6em; margin-top: 0.3em;">
+      Supports <span class="kw">bearer</span>, <span class="kw">basic</span>, and custom <span class="kw">header</span> auth.
+      Wildcard domains supported. <span class="kw">isx init</span> prompts for credentials.
+    </p>
+  </section>
+
+  <section>
+    <h2>Session persistence: <span class="accent">zmx</span></h2>
+    <p style="font-size: 0.85em; margin-bottom: 0.8em;">
+      Persistent terminal sessions that survive disconnections &mdash; with native scrollback and multi-client support.
+    </p>
+    <pre><code class="language-bash"># Sessions appear natively on the host (Linux)
+zmx list                        # shows isx-my-branch
+zmx attach isx-my-branch        # attach from the host
+zmx history isx-my-branch       # view scrollback
+zmx run isx-my-branch git status # run a command</code></pre>
+    <ul style="margin-top: 0.8em;">
+      <li class="fragment">Auto-attaches on shell entry &mdash; every session is persistent by default</li>
+      <li class="fragment">Long-running agents keep working if you disconnect</li>
+      <li class="fragment">Container sessions share via socket directory &mdash; no extra config</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Agent-agnostic</h2>
+    <p style="font-size: 0.75em; margin-bottom: 0.6em;">
+      isx is not tied to one AI agent. The proxy and tooling work with any agent that speaks HTTPS.
+    </p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>Claude Code</h4>
+        <p>Anthropic's coding CLI &mdash; all auth modes (API key, OAuth, Vertex)</p>
+      </div>
+      <div class="feature-card orange">
+        <h4>Pi</h4>
+        <p>Provider-agnostic CLI agent &mdash; uses standard Anthropic API</p>
+      </div>
+      <div class="feature-card purple">
+        <h4>Bob Shell</h4>
+        <p>IBM's AI assistant &mdash; API key injected via proxy</p>
+      </div>
+      <div class="feature-card green">
+        <h4>Codex / any HTTPS agent</h4>
+        <p>Custom proxy rules for any service &mdash; add your own in YAML</p>
+      </div>
+    </div>
+    <p class="fragment muted" style="font-size: 0.6em; margin-top: 0.5em;">
+      Add an agent to a template with one line: <span class="kw">tools: [claude]</span>.
+      The proxy handles auth transparently for all of them.
+    </p>
+  </section>
+
+  <section>
+    <h2 style="margin-bottom: 0.3em;">Self-diagnosing: <span class="accent">isx doctor</span></h2>
+    <p style="font-size: 0.75em; margin-bottom: 0.6em;">
+      When something isn't right, <span class="kw">isx doctor</span> checks everything and offers to fix what it finds.
+    </p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>Host checks</h4>
+        <p>Incus, storage pool, firewall, bridge configuration</p>
+      </div>
+      <div class="feature-card orange">
+        <h4>Proxy checks</h4>
+        <p>Service status, port availability, certificate validity</p>
+      </div>
+      <div class="feature-card purple">
+        <h4>Deep mode</h4>
+        <p><span class="kw">--deep</span> runs per-instance checks: DNS, TLS, resolv.conf</p>
+      </div>
+      <div class="feature-card green">
+        <h4>Support bundle</h4>
+        <p><span class="kw">--bundle</span> collects findings and logs into a redacted archive</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- DEMO -->
+  <!-- ============================================ -->
+  <section class="demo-marker" data-background-gradient="linear-gradient(135deg, rgba(109, 169, 228, 0.1), rgba(167, 139, 218, 0.1))">
+    <h2>&#9654; Demo</h2>
+    <p>Build &bull; Branch &bull; Work &bull; Review &bull; Destroy</p>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- VISION -->
+  <!-- ============================================ -->
+  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.06) 0%, var(--bg) 70%)">
+    <div class="section-number">07</div>
+    <h2>The <span class="accent">Vision</span></h2>
+    <h3>Where isx is heading</h3>
+  </section>
+
+  <section class="statement">
+    <h2>Agents are <span class="accent">principals</span>,<br>not processes</h2>
+    <p class="fragment muted" style="font-size: 0.9em; margin-top: 1em;">
+      Own identity &bull; own credentials &bull; own audit trail
+    </p>
+  </section>
+
+  <section>
+    <h2>The proxy is the control plane</h2>
+    <p style="font-size: 0.85em; margin-bottom: 1em;">
+      Every API call every agent makes passes through it. Zero instrumentation inside containers.
+    </p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>Activity</h4>
+        <p>Is the agent streaming, waiting for input, or stuck?</p>
+      </div>
+      <div class="feature-card orange">
+        <h4>Spend</h4>
+        <p>Live token usage per agent, attributable per container</p>
+      </div>
+      <div class="feature-card purple">
+        <h4>Audit</h4>
+        <p>Complete record of what each agent did with its identity</p>
+      </div>
+      <div class="feature-card green">
+        <h4>Policy &amp; routing</h4>
+        <p>Per-agent budget caps, domain allowlists &mdash; and route requests to different models per container</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>TUI &rarr; Mission Control</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>isx Primitive</th>
+          <th>Mission Control Meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Template</td>
+          <td>Standardized workstation for every agent</td>
+        </tr>
+        <tr>
+          <td>Branch</td>
+          <td>One agent, one task, one disposable machine</td>
+        </tr>
+        <tr>
+          <td>Per-container profile</td>
+          <td>Agent's identity: token, signing key, budget</td>
+        </tr>
+        <tr>
+          <td>Git remote</td>
+          <td>The deliverable &mdash; an immutable commit you review before merging</td>
+        </tr>
+        <tr>
+          <td>Destroy</td>
+          <td>Offboarding: everything cleaned up atomically</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- LOCAL FIRST -->
+  <!-- ============================================ -->
+  <section class="statement" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.06) 0%, var(--bg) 70%)">
+    <h2>Local-first,<br><span class="accent">by conviction</span></h2>
+    <p class="fragment muted" style="font-size: 0.9em; margin-top: 1em;">
+      Your hardware. Your network. Your repos.<br>Nothing leaves the building.
+    </p>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- GETTING STARTED -->
+  <!-- ============================================ -->
+  <section>
+    <h2>Installation</h2>
+    <pre><code class="language-bash"># Fedora / RHEL
+sudo dnf copr enable sanne/incus-spawn
+sudo dnf install incus-spawn
+
+# macOS
+brew install Sanne/tap/incus-spawn
+
+# Ubuntu / Debian — APT repo available
+# Any Linux — single native binary, no JVM:
+curl -fsSL https://isx.run | sh
+
+# Already have a JVM? One-liner via JBang:
+jbang app install isx@Sanne/incus-spawn</code></pre>
+    <p class="muted" style="font-size: 0.65em; margin-top: 0.5em;">
+      On macOS, isx automatically provisions a custom lightweight Linux appliance &mdash;
+      no Docker Desktop, no manual VM setup.
+    </p>
+  </section>
+
+  <section>
+    <h2>Initial setup</h2>
+    <pre><code class="language-bash"># One command sets up Incus, firewall, auth, proxy, SSH keys
+isx init
+
+# Build a template
+isx build tpl-java
+
+# Branch and work
+isx branch my-feature --from tpl-java
+
+# Or launch the TUI
+isx</code></pre>
+    <p class="muted" style="font-size: 0.65em; margin-top: 0.5em;">
+      <span class="kw">isx init</span> walks you through everything interactively &mdash; credentials, proxy setup, base image.
+    </p>
+  </section>
+
+  <section>
+    <h2>Got questions? <span class="accent">Ask isx</span></h2>
+    <p style="font-size: 0.85em; margin-bottom: 0.8em;">
+      Built-in AI-powered help &mdash; just ask in plain English.
+    </p>
+    <pre><code class="language-bash">isx ask "how do I restrict network access for a branch"
+
+isx ask "which of my templates have Claude Code installed" --with-templates</code></pre>
+    <p class="muted" style="font-size: 0.65em; margin-top: 0.8em;">
+      <span class="kw">--with-templates</span> includes your template and tool definitions for context-aware answers.
+    </p>
+  </section>
+
+  <section>
+    <h2>Built with</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>Java 25</h4>
+        <p>Modern Java &mdash; virtual threads, pattern matching, records</p>
+      </div>
+      <div class="feature-card orange">
+        <h4><a href="https://quarkus.io/" style="color: var(--accent2); text-decoration: none;">Quarkus</a></h4>
+        <p>Supersonic Subatomic Java framework &mdash; CDI, fast startup, native-ready</p>
+      </div>
+      <div class="feature-card purple">
+        <h4><a href="https://www.graalvm.org/" style="color: var(--accent3); text-decoration: none;">GraalVM</a></h4>
+        <p>Ahead-of-time compiled native binaries &mdash; instant startup, no JVM required</p>
+      </div>
+      <div class="feature-card green">
+        <h4><a href="https://tamboui.dev/" style="color: var(--success); text-decoration: none;">Tamboui</a> &amp; <a href="https://github.com/aeshell/aesh" style="color: var(--success); text-decoration: none;">Aesh</a></h4>
+        <p>Terminal UI framework and CLI command engine &mdash; powering the interactive TUI</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- CLOSING -->
+  <!-- ============================================ -->
+  <section class="statement" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.1) 0%, var(--bg) 70%)">
+    <h2 style="font-size: 2.2em;"><span class="accent">Their machines.</span><br>Your machine.</h2>
+    <p style="margin-top: 2em; font-size: 0.9em;">
+      <span class="kw">isx.run</span>
+    </p>
+  </section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    progress: true,
+    center: false,
+    width: 1100,
+    height: 700,
+    margin: 0.08,
+    minScale: 0.2,
+    maxScale: 1.5,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'fade',
+    plugins: [RevealHighlight, RevealNotes]
+  });
+</script>
+
+</body>
+</html>
