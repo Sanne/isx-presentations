@@ -8,74 +8,166 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
 
+    /* ==========================================================
+       DESIGN TOKENS
+       Canvas is 1280x720. Every size below is in canvas pixels,
+       never em, so a "caption" is the same size on every slide.
+       ========================================================== */
     :root {
-      --bg: #0f1729;
-      --surface: #182038;
-      --accent: #6da9e4;
-      --accent2: #d4a84b;
-      --accent3: #a78bda;
-      --danger: #d96070;
-      --success: #6dba80;
-      --text: #d8dce8;
-      --text-muted: #7d88a0;
+      /* palette — midnight blue */
+      /* Three chromatic roles, used semantically and never decoratively:
+         accent = isx and anything affirmative, warn = partial or
+         conditional, danger = a genuine threat. A slide title highlights in
+         accent; only the problem slides highlight in danger. If a colour
+         isn't carrying one of those meanings, it doesn't appear. */
+      --bg:          #070b14;
+      --surface:     #0e1626;
+      --surface-2:   #131f35;
+      --line:        #1e2c49;
+      --accent:      #22d3ee;
+      --accent-soft: rgba(34, 211, 238, 0.11);
+      --accent-edge: rgba(34, 211, 238, 0.38);
+      --warn:        #f5a524;
+      --danger:      #ff4d6d;
+      --text:        #e6edf7;
+      --text-muted:  #8b98b0;
+      --glow:        0 0 14px rgba(34, 211, 238, 0.45);
+
+      /* type scale */
+      --fs-display:   132px;  /* title wordmark            */
+      --fs-statement:  58px;  /* full-bleed statement       */
+      --fs-section:    56px;  /* section divider            */
+      --fs-title:      42px;  /* slide heading (h2)         */
+      --fs-lead:       27px;  /* intro line under a heading */
+      --fs-body:       27px;  /* paragraphs, list items     */
+      --fs-caption:    21px;  /* footnotes, muted asides    */
+      --fs-card-head:  25px;
+      --fs-card-body:  19px;
+      --fs-table:      20px;
+      --fs-table-head: 17px;
+      --fs-code:       19px;
+      --fs-diagram:    19px;
+      --fs-kicker:     19px;
+
+      /* rhythm */
+      --gap-xs:  8px;
+      --gap-sm: 14px;
+      --gap-md: 20px;
+      --gap-lg: 30px;
+
+      --canvas-h: 720px;   /* keep in sync with Reveal.initialize height */
+      --pad-slide: 34px 56px;
+      --radius: 10px;
     }
 
+    /* ==========================================================
+       BASE
+       ========================================================== */
     .reveal {
       font-family: 'Inter', system-ui, sans-serif;
+      font-size: var(--fs-body);
       color: var(--text);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .reveal .slides {
-      text-align: left;
-    }
+    .reveal .slides { text-align: left; }
 
-    .reveal .slides section {
-      padding: 20px 40px;
+    /* Layout lives on an inner wrapper, never on <section> itself, so reveal
+       keeps sole control of the section's `display` and we need no
+       !important. Putting it on `section.present` instead caused a visible
+       glitch: the outgoing slide loses .present the instant you navigate, so
+       its padding and centring vanished and its title snapped to the top-left
+       corner where it then sat, fully opaque, for the whole 400ms fade-out. */
+    .reveal .slides > section { padding: 0; }
+
+    .slide-inner {
+      display: flex;
+      flex-direction: column;
+      /* matches the height passed to Reveal.initialize below */
+      min-height: var(--canvas-h);
+      padding: var(--pad-slide);
       box-sizing: border-box;
     }
+
+    .center-slide .slide-inner {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Content slides are three fixed zones: the heading is anchored to the
+       top, .note is pinned to the bottom, and .body fills the space between.
+       So across every slide the title, the first line of content and the
+       footnote each start at the same y. */
+    .slide-inner > .body {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Optical rather than geometric centring: leftover space splits about
+       2:3 above and below the content, so it sits just above the true
+       middle where the eye expects it, instead of drifting away from its
+       heading. Both spacers have flex-basis 0, so on a full slide they
+       collapse to nothing and cost no height -- which fixed-size padding
+       could not do without overflowing the densest slides. */
+    .slide-inner > .body::before { content: ''; flex: 2 1 0; min-height: 0; }
+    .slide-inner > .body::after  { content: ''; flex: 3 1 0; min-height: 0; }
+
+    /* Spacing between the real blocks. Uses margins rather than `gap` so the
+       two pseudo-element spacers above don't each add a gap of their own;
+       `*` never matches a pseudo-element, so they're skipped here. */
+    .slide-inner > .body > * + * { margin-top: var(--gap-md); }
 
     .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
       font-family: 'Inter', system-ui, sans-serif;
       font-weight: 600;
       text-transform: none;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.015em;
       color: var(--text);
+      margin: 0;
     }
 
-    .reveal h1 {
-      font-size: 2.6em;
-      line-height: 1.05;
-    }
-
+    /* Slide heading — one size, one position, on every content slide. */
     .reveal h2 {
-      font-size: 1.8em;
-      line-height: 1.1;
-      margin-bottom: 0.4em;
+      font-size: var(--fs-title);
+      line-height: 1.12;
+      margin-bottom: var(--gap-md);
     }
 
-    .reveal h3 {
-      font-size: 1.2em;
-      color: var(--text-muted);
-      font-weight: 600;
+    /* Signature accent rule: the constant that ties content slides
+       together. Statement / divider / title slides opt out. */
+    .reveal section:not(.center-slide):not(.section-divider):not(.title-slide) > h2::after {
+      content: '';
+      display: block;
+      width: 54px;
+      height: 3px;
+      margin-top: var(--gap-sm);
+      background: var(--accent);
+      border-radius: 2px;
+      box-shadow: var(--glow);
     }
 
-    .reveal p, .reveal li {
-      font-size: 0.75em;
-      line-height: 1.5;
-    }
+    .reveal p,
+    .reveal li { font-size: var(--fs-body); line-height: 1.5; margin: 0; }
+
+    .reveal p + p { margin-top: var(--gap-sm); }
 
     .reveal ul {
       list-style: none;
       padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-xs);
     }
 
     .reveal ul li {
-      padding: 0.2em 0;
       padding-left: 1.4em;
       position: relative;
     }
@@ -84,85 +176,384 @@
       content: '▸';
       position: absolute;
       left: 0;
+      top: 0;
       color: var(--accent);
-      font-weight: bold;
     }
 
-    .reveal code {
-      font-family: 'JetBrains Mono', monospace;
-    }
+    .reveal a { color: var(--accent); text-decoration: none; }
 
-    .reveal pre {
-      width: 100%;
-      font-size: 0.48em;
-      border-radius: 10px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-      margin: 0.4em 0;
-    }
-
-    .reveal pre code {
-      padding: 0.8em 1.2em;
-      line-height: 1.4;
-      border-radius: 10px;
-      background: var(--surface);
-    }
-
-    .reveal .slides section .fragment.visible {
-      opacity: 1;
-    }
-
-    /* Title slide */
-    .title-slide h1 {
-      font-size: 3.2em;
+    /* ==========================================================
+       TEXT ROLES — used instead of per-slide font-size overrides
+       ========================================================== */
+    .lead {
+      font-size: var(--fs-lead) !important;
+      color: var(--text);
       margin-bottom: 0;
     }
 
+    /* Footnotes pin to the bottom of the slide, so the last line
+       lands in the same place every time. */
+    .note {
+      font-size: var(--fs-caption) !important;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-top: auto !important;
+      padding-top: var(--gap-md);
+    }
+
+    .center-slide .note { margin-top: var(--gap-md) !important; padding-top: 0; }
+
+    .kicker {
+      font-size: var(--fs-kicker);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .accent  { color: var(--accent); }
+    .warn    { color: var(--warn); }
+    .danger  { color: var(--danger); }
+    .muted   { color: var(--text-muted); }
+    .bold    { font-weight: 700; }
+
+    /* Inline code chip */
+    .kw {
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-edge);
+      color: var(--accent);
+      padding: 0.08em 0.4em;
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88em;
+      white-space: nowrap;
+    }
+
+    /* ==========================================================
+       TITLE SLIDE
+       ========================================================== */
+    .title-slide h1 {
+      font-size: var(--fs-display);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      color: var(--text);
+    }
+
     .title-slide .subtitle {
-      font-size: 1.2em;
+      font-size: 34px !important;
       color: var(--accent);
       font-weight: 600;
-      margin-top: 0.3em;
+      margin-top: var(--gap-md);
+      letter-spacing: -0.01em;
     }
 
     .title-slide .tagline {
-      font-size: 0.85em;
+      font-size: var(--fs-lead) !important;
       color: var(--text-muted);
-      margin-top: 1.5em;
+      margin-top: var(--gap-lg);
     }
 
-    /* Accent text */
-    .accent { color: var(--accent); }
-    .accent2 { color: var(--accent2); }
-    .accent3 { color: var(--accent3); }
-    .danger { color: var(--danger); }
-    .success { color: var(--success); }
-    .muted { color: var(--text-muted); }
-    .bold { font-weight: 700; }
-
-    /* Big statement slides */
-    .statement {
-      text-align: center !important;
-      display: flex !important;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
+    /* ==========================================================
+       STATEMENT SLIDES — one idea, one size
+       ========================================================== */
     .statement h2 {
-      font-size: 2.2em;
-      line-height: 1.15;
-      max-width: 16em;
+      font-size: var(--fs-statement);
+      line-height: 1.14;
+      max-width: 17em;
+      margin-bottom: 0;
     }
 
-    /* Diagrams */
+    .statement p {
+      font-size: var(--fs-lead) !important;
+      max-width: 30em;
+      margin-top: var(--gap-md);
+    }
+
+    /* On a big display line, a coloured phrase that straddles a line break
+       reads as one stray tinted word at the end of a line. Keep the phrase
+       whole so it moves to the next line intact, and balance the rag so the
+       lines it leaves behind stay even. */
+    .statement h2 :is(.accent, .danger, .warn),
+    .statement p  :is(.accent, .danger, .warn) {
+      white-space: nowrap;
+    }
+
+    .statement h2,
+    .statement p { text-wrap: balance; }
+
+    /* The closing beat of a statement slide: plain white against the red
+       heading, so it reads deadpan rather than shouting along with it. */
+    .punchline {
+      font-size: var(--fs-lead) !important;
+      color: var(--text);
+      font-weight: 600;
+      margin-top: var(--gap-lg) !important;
+    }
+
+    /* Hero statement: one word carries the idea, so it gets its own line
+       and the framing lines step down out of its way. */
+    .statement h2.hero { max-width: none; }
+
+    .hero-mark {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 46px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--accent);
+    }
+
+    .hero-line {
+      display: block;
+      font-size: 40px;
+      line-height: 1.25;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .hero-word {
+      display: block;
+      font-size: 106px;
+      line-height: 1.08;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      color: var(--accent);
+    }
+
+    /* ==========================================================
+       SECTION DIVIDERS — ghosted number sits behind the title
+       ========================================================== */
+    .section-divider { position: relative; }
+
+    .section-divider .ghost-number {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -54%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 300px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--accent);
+      opacity: 0.07;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .section-divider h2 {
+      position: relative;
+      font-size: var(--fs-section);
+      margin-bottom: var(--gap-sm);
+    }
+
+    .section-divider .section-sub {
+      position: relative;
+      font-size: var(--fs-lead) !important;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================
+       CARD GRID
+       ========================================================== */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap-sm);
+    }
+
+    /* Boxes hug their content and never stretch: a card with two lines in
+       it should be two lines tall. The optical centring on .body is what
+       keeps a short grid from stacking in the top half -- stretching the
+       boxes to do that just left text floating in a tall empty frame. */
+    .card {
+      background: var(--surface);
+      border-radius: 6px;
+      padding: 14px 18px 16px;
+      border-top: 2px solid var(--accent);
+      box-shadow: 0 -7px 18px -12px var(--accent);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .card.span-2 { grid-column: 1 / -1; }
+
+    .card--warn   { border-top-color: var(--warn); }
+    .card--danger { border-top-color: var(--danger); }
+
+    .card h4 {
+      font-size: var(--fs-card-head);
+      margin-bottom: 6px;
+      color: var(--accent);
+      letter-spacing: 0;
+    }
+
+    .card--warn   h4 { color: var(--warn); }
+    .card--danger h4 { color: var(--danger); }
+
+    .card p {
+      font-size: var(--fs-card-body) !important;
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .card a { color: inherit; }
+
+    /* A shell command shown inside a box. Mono, on the page ground rather
+       than the card's, so it reads as something you type. */
+    .cmd {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 17px;
+      line-height: 1.55;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 9px 13px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .card .cmd { margin-top: 10px; }
+    .card .cmd + p { margin-top: 10px; }
+
+    /* The one command everything else depends on. */
+    .cmd-hero {
+      align-self: flex-start;
+      font-size: 27px;
+      color: var(--accent);
+      border-color: var(--accent-edge);
+      padding: 11px 18px;
+    }
+
+    /* "Built with": every card shares one accent, so the consistency comes
+       from the card chrome and the colour variety comes from the logos
+       themselves. Each logo is bounded in BOTH axes -- a wordmark is ~6:1
+       and an icon ~1:1, so capping height alone leaves the square marks
+       looking huge and the wide ones tiny. */
+    .tech-head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-height: 58px;
+      margin-bottom: 10px;
+    }
+
+    /* Logo sizes are set from measured ink, not guessed. A wordmark carries
+       its weight in width, so it needs less height than a square mark to
+       read at the same visual size. Every embedded logo is cropped tight to
+       its ink -- the GraalVM asset shipped with transparent padding that
+       left it filling only a third of its own height, which is why it
+       looked shrunken next to the others. */
+    .tech-head .logo {
+      display: block;
+      width: auto;
+    }
+
+    .logo--mark { height: 56px; }   /* square icons  */
+    .logo--word { height: 38px; }   /* wide wordmarks */
+
+    .tech-name {
+      font-size: var(--fs-card-head);
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .tech-name a { color: inherit; }
+
+    /* ==========================================================
+       TABLES
+       ========================================================== */
+    .reveal table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0;
+    }
+
+    .reveal table th {
+      font-size: var(--fs-table-head);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      font-weight: 700;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 2px solid var(--accent);
+      box-shadow: 0 1px 10px -4px var(--accent);
+    }
+
+    .reveal table td {
+      font-size: var(--fs-table);
+      line-height: 1.4;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    .reveal table tr:last-child td { border-bottom: none; }
+    .reveal table tr:nth-child(even) td { background: rgba(255, 255, 255, 0.025); }
+
+    /* ==========================================================
+       CODE
+       ========================================================== */
+    .reveal code { font-family: 'JetBrains Mono', monospace; }
+
+    .reveal pre {
+      width: 100%;
+      font-size: var(--fs-code);
+      margin: 0;
+      box-shadow: none;
+      border-radius: var(--radius);
+    }
+
+    /* A long listing steps down one notch rather than being trimmed --
+       17px is the same size the .cmd blocks already use and reads fine
+       from the back. */
+    .reveal pre.pre--dense { font-size: 17px; }
+
+    .reveal pre code {
+      padding: 16px 20px;
+      line-height: 1.55;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      max-height: none;
+      overflow: visible;
+      color: var(--text);
+    }
+
+    /* Deliberately flat syntax colouring. A real highlighter theme picks out
+       whatever its grammar calls a keyword -- in bash that meant `enable` and
+       `history` lit up purely for being shell builtins, which tells the
+       audience nothing and draws the eye to the wrong word. Every token is
+       therefore one colour; only comments differ, because that distinction
+       carries meaning. highlight.js still runs, but only to find the
+       comments. */
+    .reveal pre code span {
+      color: inherit;
+      font-style: normal;
+      font-weight: inherit;
+    }
+
+    .reveal pre code .hljs-comment,
+    .reveal pre code .hljs-quote {
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================
+       DIAGRAMS — one font size for all of them
+       ========================================================== */
     .diagram {
       background: var(--surface);
-      border-radius: 12px;
-      padding: 1.2em;
-      margin: 0.6em 0;
+      border-radius: var(--radius);
+      padding: 20px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.52em;
-      line-height: 1.6;
+      font-size: var(--fs-diagram);
+      line-height: 1.5;
       text-align: center;
     }
 
@@ -170,228 +561,129 @@
       display: inline-block;
       border: 2px solid var(--accent);
       border-radius: 8px;
-      padding: 0.4em 1em;
-      margin: 0.2em;
+      padding: 8px 16px;
+      background: var(--surface-2);
     }
 
-    .diagram .box.danger-box {
-      border-color: var(--danger);
-    }
+    .diagram .box.danger-box  { border-color: var(--danger); }
 
-    .diagram .box.success-box {
-      border-color: var(--success);
-    }
+    .diagram .sub { font-size: 16px; color: var(--text-muted); }
+    .diagram .link { color: var(--text-muted); font-size: 16px; padding: 10px 0; }
 
-    .diagram .arrow {
-      color: var(--text-muted);
-      margin: 0 0.5em;
-    }
+    /* vertical stack of diagram steps */
+    .diagram.stack-flow { display: flex; flex-direction: column; align-items: center; }
 
-    /* Cards / feature boxes */
-    .feature-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8em;
-      margin-top: 0.6em;
-    }
+    /* SVG flow diagram — real arrowheads, and text sized in viewBox units
+       so it scales with the canvas exactly like the rest of the slide. */
+    .flow-svg { display: block; width: 100%; height: auto; }
 
-    .feature-card {
-      background: var(--surface);
-      border-radius: 10px;
-      padding: 0.8em 1em;
-      border-left: 4px solid var(--accent);
-    }
+    .flow-svg .bx { fill: var(--surface-2); stroke-width: 2; rx: 10; }
+    .flow-svg .danger-edge  { stroke: var(--danger); }
+    .flow-svg .proxy-edge    { stroke: var(--accent); }
+    .flow-svg .outside-edge  { stroke: var(--line); }
+    
 
-    .feature-card.orange {
-      border-left-color: var(--accent2);
-    }
+    .flow-svg text { font-family: 'Inter', system-ui, sans-serif; }
 
-    .feature-card.purple {
-      border-left-color: var(--accent3);
-    }
-
-    .feature-card.green {
-      border-left-color: var(--success);
-    }
-
-    .feature-card h4 {
-      font-size: 0.85em;
-      margin: 0 0 0.2em 0;
-      color: var(--accent);
+    .flow-svg .lbl {
+      font-size: 19px;
       font-weight: 600;
+      fill: var(--text);
+      text-anchor: middle;
     }
 
-    .feature-card.orange h4 { color: var(--accent2); }
-    .feature-card.purple h4 { color: var(--accent3); }
-    .feature-card.green h4 { color: var(--success); }
+    .flow-svg .sub,
+    .flow-svg .tok,
+    .flow-svg .step { font-family: 'JetBrains Mono', monospace; }
 
-    .feature-card p {
-      font-size: 0.65em;
-      margin: 0;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
+    .flow-svg .sub  { font-size: 13px; fill: var(--text-muted); text-anchor: middle; }
+    .flow-svg .step { font-size: 14px; fill: var(--text); }
+    .flow-svg .num  { fill: var(--accent); font-weight: 700; }
 
-    /* Comparison table */
-    .reveal table {
-      border-collapse: separate;
-      border-spacing: 0;
-      width: 100%;
-      font-size: 0.6em;
-      margin: 0.6em 0;
-    }
-
-    .reveal table th {
-      background: var(--surface);
-      color: var(--accent);
+    .flow-svg .wire {
+      font-size: 12px;
       font-weight: 700;
-      padding: 0.5em 0.8em;
-      text-align: left;
-      border-bottom: 2px solid var(--accent);
+      letter-spacing: 0.1em;
+      fill: var(--text-muted);
+      text-anchor: middle;
     }
 
-    .reveal table td {
-      padding: 0.4em 0.8em;
-      border-bottom: 1px solid #222;
-    }
+    /* the token as it sits on the wire — a chip, so it reads as payload
+       in transit rather than as part of either box */
+    .flow-svg .chip { fill: var(--bg); stroke-width: 1.5; opacity: 0.95; }
 
-    .reveal table tr:nth-child(even) td {
-      background: rgba(255,255,255,0.02);
-    }
+    .flow-svg .tok { font-size: 14px; text-anchor: middle; }
+    .flow-svg .tok-fake { fill: var(--danger); }
+    .flow-svg .tok-real { fill: var(--accent); }
 
-    /* Section divider */
-    .section-divider {
-      text-align: center !important;
-    }
+    .flow-svg .cap { font-size: 14px; fill: var(--text-muted); text-anchor: middle; }
 
-    .section-divider h2 {
-      font-size: 2.2em;
-      margin-bottom: 0.2em;
-    }
-
-    .section-divider h3 {
-      font-size: 1em;
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-
-    .section-number {
-      font-size: 3.5em;
-      font-weight: 700;
-      color: var(--accent);
-      opacity: 0.3;
-      line-height: 1;
-      margin-bottom: -0.2em;
-    }
-
-    /* Tree diagram */
-    .tree {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.58em;
-      line-height: 1.8;
-      background: var(--surface);
-      border-radius: 10px;
-      padding: 1em 1.5em;
-      margin: 0.6em 0;
-    }
-
-    /* Inline keyword highlight */
-    .kw {
-      background: rgba(109, 169, 228, 0.12);
-      color: var(--accent);
-      padding: 0.1em 0.4em;
-      border-radius: 4px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9em;
-    }
-
-    /* Slide backgrounds */
-    .reveal .slide-background {
-      background: var(--bg);
-    }
-
-    /* Progress bar */
-    .reveal .progress {
-      color: var(--accent);
-      height: 4px;
-    }
-
-    /* Slide numbers */
-    .reveal .slide-number {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.5em;
-      color: var(--text-muted);
-    }
-
-    /* Big stat */
-    .big-stat {
-      font-size: 3em;
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1;
-      margin: 0.2em 0;
-    }
-
-    .big-stat.orange { color: var(--accent2); }
-    .big-stat.purple { color: var(--accent3); }
-
-    /* Flow diagram */
-    .flow {
+    /* horizontal rows of diagram steps */
+    .diagram .row {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 0.8em;
-      margin: 1.5em 0;
+      gap: var(--gap-sm);
       flex-wrap: wrap;
+      justify-content: center;
     }
 
-    .flow .step {
-      background: var(--surface);
-      border: 2px solid var(--accent);
-      border-radius: 8px;
-      padding: 0.4em 0.8em;
+    .diagram .row + .row { margin-top: var(--gap-sm); }
+
+    /* A flow with this many rows needs a tighter rhythm to stay on the
+       slide; the type stays large enough to read from the back. */
+    .diagram--dense { font-size: 17px; }
+    .diagram--dense .row + .row { margin-top: 7px; }
+    .diagram--dense .box { padding: 6px 14px; }
+    .diagram--dense .link,
+    .diagram--dense .muted { font-size: 16px; }
+
+    /* equal-width command boxes keep the arrow columns aligned across rows */
+    .diagram .box.fixed { min-width: 250px; }
+    .diagram .row.left { justify-content: flex-start; }
+    .diagram .row .lane { color: var(--text-muted); min-width: 92px; text-align: left; }
+    /* Flow arrows carry the diagram's meaning, so they get the accent
+       colour and enough weight to read from the back of a room. */
+    .diagram .row .arrow {
+      color: var(--accent);
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .tree {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.5em;
-      text-align: center;
+      font-size: var(--fs-diagram);
+      line-height: 1.85;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      white-space: pre;
     }
 
-    .flow .step.danger-step {
-      border-color: var(--danger);
-    }
+    /* ==========================================================
+       DEMO SLIDE
+       ========================================================== */
+    .demo-marker h2 { font-size: var(--fs-statement); }
+    .demo-marker p  { font-size: var(--fs-lead) !important; color: var(--text-muted); margin-top: var(--gap-md); letter-spacing: 0.06em; }
 
-    .flow .step.success-step {
-      border-color: var(--success);
-    }
+    /* ==========================================================
+       CHROME
+       ========================================================== */
+    .reveal .slide-background { background: var(--bg); }
+    .reveal .progress { color: var(--accent); height: 4px; }
 
-    .flow .arrow-right {
+    .reveal .slide-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
       color: var(--text-muted);
-      font-size: 1.5em;
+      background: none;
     }
 
-    /* Prevent overflow on code slides */
-    .reveal .slides section.code-slide {
-      padding: 15px 35px;
-    }
+    .reveal .slides section .fragment.visible { opacity: 1; }
 
-    .reveal .slides section.code-slide h2 {
-      font-size: 1.5em;
-      margin-bottom: 0.3em;
-    }
-
-    /* Demo slide marker */
-    .demo-marker {
-      text-align: center !important;
-      background: linear-gradient(135deg, rgba(109, 169, 228, 0.08), rgba(167, 139, 218, 0.08));
-    }
-
-    .demo-marker h2 {
-      font-size: 2em;
-    }
-
-    .demo-marker p {
-      color: var(--text-muted);
-      font-size: 1em;
-    }
+    /* spacing helpers — replace one-off inline margins */
+    .mt-sm { margin-top: var(--gap-sm) !important; }
+    .mt-md { margin-top: var(--gap-md) !important; }
+    .mt-lg { margin-top: var(--gap-lg) !important; }
   </style>
 </head>
 <body>
@@ -402,642 +694,776 @@
   <!-- ============================================ -->
   <!-- TITLE -->
   <!-- ============================================ -->
-  <section class="title-slide" data-background-gradient="radial-gradient(ellipse at 30% 60%, rgba(109, 169, 228, 0.08) 0%, var(--bg) 70%)">
+  <section class="title-slide center-slide" data-background-gradient="radial-gradient(ellipse at 50% 55%, rgba(34, 211, 238, 0.12) 0%, #070b14 68%)"><div class="slide-inner">
     <h1>isx</h1>
     <div class="subtitle">Safe machines for AI agents</div>
-    <p class="tagline">Give your agents their own workstations &mdash; not your credentials.</p>
+    <p class="tagline">Give your agents their own workstations &mdash; not your credentials.</p></div>
   </section>
 
   <!-- ============================================ -->
   <!-- THE PROBLEM -->
   <!-- ============================================ -->
-  <section class="statement" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(217, 96, 112, 0.06) 0%, var(--bg) 70%)">
-    <h2>You're about to hand an AI agent <span class="danger">a terminal</span></h2>
+  <section class="statement center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(255, 77, 109, 0.08) 0%, #070b14 70%)"><div class="slide-inner">
+    <h2>You're about to hand an AI agent <span class="danger">a terminal</span></h2></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>What that terminal can see</h2>
-    <ul>
-      <li class="fragment"><span class="danger bold">~/.ssh/</span> &mdash; every private key you own</li>
-      <li class="fragment"><span class="danger bold">~/.config/</span> &mdash; API tokens, cloud credentials</li>
-      <li class="fragment"><span class="danger bold">~/projects/</span> &mdash; every repo you have checked out</li>
-      <li class="fragment"><span class="danger bold">Your shell</span> &mdash; curl, git push, npm publish</li>
-    </ul>
-    <p class="fragment muted" style="margin-top: 1.5em; font-size: 0.8em;">
+    <div class="body">
+      <ul>
+        <li class="fragment"><span class="danger bold">~/.ssh/</span> &mdash; every private key you own</li>
+        <li class="fragment"><span class="danger bold">~/.config/</span> &mdash; API tokens, cloud credentials</li>
+        <li class="fragment"><span class="danger bold">~/projects/</span> &mdash; every repo you have checked out</li>
+        <li class="fragment"><span class="danger bold">~/Documents/</span> &mdash; contracts, bank statements, private correspondence</li>
+        <li class="fragment"><span class="danger bold">Your shell</span> &mdash; curl, git push, npm publish</li>
+      </ul>
+    </div>
+    <p class="fragment note">
       And anything it writes, your IDE and build tools will <span class="danger">happily execute</span>.
     </p>
+  </div>
   </section>
 
-  <section class="statement">
+  <section class="statement center-slide"><div class="slide-inner">
     <h2>Your keys are <span class="danger">your identity</span></h2>
-    <p class="fragment" style="font-size: 0.9em; margin-top: 1em;">
+    <p class="fragment">
       With your GitHub token, an agent can push code, open PRs,<br>
       approve reviews, and merge &mdash; <span class="danger bold">as you</span>.
     </p>
-    <p class="fragment" style="font-size: 0.9em; margin-top: 0.6em;">
+    <p class="fragment">
       With your API keys, it can spin up cloud resources,<br>
       send messages, make purchases &mdash; <span class="danger bold">as you</span>.
     </p>
-    <p class="fragment muted" style="font-size: 0.85em; margin-top: 1em;">
+    <p class="fragment note">
       You can't tell what the agent did from what <em>you</em> did.<br>
       There is no audit trail. There is no boundary.
-    </p>
+    </p></div>
   </section>
 
-  <section class="statement">
+  <section class="statement center-slide"><div class="slide-inner">
     <h2>An agent on your laptop has <span class="danger">your full blast radius</span></h2>
-    <p class="fragment muted" style="font-size: 0.9em; margin-top: 1em;">
-      Same credentials. Same network. Same repos. Same consequences.
+    <p class="fragment note">
+      Same credentials. Same network. Same repos.
     </p>
+    <p class="fragment punchline">
+      &ldquo;My agent did it&rdquo; is not a defense.
+    </p></div>
   </section>
 
   <!-- ============================================ -->
   <!-- WHY NOT DOCKER -->
   <!-- ============================================ -->
-  <section>
-    <h2 style="margin-bottom: 0.2em;">Can't we just use <span class="muted">Docker?</span></h2>
-    <table style="font-size: 0.55em; margin: 0.3em 0;">
-      <thead>
-        <tr>
-          <th style="padding: 0.35em 0.6em;">Capability</th>
-          <th style="padding: 0.35em 0.6em;">Docker / Podman</th>
-          <th style="padding: 0.35em 0.6em;">isx</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">Init system (systemd)</td>
-          <td style="padding: 0.25em 0.6em;" class="danger">No</td>
-          <td style="padding: 0.25em 0.6em;" class="success">Yes</td>
-        </tr>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">Real networking (ping, strace)</td>
-          <td style="padding: 0.25em 0.6em;" class="danger">No</td>
-          <td style="padding: 0.25em 0.6em;" class="success">Yes</td>
-        </tr>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">Nested containers</td>
-          <td style="padding: 0.25em 0.6em;" class="danger">Fragile</td>
-          <td style="padding: 0.25em 0.6em;" class="success">Native</td>
-        </tr>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">dnf / apt install</td>
-          <td style="padding: 0.25em 0.6em;" class="accent2">Limited</td>
-          <td style="padding: 0.25em 0.6em;" class="success">Full OS</td>
-        </tr>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">CoW branching</td>
-          <td style="padding: 0.25em 0.6em;" class="danger">No</td>
-          <td style="padding: 0.25em 0.6em;" class="success">Instant</td>
-        </tr>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">Composable tooling</td>
-          <td style="padding: 0.25em 0.6em;" class="danger">Dockerfile layers</td>
-          <td style="padding: 0.25em 0.6em;" class="success">Declarative YAML tools</td>
-        </tr>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">Host integration</td>
-          <td style="padding: 0.25em 0.6em;" class="danger">DIY</td>
-          <td style="padding: 0.25em 0.6em;" class="success">ssh, git fetch, IDE &mdash; just work</td>
-        </tr>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">Credential isolation</td>
-          <td style="padding: 0.25em 0.6em;" class="danger">Manual</td>
-          <td style="padding: 0.25em 0.6em;" class="success">Built-in</td>
-        </tr>
-      </tbody>
-    </table>
-    <p class="fragment muted" style="font-size: 0.65em; margin-top: 0.4em;">
+  <section><div class="slide-inner">
+    <h2>Can't we just use <span class="muted">Docker?</span></h2>
+    <div class="body">
+      <table>
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>Docker / Podman</th>
+            <th>isx</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Init system (systemd)</td>
+            <td class="danger">No</td>
+            <td class="accent">Yes</td>
+          </tr>
+          <tr>
+            <td>Real networking (ping, strace)</td>
+            <td class="danger">No</td>
+            <td class="accent">Yes</td>
+          </tr>
+          <tr>
+            <td>Nested containers</td>
+            <td class="danger">Fragile</td>
+            <td class="accent">Native</td>
+          </tr>
+          <tr>
+            <td>dnf / apt install</td>
+            <td class="warn">Limited</td>
+            <td class="accent">Full OS</td>
+          </tr>
+          <tr>
+            <td>CoW branching</td>
+            <td class="danger">No</td>
+            <td class="accent">Instant</td>
+          </tr>
+          <tr>
+            <td>Composable tooling</td>
+            <td class="danger">Dockerfile layers</td>
+            <td class="accent">Declarative YAML tools</td>
+          </tr>
+          <tr>
+            <td>Host integration</td>
+            <td class="danger">DIY</td>
+            <td class="accent">ssh, git fetch, IDE &mdash; just work</td>
+          </tr>
+          <tr>
+            <td>Credential isolation</td>
+            <td class="danger">Manual</td>
+            <td class="accent">Built-in</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fragment note">
       Docker builds minimal images for deploying apps. isx builds full dev environments for agents to work in.
     </p>
+  </div>
+  </section>
+
+  <section><div class="slide-inner">
+    <h2>Or a <span class="muted">VM</span> per agent?</h2>
+    <div class="body">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>A full VM</th>
+            <th>isx container</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Startup</td>
+            <td class="warn">Boots its own kernel &mdash; seconds</td>
+            <td class="accent">Shares the host kernel &mdash; near-instant</td>
+          </tr>
+          <tr>
+            <td>Memory</td>
+            <td class="warn">Sized up front</td>
+            <td class="accent">Uses what it uses</td>
+          </tr>
+          <tr>
+            <td>Host files</td>
+            <td class="warn">virtiofs, 9p or scp</td>
+            <td class="accent">Bind mount, direct</td>
+          </tr>
+          <tr>
+            <td>Cost per instance</td>
+            <td class="warn">A guest kernel and firmware</td>
+            <td class="accent">Just the processes</td>
+          </tr>
+          <tr>
+            <td>Isolation boundary</td>
+            <td class="accent">Separate kernel &mdash; stronger</td>
+            <td class="warn">Shared kernel</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      The last row is the honest one &mdash; a VM's boundary really is stronger. isx runs both, one flag apart:
+      <span class="kw">--type vm</span> when you want it. The container is the default because it is cheap enough to branch per task.
+    </p>
+  </div>
   </section>
 
   <!-- ============================================ -->
-  <!-- THE ISX MODEL -->
+  <!-- 01 — THE ISX MODEL -->
   <!-- ============================================ -->
-  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.06) 0%, var(--bg) 70%)">
-    <div class="section-number">01</div>
+  <section class="section-divider center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(34, 211, 238, 0.08) 0%, #070b14 70%)"><div class="slide-inner">
+    <div class="ghost-number">01</div>
     <h2>The <span class="accent">isx</span> model</h2>
-    <h3>Onboard agents like you'd onboard a teammate</h3>
+    <p class="section-sub">You wouldn't hand a new hire your laptop &mdash; not even a clone of it</p></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>Three pillars</h2>
-    <div class="feature-grid">
-      <div class="feature-card" style="grid-column: 1 / -1;">
-        <h4>A real machine of their own</h4>
-        <p>Full Linux workstation &mdash; own filesystem, init, networking, process tree. Everything works because it <em>is</em> a real system.
-           Sudo works without a password &mdash; the agent can install any package, start services, tune sysctl, run Docker Compose, use strace. Full autonomy, zero babysitting.</p>
+    <div class="body">
+      <div class="cards">
+        <div class="card span-2">
+          <h4>A real machine of their own</h4>
+          <p>Full Linux workstation &mdash; own filesystem, init, networking, process tree. Everything works because it <em>is</em> a real system.
+             Sudo works without a password &mdash; the agent can install any package, start services, tune sysctl, run Docker Compose, use strace. Full autonomy, zero babysitting.</p>
+        </div>
+        <div class="card">
+          <h4>Zero credential exposure</h4>
+          <p>API keys and tokens never enter the environment in any form. A host-side TLS proxy injects credentials upstream.</p>
+        </div>
+        <div class="card">
+          <h4>A fresh one in seconds</h4>
+          <p>Branch a template like you'd branch a repo &mdash; an instant CoW clone, booted and ready to work in. Need another? Branch again.</p>
+        </div>
       </div>
-      <div class="feature-card orange">
-        <h4>Zero credential exposure</h4>
-        <p>API keys and tokens never enter the environment in any form. A host-side TLS proxy injects credentials upstream.</p>
-      </div>
-      <div class="feature-card purple">
-        <h4>Disposable in seconds</h4>
-        <p>Branch a template like you'd branch a repo &mdash; instant CoW clones. Use them, throw them away, branch again.</p>
-      </div>
-    </div>
+    </div></div>
   </section>
 
-  <section class="statement" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 186, 128, 0.06) 0%, var(--bg) 70%)">
-    <h2><span class="success">Total freedom</span> inside the sandbox</h2>
-    <p class="fragment" style="font-size: 0.8em; margin-top: 0.8em;">
-      The agent has root. It can install anything, change anything, break anything.
+  <section class="statement center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(34, 211, 238, 0.08) 0%, #070b14 70%)"><div class="slide-inner">
+    <h2><span class="accent">Total freedom</span> inside the sandbox</h2>
+    <p class="fragment">
+      The agent has root &mdash; <span class="accent bold">on its own machine</span>.
     </p>
-    <p class="fragment" style="font-size: 0.8em; margin-top: 0.4em;">
+    <p class="fragment">
+      It can install profiling and diagnostic tools, craft its own, tune sysctl,
+      start and stop services &mdash; and break any of it.
+    </p>
+    <p class="fragment">
       And there is <span class="accent bold">nothing of value to steal</span>.
-      <span class="muted">No real keys. No real tokens. No credentials worth selling.</span>
+      <span class="muted">No real keys. No real tokens. No personal documents.
+      No credentials worth selling.</span>
     </p>
-    <p class="fragment" style="font-size: 0.8em; margin-top: 0.4em;">
-      The agent taints its own storage &mdash; but it's a <span class="accent3 bold">cheap CoW branch</span>.
+    <p class="fragment">
+      The agent taints its own storage &mdash; but it's a <span class="accent bold">cheap CoW branch</span>.
       <span class="muted">Destroy it. Branch a fresh one in seconds. The template stays clean.</span>
-    </p>
+    </p></div>
   </section>
 
   <!-- ============================================ -->
-  <!-- CREDENTIAL ISOLATION -->
+  <!-- 02 — CREDENTIAL ISOLATION -->
   <!-- ============================================ -->
-  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(212, 168, 75, 0.06) 0%, var(--bg) 70%)">
-    <div class="section-number">02</div>
-    <h2>Credential <span class="accent2">Isolation</span></h2>
-    <h3>The standout feature</h3>
+  <section class="section-divider center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(34, 211, 238, 0.08) 0%, #070b14 70%)"><div class="slide-inner">
+    <div class="ghost-number">02</div>
+    <h2>Credential <span class="accent">isolation</span></h2>
+    <p class="section-sub">The agent never holds a real key</p></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>The problem with credentials</h2>
-    <ul>
-      <li class="fragment">Env vars? <span class="danger">Readable by any process</span></li>
-      <li class="fragment">Mounted files? <span class="danger">Cat-able, exfiltrable</span></li>
-      <li class="fragment">Credential helpers? <span class="danger">Agent can call them</span></li>
-      <li class="fragment">BASE_URL wrappers? <span class="danger">Agent can bypass them</span></li>
-    </ul>
-    <p class="fragment" style="margin-top: 1.5em;">
-      Every approach that puts credentials <em>inside</em> the container<br>
-      leaves an <span class="danger bold">attack surface inside the container</span>.
-    </p>
+    <div class="body">
+      <ul>
+        <li class="fragment">Env vars? <span class="danger">Readable by any process</span></li>
+        <li class="fragment">Mounted files? <span class="danger">Cat-able, exfiltrable</span></li>
+        <li class="fragment">Credential helpers? <span class="danger">Agent can call them</span></li>
+        <li class="fragment">BASE_URL wrappers? <span class="danger">Agent can bypass them</span></li>
+        <li class="fragment">OAuth tokens? <span class="warn">Better &mdash; scoped and expiring &mdash; but can still leak to other systems</span></li>
+      </ul>
+      <p class="fragment mt-lg">
+        Every approach that puts credentials <em>inside</em> the container<br>
+        leaves an <span class="danger bold">attack surface inside the container</span>.
+      </p>
+    </div></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>isx: credentials <span class="accent">never enter</span></h2>
-    <div class="diagram" style="font-size: 0.55em; text-align: center;">
-      <div style="margin-bottom: 1.2em;">
-        <span class="box danger-box" style="min-width: 12em;">
-          Container<br>
-          <span style="font-size: 0.85em; color: var(--text-muted);">holds only: <code>sk-ant-placeholder</code></span>
-        </span>
-      </div>
-      <div style="margin-bottom: 0.5em; color: var(--text-muted);">
-        &darr;&nbsp; HTTPS request with placeholder token
-      </div>
-      <div style="margin-bottom: 0.5em;">
-        <span class="box success-box" style="min-width: 14em;">
-          Host-side MITM Proxy<br>
-          <span style="font-size: 0.85em; color: var(--text-muted);">terminates TLS &bull; injects real credentials &bull; re-encrypts</span>
-        </span>
-      </div>
-      <div style="margin-bottom: 0.5em; color: var(--text-muted);">
-        &darr;&nbsp; Real auth header injected
-      </div>
-      <div>
-        <span class="box" style="min-width: 12em;">
-          Upstream API<br>
-          <span style="font-size: 0.85em; color: var(--text-muted);">api.anthropic.com, github.com, &hellip;</span>
-        </span>
+    <div class="body">
+      <div class="diagram">
+        <svg class="flow-svg" viewBox="0 0 1160 248" role="img"
+             aria-label="A request leaves the container carrying a placeholder token, the host-side proxy terminates TLS and swaps in the real credential, then re-encrypts to the upstream API.">
+          <defs>
+            <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+            </marker>
+          </defs>
+
+          <!-- container -->
+          <rect class="bx danger-edge" x="1" y="65" width="230" height="90"/>
+          <text class="lbl" x="116" y="102">Container</text>
+          <text class="sub" x="116" y="128">the agent and its tools</text>
+
+          <!-- wire 1: what the agent actually puts on the wire -->
+          <line x1="231" y1="110" x2="439" y2="110"
+                stroke="var(--accent)" stroke-width="3" marker-end="url(#arrowhead)"/>
+          <rect class="chip danger-edge" x="252" y="62" width="167" height="32" rx="6"/>
+          <text class="tok tok-fake" x="335" y="84">sk-ant-placeholder</text>
+          <text class="wire" x="335" y="136">HTTPS</text>
+
+          <!-- the proxy: taller, because this is the mechanism -->
+          <rect class="bx proxy-edge" x="445" y="30" width="270" height="160"/>
+          <text class="lbl" x="580" y="64">Host-side proxy</text>
+          <text class="step" x="468" y="101"><tspan class="num">1</tspan>  terminates TLS</text>
+          <text class="step" x="468" y="129"><tspan class="num">2</tspan>  swaps in the real key</text>
+          <text class="step" x="468" y="157"><tspan class="num">3</tspan>  re-encrypts upstream</text>
+
+          <!-- wire 2: what the API actually receives -->
+          <line x1="715" y1="110" x2="923" y2="110"
+                stroke="var(--accent)" stroke-width="3" marker-end="url(#arrowhead)"/>
+          <rect class="chip proxy-edge" x="740" y="62" width="159" height="32" rx="6"/>
+          <text class="tok tok-real" x="820" y="84">sk-ant-api03-R7f&hellip;</text>
+          <text class="wire" x="820" y="136">HTTPS</text>
+
+          <!-- upstream -->
+          <rect class="bx outside-edge" x="929" y="65" width="230" height="90"/>
+          <text class="lbl" x="1044" y="102">Upstream API</text>
+          <text class="sub" x="1044" y="128">api.anthropic.com, &hellip;</text>
+
+          <!-- where the real secret actually lives -->
+          <text class="cap" x="116" y="224">no real credential here</text>
+          <text class="cap" x="580" y="224">real credential lives here, on the host</text>
+        </svg>
       </div>
     </div>
-    <p class="muted" style="font-size: 0.7em; text-align: center;">
-      Real credentials are never given to the container &mdash; the injection happens entirely outside.
+    <p class="note">
+      The container trusts the proxy's CA, which is what lets the proxy terminate TLS and rewrite the
+      header. The real credential stays on the host &mdash; we never hand it to the container.
     </p>
+  </div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>What works transparently</h2>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h4>claude / pi / bob</h4>
-        <p>AI coding agents authenticate without knowing real keys</p>
+    <div class="body">
+      <div class="cards">
+        <div class="card">
+          <h4>claude / pi / bob</h4>
+          <p>AI coding agents authenticate without knowing real keys</p>
+        </div>
+        <div class="card">
+          <h4>gh / git push</h4>
+          <p>GitHub PAT injected on HTTPS git operations</p>
+        </div>
+        <div class="card">
+          <h4>curl / any HTTPS</h4>
+          <p>Custom tools get proxy rules via YAML declarations</p>
+        </div>
+        <div class="card">
+          <h4>Vertex AI</h4>
+          <p>Automatic API format translation &mdash; no GCP creds in container</p>
+        </div>
       </div>
-      <div class="feature-card orange">
-        <h4>gh / git push</h4>
-        <p>GitHub PAT injected on HTTPS git operations</p>
-      </div>
-      <div class="feature-card purple">
-        <h4>curl / any HTTPS</h4>
-        <p>Custom tools get proxy rules via YAML declarations</p>
-      </div>
-      <div class="feature-card green">
-        <h4>Vertex AI</h4>
-        <p>Automatic API format translation &mdash; no GCP creds in container</p>
-      </div>
-    </div>
+    </div></div>
   </section>
 
   <!-- ============================================ -->
-  <!-- COW BRANCHING -->
+  <!-- 03 — COW BRANCHING -->
   <!-- ============================================ -->
-  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(167, 139, 218, 0.06) 0%, var(--bg) 70%)">
-    <div class="section-number">03</div>
-    <h2>Copy-on-Write <span class="accent3">Branching</span></h2>
-    <h3>The git metaphor for environments</h3>
+  <section class="section-divider center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(34, 211, 238, 0.08) 0%, #070b14 70%)"><div class="slide-inner">
+    <div class="ghost-number">03</div>
+    <h2>Copy-on-write <span class="accent">branching</span></h2>
+    <p class="section-sub">The git metaphor for environments</p></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>You know <span class="muted">git worktrees</span></h2>
-    <p style="font-size: 0.85em; margin-bottom: 1em;">
-      Worktrees let you check out multiple branches side by side &mdash; each gets its own working directory. Great for parallel work on source code.
-    </p>
-    <p class="fragment" style="font-size: 0.85em; margin-bottom: 1em;">
-      But a worktree only isolates <span class="accent3 bold">files in the repo</span>. Everything else is shared:
-    </p>
-    <ul>
-      <li class="fragment"><span class="danger bold">Dependencies</span> &mdash; node_modules, ~/.m2, pip packages, SNAPSHOT JARs</li>
-      <li class="fragment"><span class="danger bold">Installed software</span> &mdash; JDK version, system libraries, CLI tools</li>
-      <li class="fragment"><span class="danger bold">Running services</span> &mdash; databases, Docker containers, dev servers</li>
-      <li class="fragment"><span class="danger bold">Ports &amp; networking</span> &mdash; port 8080 is port 8080 is port 8080</li>
-    </ul>
+    <div class="body">
+      <p class="lead">
+        Worktrees let you check out multiple branches side by side &mdash; each gets its own working directory. Great for parallel work on source code.
+      </p>
+      <p class="fragment lead">
+        But a worktree only isolates <span class="accent bold">files in the repo</span>. Everything else is shared:
+      </p>
+      <ul>
+        <li class="fragment"><span class="danger bold">Dependencies</span> &mdash; node_modules, ~/.m2, pip packages, SNAPSHOT JARs</li>
+        <li class="fragment"><span class="danger bold">Installed software</span> &mdash; JDK version, system libraries, CLI tools</li>
+        <li class="fragment"><span class="danger bold">Running services</span> &mdash; databases, Docker containers, dev servers</li>
+        <li class="fragment"><span class="danger bold">Ports &amp; networking</span> &mdash; port 8080 is port 8080 is port 8080</li>
+      </ul>
+    </div></div>
   </section>
 
-  <section class="statement">
-    <h2>isx is <span class="accent3">branching for the entire machine</span></h2>
-    <p class="fragment" style="font-size: 0.9em; margin-top: 1em;">
-      Source code, dependencies, installed packages, running services,<br>
-      open ports, environment variables, the entire filesystem &mdash;<br>
-      <span class="accent3 bold">all isolated, all snapshotted, all instant</span>.
-    </p>
+  <section class="statement center-slide"><div class="slide-inner">
+    <h2 class="hero">
+      <span class="hero-mark">isx</span>
+      <span class="hero-word">branching</span>
+      <span class="hero-line">for the entire machine</span>
+    </h2>
+    <p class="fragment">
+      Source code, dependencies, installed packages, running services,
+      open ports, environment variables, the entire filesystem &mdash;
+      <span class="accent bold">all isolated, all snapshotted, all instant</span>.
+    </p></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>Build once, branch instantly</h2>
-    <div class="tree">
-      <span class="accent">tpl-java</span>  <span class="muted">(stopped template, ~2 GB)</span><br>
-      &nbsp;&nbsp;├── <span class="success">fix-nasty-bug</span>    <span class="muted">(running, ~50 MB extra)</span><br>
-      &nbsp;&nbsp;├── <span class="success">review-pr-423</span>    <span class="muted">(running, ~30 MB extra)</span><br>
-      &nbsp;&nbsp;└── <span class="muted">experiment</span>        <span class="muted">(stopped, ~10 MB extra)</span>
-    </div>
-    <ul>
-      <li class="fragment">Branch = instant CoW clone (btrfs/zfs/lvm)</li>
-      <li class="fragment">Each branch has its own independent filesystem</li>
-      <li class="fragment">Install packages, break things &mdash; destroy when done</li>
-      <li class="fragment">Template and other branches are <span class="accent bold">completely unaffected</span></li>
-    </ul>
+    <div class="body">
+      <div class="tree"><span class="accent">tpl-java</span>  <span class="muted">(stopped template, ~2 GB)</span>
+  ├── <span class="accent">fix-nasty-bug</span>    <span class="muted">(running, ~50 MB extra)</span>
+  ├── <span class="accent">review-pr-423</span>    <span class="muted">(running, ~30 MB extra)</span>
+  └── <span class="muted">experiment</span>        <span class="muted">(stopped, ~10 MB extra)</span></div>
+      <ul>
+        <li class="fragment"><span class="accent bold">Template</span> &mdash; a pristine environment, specified declaratively</li>
+        <li class="fragment"><span class="accent bold">Branch</span> &mdash; a booted copy. The moment an agent touches it, it is <span class="accent bold">tainted</span></li>
+        <li class="fragment">An instant CoW clone (btrfs/zfs/lvm), with its own independent filesystem</li>
+        <li class="fragment">Not a verdict on what the agent did &mdash; you simply can't prove what it changed</li>
+        <li class="fragment">So you never clean one up: destroy it, branch a fresh one</li>
+        <li class="fragment">The template and every other branch stay <span class="accent bold">completely unaffected</span></li>
+      </ul>
+    </div></div>
   </section>
 
-  <section>
-    <h2 style="margin-bottom: 0.2em;">Storage: <span class="accent3">shared, not copied</span> &mdash; but isolated</h2>
-    <div class="diagram" style="font-size: 0.48em; padding: 0.8em;">
-      <div style="margin-bottom: 0.6em;">
-        <span class="box" style="min-width: 18em;">
-          <span class="accent3">Shared base blocks</span> &mdash; stored <strong>once</strong> (~2 GB)
-        </span>
+  <section><div class="slide-inner">
+    <h2>Storage: <span class="accent">shared, not copied</span> &mdash; but isolated</h2>
+    <div class="body">
+      <div class="diagram">
+        <div class="row">
+          <span class="box">
+            <span class="accent">Shared base blocks</span> &mdash; stored <strong>once</strong> (~2 GB)
+          </span>
+        </div>
+        <div class="row">
+          <span class="box">fix-bug <span class="muted">~50 MB</span></span>
+          <span class="box">review-pr <span class="muted">~30 MB</span></span>
+          <span class="box">experiment <span class="muted">~10 MB</span></span>
+          <span class="box">agent-4 <span class="muted">~40 MB</span></span>
+        </div>
       </div>
-      <div style="display: flex; justify-content: center; gap: 0.6em; flex-wrap: wrap;">
-        <span class="box success-box">fix-bug <span style="color: var(--text-muted);">~50 MB</span></span>
-        <span class="box success-box">review-pr <span style="color: var(--text-muted);">~30 MB</span></span>
-        <span class="box success-box">experiment <span style="color: var(--text-muted);">~10 MB</span></span>
-        <span class="box success-box">agent-4 <span style="color: var(--text-muted);">~40 MB</span></span>
+      <div class="cards">
+        <div class="card card--danger">
+          <h4>Without CoW</h4>
+          <p>10 branches &times; 2 GB = <span class="danger bold">20 GB</span></p>
+        </div>
+        <div class="card">
+          <h4>With CoW</h4>
+          <p>2 GB shared + deltas = <span class="accent bold">~2.4 GB</span></p>
+        </div>
       </div>
     </div>
-    <div class="feature-grid" style="margin-top: 0.5em;">
-      <div class="feature-card purple">
-        <h4>Without CoW</h4>
-        <p>10 branches &times; 2 GB = <span class="danger bold">20 GB</span></p>
-      </div>
-      <div class="feature-card green">
-        <h4>With CoW</h4>
-        <p>2 GB shared + deltas = <span class="success bold">~2.4 GB</span></p>
-      </div>
-    </div>
-    <p class="fragment muted" style="font-size: 0.6em; margin-top: 0.4em;">
-      Branches share unchanged data at the filesystem level. Each branch only stores its own modifications.
+    <p class="fragment note">
+      Git shares objects between branches. isx shares blocks between machines &mdash; the same trick, one layer down, and why a whole machine is about as cheap to branch as a repo.
+    </p>
+  </div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>Getting work back out</h2>
-    <h3 style="margin-bottom: 0.8em;">Git push &amp; pull &mdash; directly to containers</h3>
-    <pre><code class="language-bash"># The agent works inside the container, makes commits...
+    <div class="body">
+      <p class="lead">
+        Standard <span class="kw">git fetch</span>, <span class="kw">git push</span>, <span class="kw">git pull</span> &mdash; directly to containers. isx handles all the wiring.
+      </p>
+      <pre><code class="language-bash"># The agent works inside the container, makes commits...
 
-# On the host — just use git:
+# On the host — review and cherry-pick, like any teammate's work:
 git fetch fix-auth
 git diff main..fix-auth/main
 git cherry-pick fix-auth/main</code></pre>
-    <ul style="margin-top: 0.8em;">
-      <li class="fragment">isx manages the git remotes automatically &mdash; added on branch, removed on destroy</li>
-      <li class="fragment">You always review a <span class="accent bold">specific, immutable commit</span></li>
-      <li class="fragment">Review each agent's work as you would any teammate's PR</li>
-    </ul>
+      <div class="cards">
+        <div class="card">
+          <h4>Fully managed</h4>
+          <p>Remotes are added on branch, removed on destroy &mdash; zero manual setup</p>
+        </div>
+        <div class="card">
+          <h4>Immutable snapshots</h4>
+          <p>You act on a specific commit, not a live directory the agent can still change</p>
+        </div>
+      </div>
+    </div></div>
   </section>
 
   <!-- ============================================ -->
-  <!-- TEMPLATES & TOOLS -->
+  <!-- 04 — TEMPLATES & TOOLS -->
   <!-- ============================================ -->
-  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 186, 128, 0.06) 0%, var(--bg) 70%)">
-    <div class="section-number">04</div>
-    <h2>Templates <span class="success">&amp;</span> Tools</h2>
-    <h3>Composable, cacheable, declarative</h3>
+  <section class="section-divider center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(34, 211, 238, 0.08) 0%, #070b14 70%)"><div class="slide-inner">
+    <div class="ghost-number">04</div>
+    <h2>Templates <span class="accent">&amp;</span> tools</h2>
+    <p class="section-sub">Composable, cacheable, declarative</p></div>
   </section>
 
-  <section class="code-slide">
+  <section><div class="slide-inner">
     <h2>Define a template in YAML</h2>
-    <pre><code class="language-yaml">name: tpl-agent
-description: Isolated dev environment with Claude Code
-parent: tpl-java
+    <div class="body">
+      <pre class="pre--dense"><code class="language-yaml">name: tpl-quarkus
+description: Quarkus development box
+parent: tpl-mydev
 tools:
-  - claude
   - podman
-  - vscode-remote
+  - graalvm
+  - mvnd
+  - claude: {model: claude-sonnet-5}
+default-action: claude
+packages:
+  - unzip
 repos:
-  - url: https://github.com/myorg/myproject.git
-    path: ~/myproject
-    prime: mvn -B dependency:go-offline
-workdir: ~/myproject
-default-action: claude</code></pre>
-    <p class="muted" style="font-size: 0.7em;">
-      Templates inherit from parents. Tools compose independently. Downloads are cached on the host.
+  - url: https://github.com/quarkusio/quarkus.git
+    prime: mvnd -b singlethreaded -Dquickly
+  - url: https://github.com/quarkusio/quarkus-quickstarts.git
+    path: ~/quarkus-quickstarts</code></pre>
+    </div>
+    <p class="note">
+      Templates inherit from a parent; tools compose independently and can take parameters.
     </p>
+  </div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>Built-in tools</h2>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h4>AI Agents</h4>
-        <p>claude, pi, bob, codex</p>
-      </div>
-      <div class="feature-card orange">
-        <h4>Build Tools</h4>
-        <p>maven, mvnd, gradle, podman</p>
-      </div>
-      <div class="feature-card purple">
-        <h4>IDE Integration</h4>
-        <p>VS Code Remote, JetBrains Gateway</p>
-      </div>
-      <div class="feature-card green">
-        <h4>Dev Infra</h4>
-        <p>sshd, tmux, zmx, starship</p>
+    <div class="body">
+      <div class="cards">
+        <div class="card">
+          <h4>AI agents</h4>
+          <p>claude, pi, bob, codex</p>
+        </div>
+        <div class="card">
+          <h4>Build tools</h4>
+          <p>maven-3, mvnd, podman</p>
+        </div>
+        <div class="card">
+          <h4>IDE integration</h4>
+          <p>VS Code Remote, JetBrains Gateway</p>
+        </div>
+        <div class="card">
+          <h4>Dev infra</h4>
+          <p>sshd, tmux, zmx, starship</p>
+        </div>
       </div>
     </div>
-    <p class="fragment muted" style="font-size: 0.75em; margin-top: 1em;">
+    <p class="fragment note">
       Define your own tools as YAML &mdash; packages, downloads, proxy rules, TUI actions.
     </p>
+  </div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>Host resources</h2>
-    <pre><code class="language-yaml">host-resources:
+    <div class="body">
+      <pre><code class="language-yaml">host-resources:
   - source: ~/.gitconfig         # your aliases, identity, settings
     mode: readonly               # default — safe, read-only
   - source: ~/datasets/training
     mode: overlay                # read-only base + writable layer</code></pre>
-    <div class="feature-grid" style="margin-top: 0.8em;">
-      <div class="feature-card">
-        <h4>readonly</h4>
-        <p>Read-only bind mount. Share config files, reference data.</p>
-      </div>
-      <div class="feature-card orange">
-        <h4>overlay</h4>
-        <p>Host data + ephemeral writable layer. Agent sees read-write; host is fully protected.</p>
+      <div class="cards">
+        <div class="card">
+          <h4>readonly</h4>
+          <p>Read-only bind mount. Share config files, reference data.</p>
+        </div>
+        <div class="card">
+          <h4>overlay</h4>
+          <p>Host data + ephemeral writable layer. Agent sees read-write; host is fully protected.</p>
+        </div>
       </div>
     </div>
-    <p class="fragment muted" style="font-size: 0.7em; margin-top: 0.8em;">
+    <p class="fragment note">
       Share config, datasets, or large assets without copying into every branch.
     </p>
+  </div>
   </section>
 
   <!-- ============================================ -->
-  <!-- WORKFLOW -->
+  <!-- 05 — WORKFLOW -->
   <!-- ============================================ -->
-  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.06) 0%, var(--bg) 70%)">
-    <div class="section-number">05</div>
-    <h2>The <span class="accent">Workflow</span></h2>
-    <h3>From setup to review</h3>
+  <section class="section-divider center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(34, 211, 238, 0.08) 0%, #070b14 70%)"><div class="slide-inner">
+    <div class="ghost-number">05</div>
+    <h2>The <span class="accent">workflow</span></h2>
+    <p class="section-sub">From setup to review</p></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>Day-to-day flow</h2>
-    <div class="diagram" style="font-size: 0.46em; padding: 0.6em 0.8em; text-align: left;">
-      <div style="display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.5em;">
-        <span style="color: var(--text-muted); min-width: 5em;">once</span>
-        <span class="box"><strong>isx build tpl-java</strong> <span style="color: var(--text-muted);">&mdash; install deps, clone repos, configure tools</span></span>
-      </div>
-      <div style="padding-left: 5.5em; color: var(--text-muted); margin-bottom: 0.3em;">&darr; branch as many times as you need</div>
-      <div style="display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.3em;">
-        <span style="color: var(--text-muted); min-width: 5em;">parallel</span>
-        <span class="box" style="min-width: 9em;"><strong>isx branch</strong> fix-auth</span>
-        <span style="color: var(--text-muted);">&rarr;</span>
-        <span class="box success-box">agent codes &bull; tests &bull; commits</span>
-        <span style="color: var(--text-muted);">&rarr;</span>
-        <span class="box">review</span>
-        <span style="color: var(--text-muted);">&rarr;</span>
-        <span class="box danger-box">destroy</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 0.5em; margin-bottom: 0.3em;">
-        <span style="min-width: 5em;"></span>
-        <span class="box" style="min-width: 9em;"><strong>isx branch</strong> add-tests</span>
-        <span style="color: var(--text-muted);">&rarr;</span>
-        <span class="box success-box">agent codes &bull; tests &bull; commits</span>
-        <span style="color: var(--text-muted);">&rarr;</span>
-        <span class="box">review</span>
-        <span style="color: var(--text-muted);">&rarr;</span>
-        <span class="box danger-box">destroy</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 0.5em;">
-        <span style="min-width: 5em;"></span>
-        <span class="box" style="min-width: 9em;"><strong>isx branch</strong> refactor</span>
-        <span style="color: var(--text-muted);">&rarr;</span>
-        <span class="box success-box">agent codes &bull; tests &bull; commits</span>
-        <span style="color: var(--text-muted);">&rarr;</span>
-        <span class="box">review</span>
-        <span style="color: var(--text-muted);">&rarr;</span>
-        <span class="box danger-box">destroy</span>
+    <div class="body">
+      <div class="diagram diagram--dense">
+        <div class="row left">
+          <span class="lane">once</span>
+          <span class="box"><strong>isx build tpl-quarkus</strong> <span class="muted">&mdash; JDK, Maven repo warmed, repos cloned, tools installed</span></span>
+        </div>
+        <div class="row left">
+          <span class="lane"></span>
+          <span class="arrow">&darr;</span>
+          <span class="muted">branch as many times as you need</span>
+        </div>
+        <div class="row left">
+          <span class="lane">parallel</span>
+          <span class="box fixed"><strong>isx branch</strong> fix-auth</span>
+          <span class="arrow">&rarr;</span>
+          <span class="box">agent codes &bull; mvn verify &bull; commits</span>
+          <span class="arrow">&rarr;</span>
+          <span class="box">review</span>
+          <span class="arrow">&rarr;</span>
+          <span class="box danger-box">destroy</span>
+        </div>
+        <div class="row left">
+          <span class="lane"></span>
+          <span class="box fixed"><strong>isx branch</strong> add-tests</span>
+          <span class="arrow">&rarr;</span>
+          <span class="box">agent codes &bull; mvn verify &bull; commits</span>
+          <span class="arrow">&rarr;</span>
+          <span class="box">review</span>
+          <span class="arrow">&rarr;</span>
+          <span class="box danger-box">destroy</span>
+        </div>
+        <div class="row left">
+          <span class="lane"></span>
+          <span class="box fixed"><strong>isx branch</strong> bump-quarkus</span>
+          <span class="arrow">&rarr;</span>
+          <span class="box">agent codes &bull; mvn verify &bull; commits</span>
+          <span class="arrow">&rarr;</span>
+          <span class="box">review</span>
+          <span class="arrow">&rarr;</span>
+          <span class="box danger-box">destroy</span>
+        </div>
+        <div class="row left">
+          <span class="lane"></span>
+          <span class="arrow">&darr;</span>
+          <span class="muted">deps move on, upstream moves on</span>
+        </div>
+        <div class="row left">
+          <span class="lane">now and then</span>
+          <span class="box"><strong>isx build tpl-quarkus</strong> <span class="muted">&mdash; re-run it; every branch from here starts current</span></span>
+        </div>
       </div>
     </div>
-    <p class="muted" style="font-size: 0.65em; margin-top: 0.5em;">
-      Dependencies are installed once in the template &mdash; every branch starts with them already in place.
+    <p class="note">
+      Dependencies are installed once in the template, so every branch starts with them already in place &mdash;
+      and refreshing the template is the same one command that built it.
     </p>
+  </div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>Network modes</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Mode</th>
-          <th>Flag</th>
-          <th>What it does</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="success bold">Full internet</span></td>
-          <td><span class="muted">(default)</span></td>
-          <td>Unrestricted access, auth via proxy</td>
-        </tr>
-        <tr>
-          <td><span class="accent2 bold">Proxy only</span></td>
-          <td><span class="kw">--proxy-only</span></td>
-          <td>Traffic restricted to MITM proxy only</td>
-        </tr>
-        <tr>
-          <td><span class="danger bold">Airgapped</span></td>
-          <td><span class="kw">--airgap</span></td>
-          <td>Network device removed, total isolation</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="body">
+      <table>
+        <thead>
+          <tr>
+            <th>Mode</th>
+            <th>Flag</th>
+            <th>What it does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="bold">Full internet</span></td>
+            <td><span class="muted">(default)</span></td>
+            <td>Unrestricted access, auth via proxy</td>
+          </tr>
+          <tr>
+            <td><span class="bold">Proxy only</span></td>
+            <td><span class="kw">--proxy-only</span></td>
+            <td>Traffic restricted to MITM proxy only</td>
+          </tr>
+          <tr>
+            <td><span class="bold">Airgapped</span></td>
+            <td><span class="kw">--airgap</span></td>
+            <td>Network device removed, total isolation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>Runtime modes</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Mode</th>
-          <th>Flag</th>
-          <th>What it does</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="success bold">Container</span></td>
-          <td><span class="muted">(default)</span></td>
-          <td>System container &mdash; shared kernel, near-native speed, instant startup</td>
-        </tr>
-        <tr>
-          <td><span class="accent2 bold">VM</span></td>
-          <td><span class="kw">--type vm</span></td>
-          <td>Full virtual machine &mdash; separate kernel, hardware-level isolation</td>
-        </tr>
-        <tr>
-          <td><span class="accent3 bold">KVM</span></td>
-          <td><span class="kw">--type kvm</span></td>
-          <td>VM with /dev/kvm passthrough &mdash; nested virtualization inside the VM</td>
-        </tr>
-      </tbody>
-    </table>
-    <p class="fragment muted" style="font-size: 0.65em; margin-top: 0.6em;">
+    <div class="body">
+      <table>
+        <thead>
+          <tr>
+            <th>Mode</th>
+            <th>Flag</th>
+            <th>What it does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="bold">Container</span></td>
+            <td><span class="muted">(default)</span></td>
+            <td>System container &mdash; shared kernel, near-native speed, instant startup</td>
+          </tr>
+          <tr>
+            <td><span class="bold">VM</span></td>
+            <td><span class="kw">--type vm</span></td>
+            <td>Full virtual machine &mdash; separate kernel, hardware-level isolation</td>
+          </tr>
+          <tr>
+            <td><span class="bold">KVM</span></td>
+            <td><span class="kw">--type kvm</span></td>
+            <td>VM with /dev/kvm passthrough &mdash; nested virtualization inside the VM</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fragment note">
       Containers are the practical default &mdash; near-native performance, instant CoW branching, minimal overhead.
       VMs add kernel-level separation as defense in depth &mdash; for higher security requirements or compliance mandates.
     </p>
+  </div>
   </section>
 
   <!-- ============================================ -->
-  <!-- FEATURE HIGHLIGHTS -->
+  <!-- 06 — FEATURE HIGHLIGHTS -->
   <!-- ============================================ -->
-  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.06) 0%, var(--bg) 70%)">
-    <div class="section-number">06</div>
-    <h2>Feature <span class="accent">Highlights</span></h2>
-    <h3>The things that make daily use great</h3>
+  <section class="section-divider center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(34, 211, 238, 0.08) 0%, #070b14 70%)"><div class="slide-inner">
+    <div class="ghost-number">06</div>
+    <h2>Feature <span class="accent">highlights</span></h2>
+    <p class="section-sub">The things that make daily use great</p></div>
   </section>
 
-  <section>
-    <h2>Git push &amp; pull <span class="accent">to containers</span></h2>
-    <p style="font-size: 0.85em; margin-bottom: 0.8em;">
-      Standard <span class="kw">git fetch</span>, <span class="kw">git push</span>, <span class="kw">git pull</span> &mdash; isx handles all the wiring.
-    </p>
-    <pre><code class="language-bash"># Agent commits inside the container...
-# On the host — review and cherry-pick, just like any teammate's work:
-git fetch fix-auth
-git diff main..fix-auth/main
-git cherry-pick fix-auth/main</code></pre>
-    <div class="feature-grid" style="margin-top: 1em;">
-      <div class="feature-card">
-        <h4>Fully managed</h4>
-        <p>Remotes are added on branch, removed on destroy &mdash; zero manual setup</p>
-      </div>
-      <div class="feature-card orange">
-        <h4>Immutable snapshots</h4>
-        <p>You act on a specific commit, not a live directory the agent can still change</p>
+  <section><div class="slide-inner">
+    <h2>Fast cache, <span class="accent">no surprises</span></h2>
+    <div class="body">
+      <p class="lead">
+        The same dependency is <span class="accent bold">never downloaded twice</span>. Ten branches pulling the same deps? One download.
+        But only artifacts we can guarantee are correct are cached &mdash; mutable data always passes through.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>What</th>
+            <th>How it's verified</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Maven &amp; Gradle artifacts</td>
+            <td>Only properly signed releases &mdash; SNAPSHOTs and metadata pass through</td>
+          </tr>
+          <tr>
+            <td>Container image layers</td>
+            <td>OCI content digest &mdash; immutable by design</td>
+          </tr>
+          <tr>
+            <td>Tool downloads</td>
+            <td>Verified against declared SHA256 checksum</td>
+          </tr>
+          <tr>
+            <td>DNF packages</td>
+            <td>Host-side cache shared across builds</td>
+          </tr>
+        </tbody>
+      </table>
+    </div></div>
+  </section>
+
+  <section><div class="slide-inner">
+    <h2>IDE integration: <span class="accent">your editor, their machine</span></h2>
+    <div class="body">
+      <div class="cards">
+        <div class="card">
+          <h4>VS Code Remote</h4>
+          <p>One-click from the TUI (F9). VS Code downloads its server on first connect.</p>
+        </div>
+        <div class="card">
+          <h4>JetBrains Gateway</h4>
+          <p>IntelliJ backend pre-installed. Full indexing, debugging, refactoring &mdash; inside.</p>
+        </div>
       </div>
     </div>
-  </section>
-
-  <section>
-    <h2>Prudent <span class="success">caching</span></h2>
-    <p style="font-size: 0.7em; margin-bottom: 0.4em;">
-      The same dependency is <span class="success bold">never downloaded twice</span>.
-      Ten branches pulling the same deps? One download.
-      But only artifacts we can guarantee are correct are cached &mdash; mutable data always passes through.
-    </p>
-    <table style="font-size: 0.55em; margin: 0.3em 0;">
-      <thead>
-        <tr>
-          <th style="padding: 0.3em 0.6em;">What</th>
-          <th style="padding: 0.3em 0.6em;">How it's verified</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">Maven &amp; Gradle artifacts</td>
-          <td style="padding: 0.25em 0.6em;">Only properly signed releases &mdash; SNAPSHOTs and metadata pass through</td>
-        </tr>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">Container image layers</td>
-          <td style="padding: 0.25em 0.6em;">OCI content digest &mdash; immutable by design</td>
-        </tr>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">Tool downloads</td>
-          <td style="padding: 0.25em 0.6em;">Verified against declared SHA256 checksum</td>
-        </tr>
-        <tr>
-          <td style="padding: 0.25em 0.6em;">DNF packages</td>
-          <td style="padding: 0.25em 0.6em;">Host-side cache shared across builds</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section>
-    <h2>IDE integration: <span class="accent3">your editor, their machine</span></h2>
-    <div class="feature-grid">
-      <div class="feature-card purple">
-        <h4>VS Code Remote</h4>
-        <p>One-click from TUI (F9). VS Code downloads its server on first connect.</p>
-      </div>
-      <div class="feature-card orange">
-        <h4>JetBrains Gateway</h4>
-        <p>IntelliJ backend pre-installed. Full indexing, debugging, refactoring &mdash; inside.</p>
-      </div>
-    </div>
-    <p style="font-size: 0.7em; margin-top: 0.6em;">
+    <p class="note">
       SSH keys are fully managed &mdash; <span class="kw">ssh my-branch</span> just works, no passphrase prompt, no host key warning.
     </p>
+  </div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>The <span class="accent">TUI</span></h2>
-    <p style="font-size: 0.85em; margin-bottom: 0.8em;">
-      Not a list command &mdash; an interactive interface you live in.
-    </p>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h4>At a glance</h4>
-        <p>Templates, branches, status, per-row disk usage, storage gauge &mdash; all in one view</p>
-      </div>
-      <div class="feature-card orange">
-        <h4>Modal dialogs</h4>
-        <p>Branch, rename, build &mdash; with keyboard-driven UI and inline validation</p>
-      </div>
-      <div class="feature-card purple">
-        <h4>F-key actions</h4>
-        <p>F3 details &bull; F9 tool actions (open IDE, launch agent) &bull; C to reclaim space</p>
-      </div>
-      <div class="feature-card green">
-        <h4>Build status</h4>
-        <p><span class="kw">!</span> = different isx version &bull; <span class="kw">&#x25B3;</span> = definition changed since last build</p>
+    <div class="body">
+      <p class="lead">
+        Not a list command &mdash; an interactive interface you live in.
+      </p>
+      <div class="cards">
+        <div class="card">
+          <h4>At a glance</h4>
+          <p>Templates, branches, status, per-row disk usage, storage gauge &mdash; all in one view</p>
+        </div>
+        <div class="card">
+          <h4>Modal dialogs</h4>
+          <p>Branch, rename, build &mdash; with keyboard-driven UI and inline validation</p>
+        </div>
+        <div class="card">
+          <h4>F-key actions</h4>
+          <p>F3 details &bull; F9 tool actions (open IDE, launch agent) &bull; C to reclaim space</p>
+        </div>
+        <div class="card">
+          <h4>Build status</h4>
+          <p><span class="kw">!</span> = different isx version &bull; <span class="kw">&#x25B3;</span> = definition changed since last build</p>
+        </div>
       </div>
     </div>
-    <p class="fragment muted" style="font-size: 0.7em; margin-top: 0.8em;">
+    <p class="fragment note">
       Launch it with just <span class="kw">isx</span> &mdash; no arguments needed.
     </p>
+  </div>
   </section>
 
-  <section class="code-slide">
-    <h2 style="margin-bottom: 0.2em;">Custom proxy credentials <span class="accent2">for any service</span></h2>
-    <p style="font-size: 0.7em; margin-bottom: 0.3em;">
-      Declare a YAML tool &mdash; any HTTPS API gets transparent auth, no config inside containers.
-    </p>
-    <pre><code class="language-yaml">name: artifactory
+  <section><div class="slide-inner">
+    <h2>Custom proxy credentials <span class="accent">for any service</span></h2>
+    <div class="body">
+      <p class="lead">
+        Declare a YAML tool &mdash; any HTTPS API gets transparent auth, no config inside containers.
+      </p>
+      <pre><code class="language-yaml">name: artifactory
 proxy:
   config-namespace: artifactory
   configuration:
@@ -1046,261 +1472,300 @@ proxy:
     - domains: [artifactory.internal.example.com]
       type: bearer
       token: "${token}"</code></pre>
-    <p class="muted" style="font-size: 0.6em; margin-top: 0.3em;">
+    </div>
+    <p class="note">
       Supports <span class="kw">bearer</span>, <span class="kw">basic</span>, and custom <span class="kw">header</span> auth.
       Wildcard domains supported. <span class="kw">isx init</span> prompts for credentials.
     </p>
+  </div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>Session persistence: <span class="accent">zmx</span></h2>
-    <p style="font-size: 0.85em; margin-bottom: 0.8em;">
-      Persistent terminal sessions that survive disconnections &mdash; with native scrollback and multi-client support.
-    </p>
-    <pre><code class="language-bash"># Sessions appear natively on the host (Linux)
+    <div class="body">
+      <p class="lead">
+        Persistent terminal sessions that survive disconnections &mdash; with native scrollback and multi-client support.
+      </p>
+      <pre><code class="language-bash"># Sessions appear natively on the host (Linux)
 zmx list                        # shows isx-my-branch
 zmx attach isx-my-branch        # attach from the host
 zmx history isx-my-branch       # view scrollback
 zmx run isx-my-branch git status # run a command</code></pre>
-    <ul style="margin-top: 0.8em;">
-      <li class="fragment">Auto-attaches on shell entry &mdash; every session is persistent by default</li>
-      <li class="fragment">Long-running agents keep working if you disconnect</li>
-      <li class="fragment">Container sessions share via socket directory &mdash; no extra config</li>
-    </ul>
+      <ul>
+        <li class="fragment">Auto-attaches on shell entry &mdash; every session is persistent by default</li>
+        <li class="fragment">Long-running agents keep working if you disconnect</li>
+        <li class="fragment">Container sessions share via socket directory &mdash; no extra config</li>
+      </ul>
+    </div></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>Agent-agnostic</h2>
-    <p style="font-size: 0.75em; margin-bottom: 0.6em;">
-      isx is not tied to one AI agent. The proxy and tooling work with any agent that speaks HTTPS.
-    </p>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h4>Claude Code</h4>
-        <p>Anthropic's coding CLI &mdash; all auth modes (API key, OAuth, Vertex)</p>
-      </div>
-      <div class="feature-card orange">
-        <h4>Pi</h4>
-        <p>Provider-agnostic CLI agent &mdash; uses standard Anthropic API</p>
-      </div>
-      <div class="feature-card purple">
-        <h4>Bob Shell</h4>
-        <p>IBM's AI assistant &mdash; API key injected via proxy</p>
-      </div>
-      <div class="feature-card green">
-        <h4>Codex / any HTTPS agent</h4>
-        <p>Custom proxy rules for any service &mdash; add your own in YAML</p>
+    <div class="body">
+      <p class="lead">
+        isx is not tied to one AI agent. The proxy and tooling work with any agent that speaks HTTPS.
+      </p>
+      <div class="cards">
+        <div class="card">
+          <h4>Claude Code</h4>
+          <p>Anthropic's coding CLI &mdash; all auth modes (API key, OAuth, Vertex)</p>
+        </div>
+        <div class="card">
+          <h4>Pi</h4>
+          <p>Provider-agnostic CLI agent &mdash; uses the standard Anthropic API</p>
+        </div>
+        <div class="card">
+          <h4>Bob Shell</h4>
+          <p>IBM's AI assistant &mdash; API key injected via proxy</p>
+        </div>
+        <div class="card">
+          <h4>Codex / any HTTPS agent</h4>
+          <p>Custom proxy rules for any service &mdash; add your own in YAML</p>
+        </div>
       </div>
     </div>
-    <p class="fragment muted" style="font-size: 0.6em; margin-top: 0.5em;">
+    <p class="fragment note">
       Add an agent to a template with one line: <span class="kw">tools: [claude]</span>.
       The proxy handles auth transparently for all of them.
     </p>
+  </div>
   </section>
 
-  <section>
-    <h2 style="margin-bottom: 0.3em;">Self-diagnosing: <span class="accent">isx doctor</span></h2>
-    <p style="font-size: 0.75em; margin-bottom: 0.6em;">
-      When something isn't right, <span class="kw">isx doctor</span> checks everything and offers to fix what it finds.
-    </p>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h4>Host checks</h4>
-        <p>Incus, storage pool, firewall, bridge configuration</p>
+  <section><div class="slide-inner">
+    <h2>Self-diagnosing: <span class="accent">isx doctor</span></h2>
+    <div class="body">
+      <p class="lead">
+        When something isn't right, <span class="kw">isx doctor</span> checks everything and offers to fix what it finds.
+      </p>
+      <div class="cards">
+        <div class="card">
+          <h4>Host checks</h4>
+          <p>Incus, storage pool, firewall, bridge configuration</p>
+        </div>
+        <div class="card">
+          <h4>Proxy checks</h4>
+          <p>Service status, port availability, certificate validity</p>
+        </div>
+        <div class="card">
+          <h4>Deep mode</h4>
+          <p><span class="kw">--deep</span> runs per-instance checks: DNS, TLS, resolv.conf</p>
+        </div>
+        <div class="card">
+          <h4>Support bundle</h4>
+          <p><span class="kw">--bundle</span> collects findings and logs into a redacted archive</p>
+        </div>
       </div>
-      <div class="feature-card orange">
-        <h4>Proxy checks</h4>
-        <p>Service status, port availability, certificate validity</p>
-      </div>
-      <div class="feature-card purple">
-        <h4>Deep mode</h4>
-        <p><span class="kw">--deep</span> runs per-instance checks: DNS, TLS, resolv.conf</p>
-      </div>
-      <div class="feature-card green">
-        <h4>Support bundle</h4>
-        <p><span class="kw">--bundle</span> collects findings and logs into a redacted archive</p>
-      </div>
-    </div>
+    </div></div>
   </section>
 
   <!-- ============================================ -->
   <!-- DEMO -->
   <!-- ============================================ -->
-  <section class="demo-marker" data-background-gradient="linear-gradient(135deg, rgba(109, 169, 228, 0.1), rgba(167, 139, 218, 0.1))">
-    <h2>&#9654; Demo</h2>
-    <p>Build &bull; Branch &bull; Work &bull; Review &bull; Destroy</p>
+  <section class="demo-marker center-slide" data-background-gradient="linear-gradient(135deg, rgba(34, 211, 238, 0.18), rgba(34, 211, 238, 0.04))"><div class="slide-inner">
+    <h2>&#9654;&nbsp; Demo</h2>
+    <p>Build &bull; Branch &bull; Work &bull; Review &bull; Destroy</p></div>
   </section>
 
   <!-- ============================================ -->
-  <!-- VISION -->
+  <!-- 07 — VISION -->
   <!-- ============================================ -->
-  <section class="section-divider" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.06) 0%, var(--bg) 70%)">
-    <div class="section-number">07</div>
-    <h2>The <span class="accent">Vision</span></h2>
-    <h3>Where isx is heading</h3>
+  <section class="section-divider center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(34, 211, 238, 0.08) 0%, #070b14 70%)"><div class="slide-inner">
+    <div class="ghost-number">07</div>
+    <h2>The <span class="accent">vision</span></h2>
+    <p class="section-sub">Where isx is heading</p></div>
   </section>
 
-  <section class="statement">
-    <h2>Agents are <span class="accent">principals</span>,<br>not processes</h2>
-    <p class="fragment muted" style="font-size: 0.9em; margin-top: 1em;">
+  <section class="statement center-slide"><div class="slide-inner">
+    <h2>Agents are<br><span class="accent">principals</span>,<br>not processes</h2>
+    <p class="fragment note">
       Own identity &bull; own credentials &bull; own audit trail
-    </p>
+    </p></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>The proxy is the control plane</h2>
-    <p style="font-size: 0.85em; margin-bottom: 1em;">
-      Every API call every agent makes passes through it. Zero instrumentation inside containers.
-    </p>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h4>Activity</h4>
-        <p>Is the agent streaming, waiting for input, or stuck?</p>
+    <div class="body">
+      <p class="lead">
+        Every API call every agent makes passes through it. Zero instrumentation inside containers.
+      </p>
+      <div class="cards">
+        <div class="card">
+          <h4>Activity</h4>
+          <p>Is the agent streaming, waiting for input, or stuck?</p>
+        </div>
+        <div class="card">
+          <h4>Spend</h4>
+          <p>Live token usage per agent, attributable per container</p>
+        </div>
+        <div class="card">
+          <h4>Audit</h4>
+          <p>Complete record of what each agent did with its identity</p>
+        </div>
+        <div class="card">
+          <h4>Policy &amp; routing</h4>
+          <p>Per-agent budget caps, domain allowlists &mdash; and route requests to different models per container</p>
+        </div>
       </div>
-      <div class="feature-card orange">
-        <h4>Spend</h4>
-        <p>Live token usage per agent, attributable per container</p>
-      </div>
-      <div class="feature-card purple">
-        <h4>Audit</h4>
-        <p>Complete record of what each agent did with its identity</p>
-      </div>
-      <div class="feature-card green">
-        <h4>Policy &amp; routing</h4>
-        <p>Per-agent budget caps, domain allowlists &mdash; and route requests to different models per container</p>
-      </div>
-    </div>
+    </div></div>
   </section>
 
-  <section>
+  <section><div class="slide-inner">
     <h2>TUI &rarr; Mission Control</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>isx Primitive</th>
-          <th>Mission Control Meaning</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Template</td>
-          <td>Standardized workstation for every agent</td>
-        </tr>
-        <tr>
-          <td>Branch</td>
-          <td>One agent, one task, one disposable machine</td>
-        </tr>
-        <tr>
-          <td>Per-container profile</td>
-          <td>Agent's identity: token, signing key, budget</td>
-        </tr>
-        <tr>
-          <td>Git remote</td>
-          <td>The deliverable &mdash; an immutable commit you review before merging</td>
-        </tr>
-        <tr>
-          <td>Destroy</td>
-          <td>Offboarding: everything cleaned up atomically</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="body">
+      <table>
+        <thead>
+          <tr>
+            <th>isx primitive</th>
+            <th>Mission Control meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Template</td>
+            <td>Standardized workstation for every agent</td>
+          </tr>
+          <tr>
+            <td>Branch</td>
+            <td>One agent, one task, one disposable machine</td>
+          </tr>
+          <tr>
+            <td>Per-container profile</td>
+            <td>Agent's identity: token, signing key, budget</td>
+          </tr>
+          <tr>
+            <td>Git remote</td>
+            <td>The deliverable &mdash; an immutable commit you review before merging</td>
+          </tr>
+          <tr>
+            <td>Destroy</td>
+            <td>Offboarding: everything cleaned up atomically</td>
+          </tr>
+        </tbody>
+      </table>
+    </div></div>
   </section>
 
-  <!-- ============================================ -->
-  <!-- LOCAL FIRST -->
-  <!-- ============================================ -->
-  <section class="statement" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.06) 0%, var(--bg) 70%)">
+  <section class="statement center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(34, 211, 238, 0.08) 0%, #070b14 70%)"><div class="slide-inner">
     <h2>Local-first,<br><span class="accent">by conviction</span></h2>
-    <p class="fragment muted" style="font-size: 0.9em; margin-top: 1em;">
+    <p class="fragment note">
       Your hardware. Your network. Your repos.<br>Nothing leaves the building.
-    </p>
+    </p></div>
   </section>
 
   <!-- ============================================ -->
   <!-- GETTING STARTED -->
   <!-- ============================================ -->
-  <section>
+  <section><div class="slide-inner">
     <h2>Installation</h2>
-    <pre><code class="language-bash"># Fedora / RHEL
-sudo dnf copr enable sanne/incus-spawn
-sudo dnf install incus-spawn
-
-# macOS
-brew install Sanne/tap/incus-spawn
-
-# Ubuntu / Debian — APT repo available
-# Any Linux — single native binary, no JVM:
-curl -fsSL https://isx.run | sh
-
-# Already have a JVM? One-liner via JBang:
-jbang app install isx@Sanne/incus-spawn</code></pre>
-    <p class="muted" style="font-size: 0.65em; margin-top: 0.5em;">
-      On macOS, isx automatically provisions a custom lightweight Linux appliance &mdash;
-      no Docker Desktop, no manual VM setup.
-    </p>
-  </section>
-
-  <section>
-    <h2>Initial setup</h2>
-    <pre><code class="language-bash"># One command sets up Incus, firewall, auth, proxy, SSH keys
-isx init
-
-# Build a template
-isx build tpl-java
-
-# Branch and work
-isx branch my-feature --from tpl-java
-
-# Or launch the TUI
-isx</code></pre>
-    <p class="muted" style="font-size: 0.65em; margin-top: 0.5em;">
-      <span class="kw">isx init</span> walks you through everything interactively &mdash; credentials, proxy setup, base image.
-    </p>
-  </section>
-
-  <section>
-    <h2>Got questions? <span class="accent">Ask isx</span></h2>
-    <p style="font-size: 0.85em; margin-bottom: 0.8em;">
-      Built-in AI-powered help &mdash; just ask in plain English.
-    </p>
-    <pre><code class="language-bash">isx ask "how do I restrict network access for a branch"
-
-isx ask "which of my templates have Claude Code installed" --with-templates</code></pre>
-    <p class="muted" style="font-size: 0.65em; margin-top: 0.8em;">
-      <span class="kw">--with-templates</span> includes your template and tool definitions for context-aware answers.
-    </p>
-  </section>
-
-  <section>
-    <h2>Built with</h2>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h4>Java 25</h4>
-        <p>Modern Java &mdash; virtual threads, pattern matching, records</p>
-      </div>
-      <div class="feature-card orange">
-        <h4><a href="https://quarkus.io/" style="color: var(--accent2); text-decoration: none;">Quarkus</a></h4>
-        <p>Supersonic Subatomic Java framework &mdash; CDI, fast startup, native-ready</p>
-      </div>
-      <div class="feature-card purple">
-        <h4><a href="https://www.graalvm.org/" style="color: var(--accent3); text-decoration: none;">GraalVM</a></h4>
-        <p>Ahead-of-time compiled native binaries &mdash; instant startup, no JVM required</p>
-      </div>
-      <div class="feature-card green">
-        <h4><a href="https://tamboui.dev/" style="color: var(--success); text-decoration: none;">Tamboui</a> &amp; <a href="https://github.com/aeshell/aesh" style="color: var(--success); text-decoration: none;">Aesh</a></h4>
-        <p>Terminal UI framework and CLI command engine &mdash; powering the interactive TUI</p>
+    <div class="body">
+      <div class="cards">
+        <div class="card">
+          <h4>Fedora / RHEL</h4>
+          <div class="cmd">sudo dnf copr enable sanne/incus-spawn
+sudo dnf install incus-spawn</div>
+        </div>
+        <div class="card">
+          <h4>macOS</h4>
+          <div class="cmd">brew install Sanne/tap/incus-spawn</div>
+        </div>
+        <div class="card">
+          <h4>Any Linux</h4>
+          <div class="cmd">curl -fsSL https://isx.run | sh</div>
+          <p>Single native binary, no JVM. APT repo for Ubuntu / Debian.</p>
+        </div>
+        <div class="card">
+          <h4>Already have a JVM?</h4>
+          <div class="cmd">jbang app install isx@Sanne/incus-spawn</div>
+        </div>
       </div>
     </div>
+    <p class="note">
+      On macOS, isx provisions a lightweight Linux appliance for you &mdash; no Docker Desktop, no manual VM setup.
+      Full instructions at <a class="kw" href="https://isx.run">isx.run</a>.
+    </p>
+  </div>
+  </section>
+
+  <section><div class="slide-inner">
+    <h2>Initial setup</h2>
+    <div class="body">
+      <p class="lead">Everything starts with one command &mdash; it sets up Incus, the firewall, auth, the proxy and your SSH keys.</p>
+      <div class="cmd cmd-hero">isx init</div>
+      <div class="cards">
+        <div class="card">
+          <h4>Then drive it from the CLI</h4>
+          <div class="cmd">isx build tpl-java
+isx branch my-feature --from tpl-java</div>
+        </div>
+        <div class="card">
+          <h4>Or live in the TUI</h4>
+          <div class="cmd">isx</div>
+          <p>No arguments needed.</p>
+        </div>
+      </div>
+    </div>
+    <p class="note">
+      <span class="kw">isx init</span> walks you through everything interactively &mdash; credentials, proxy setup, base image.
+    </p>
+  </div>
+  </section>
+
+  <section><div class="slide-inner">
+    <h2>Got questions? <span class="accent">Ask isx</span></h2>
+    <div class="body">
+      <p class="lead">
+        Built-in AI-powered help &mdash; just ask in plain English.
+      </p>
+      <pre><code class="language-bash">isx ask "how do I restrict network access for a branch"
+
+isx ask "which of my templates have Claude Code installed" --with-templates</code></pre>
+    </div>
+    <p class="note">
+      <span class="kw">--with-templates</span> includes your template and tool definitions for context-aware answers.
+    </p>
+  </div>
+  </section>
+
+  <section><div class="slide-inner">
+    <h2>Built with</h2>
+    <div class="body">
+      <div class="cards">
+        <div class="card tech">
+          <div class="tech-head">
+            <img class="logo logo--mark" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDQiIGhlaWdodD0iNDQiIHZpZXdCb3g9IjAgMCA0NCA0NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgZmlsdGVyPSJ1cmwoI2ZpbHRlcjBfaV83ODdfNDg1MykiPgo8cGF0aCBkPSJNMTcuNTEzIDQzLjc5MzNDMjUuNDc5MyA0NC4yOTkzIDM3LjcxMTYgNDMuNTEyOCAzOC4wMDEgMzkuNzc1NEMzOC4wMDEgMzkuNzc1NCAzNy40NDQzIDQxLjE5MDYgMzEuNDE3NiA0Mi4zMTY3QzI0LjYyIDQzLjU4NTEgMTYuMjMzOSA0My40Mzg0IDExLjI1ODggNDIuNjI1NkMxMS4yNTg4IDQyLjYyNTYgMTIuMjc3MiA0My40NjAzIDE3LjUxMyA0My43OTMzIiBmaWxsPSIjRjI5MTExIi8+CjxwYXRoIGQ9Ik0xNS44ODQ3IDMzLjk4OTNDMTUuODg0NyAzMy45ODkzIDE0LjE5NDcgMzQuOTY0MSAxNy4wODg3IDM1LjI5MjhDMjAuNTkyNSAzNS42ODkzIDIyLjM5MDggMzUuNjM0NSAyNi4yNDggMzQuOTA5NEMyNy4wMjI3IDM1LjM2OTYgMjcuODM1NyAzNS43NjMyIDI4LjY3ODEgMzYuMDg1OEMyMC4wMjAzIDM5Ljc2NjMgOS4wODI2IDM1Ljg2NjcgMTUuODgyNSAzMy45ODkzIiBmaWxsPSIjRjI5MTExIi8+CjxwYXRoIGQ9Ik0xNC44MjQ2IDI5LjE4NUMxNC44MjQ2IDI5LjE4NSAxMi45MzEzIDMwLjU4NDkgMTUuODI1MyAzMC44NzQxQzE5LjU2NzcgMzEuMjU1MyAyMi41MjU4IDMxLjI4ODIgMjcuNjQyMyAzMC4zMTExQzI4LjE2NjcgMzAuNzk2NCAyOC43ODY0IDMxLjE2OTMgMjkuNDYyNyAzMS40MDY1QzE4Ljk5MzMgMzQuNDQyOSA3LjMzMzIxIDMxLjY0NTMgMTQuODI0NiAyOS4xODA3IiBmaWxsPSIjRjI5MTExIi8+CjxwYXRoIGQ9Ik0yMy43NTc0IDIxLjAzODZDMjUuODkxNCAyMy40NzQ3IDIzLjE5NjIgMjUuNjY3NyAyMy4xOTYyIDI1LjY2NzdDMjMuMTk2MiAyNS42Njc3IDI4LjYwMjEgMjIuODk0MSAyNi4xMTQ2IDE5LjQxM0MyMy43OTA1IDE2LjE3MjkgMjIuMDA5OSAxNC41NjQ4IDMxLjY1NTIgOS4wMTU2MkMzMS42NTUyIDkuMDE1NjIgMTYuNTEzNCAxMi43NjYyIDIzLjc0NjMgMjEuMDI5OCIgZmlsbD0iI0YyOTExMSIvPgo8cGF0aCBkPSJNMzUuMjAwMyAzNy41NDAyQzM1LjIwMDMgMzcuNTQwMiAzNi40NTA3IDM4LjU2MzMgMzMuODIxOCAzOS4zNTQyQzI4LjgyNDYgNDAuODU0OSAxMy4wMiA0MS4zMDgzIDguNjM3MDIgMzkuNDEzM0M3LjA1OTY2IDM4LjczMiAxMC4wMiAzNy43ODc4IDEwLjk1IDM3LjU4ODRDMTEuNDQ5NSAzNy40Njc2IDExLjk2MjYgMzcuNDEwOSAxMi40NzY2IDM3LjQxOTdDMTAuNzA5MiAzNi4xOTI5IDEuMTMyNCAzOS44Mjk2IDcuNjE2MzcgNDAuODY4QzI1LjI3IDQzLjcxNiAzOS43OTk4IDM5LjU4ODYgMzUuMjMxMiAzNy41NDAyIiBmaWxsPSIjRjI5MTExIi8+CjxwYXRoIGQ9Ik0xNi42ODc4IDI0LjIxMTRDMTYuNjg3OCAyNC4yMTE0IDguNjQ4NiAyNi4xMDQyIDEzLjg0MDIgMjYuNzkyMUMxNi4wMzM5IDI3LjA4MzUgMjAuNDAzNyAyNy4wMTEyIDI0LjQ3NTIgMjYuNjc4MkMyNy44MDIzIDI2LjQgMzEuMTQyNiAyNS44MDE5IDMxLjE0MjYgMjUuODAxOUMzMC40NDAyIDI2LjEwNDIgMjkuNzY0MSAyNi40NjMyIDI5LjEyMTIgMjYuODc1NEMyMC45NDcyIDI5LjAwNDggNS4xODY4IDI4LjAxMjQgOS43MjY2OSAyNS44MzQ4QzEzLjU3NTEgMjQuMDAxMSAxNi42ODc4IDI0LjIxMTQgMTYuNjg3OCAyNC4yMTE0WiIgZmlsbD0iI0YyOTExMSIvPgo8cGF0aCBkPSJNMzEuMTE4MSAzMi4yMDM5QzM5LjQxNTggMjcuOTI3NSAzNS41ODA3IDIzLjgxNzcgMzIuOTAwOSAyNC4zNzE5QzMyLjU3ODYgMjQuNDMxMiAzMi4yNjE3IDI0LjUxNjIgMzEuOTUzMiAyNC42MjZDMzIuMTI4NiAyNC4zNzc5IDMyLjM3NTkgMjQuMTg4NCAzMi42NjIzIDI0LjA4MjdDMzcuOTY0NCAyMi4yMzU5IDQyLjAzMzcgMjkuNTMxMiAzMC45NTAyIDMyLjQyMDhDMzEuMDIwMyAzMi4zNTk2IDMxLjA3NzQgMzIuMjg1MSAzMS4xMTgxIDMyLjIwMTciIGZpbGw9IiNGMjkxMTEiLz4KPHBhdGggZD0iTTI2LjExNzMgMC4wNjY0MDYyQzI2LjExNzMgMC4wNjY0MDYyIDMwLjcxNDYgNC42MjU0IDIxLjc1ODYgMTEuNjM1OUMxNC41NzY1IDE3LjI1OTYgMjAuMTIxNiAyMC40NjY4IDIxLjc1ODYgMjQuMTIzMkMxNy41NzQ0IDIwLjM3OTIgMTQuNDgxNSAxNy4wNzc3IDE2LjU1MTUgMTQuMDA0MUMxOS41ODAzIDkuNDk1NDggMjcuOTczIDcuMzA2OSAyNi4xMTczIDAuMDY2NDA2MiIgZmlsbD0iI0YyOTExMSIvPgo8L2c+CjxkZWZzPgo8ZmlsdGVyIGlkPSJmaWx0ZXIwX2lfNzg3XzQ4NTMiIHg9IjUuMzkxNiIgeT0iMC4wNjY0MDYyIiB3aWR0aD0iMzMuNjA5NCIgaGVpZ2h0PSI0NS44NjUyIiBmaWx0ZXJVbml0cz0idXNlclNwYWNlT25Vc2UiIGNvbG9yLWludGVycG9sYXRpb24tZmlsdGVycz0ic1JHQiI+CjxmZUZsb29kIGZsb29kLW9wYWNpdHk9IjAiIHJlc3VsdD0iQmFja2dyb3VuZEltYWdlRml4Ii8+CjxmZUJsZW5kIG1vZGU9Im5vcm1hbCIgaW49IlNvdXJjZUdyYXBoaWMiIGluMj0iQmFja2dyb3VuZEltYWdlRml4IiByZXN1bHQ9InNoYXBlIi8+CjxmZUNvbG9yTWF0cml4IGluPSJTb3VyY2VBbHBoYSIgdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDEyNyAwIiByZXN1bHQ9ImhhcmRBbHBoYSIvPgo8ZmVPZmZzZXQgZHg9IjEiIGR5PSIyIi8+CjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjIiLz4KPGZlQ29tcG9zaXRlIGluMj0iaGFyZEFscGhhIiBvcGVyYXRvcj0iYXJpdGhtZXRpYyIgazI9Ii0xIiBrMz0iMSIvPgo8ZmVDb2xvck1hdHJpeCB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMC4xIDAiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbjI9InNoYXBlIiByZXN1bHQ9ImVmZmVjdDFfaW5uZXJTaGFkb3dfNzg3XzQ4NTMiLz4KPC9maWx0ZXI+CjwvZGVmcz4KPC9zdmc+Cg==" alt="Java">
+            <span class="tech-name">Java 25</span>
+          </div>
+          <p>The current LTS release &mdash; the language isx is written in</p>
+        </div>
+        <div class="card tech">
+          <div class="tech-head">
+            <a href="https://quarkus.io/"><img class="logo logo--word" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4MCIgaGVpZ2h0PSIxOTUiIHZpZXdCb3g9IjAgMCAxMjgwIDE5NSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSIjZmZmIj48cGF0aCBkPSJtNDA0IDg5LjM5cTAgMjUuOS0xMC40OSA0My4wN2E1Mi4zMSA1Mi4zMSAwIDAgMSAtMjkuNjEgMjMuMjRsMzIuMyAzMy4zOWgtMjIuOTFsLTI2LjQ1LTMwLjQ0LTUuMTEuMTlxLTMwIDAtNDYuMjctMTguMjJ0LTE2LjI5LTUxLjQycTAtMzIuOTMgMTYuMzQtNTEuMDV0NDYuNDEtMTguMTVxMjkuMjQgMCA0NS42NiAxOC40NXQxNi40MiA1MC45NHptLTEwOC4xNCAwcTAgMjcuMzkgMTEuNzQgNDEuNTV0MzQuMTEgMTQuMTVxMjIuNTYgMCAzNC4wNy0xNC4xMXQxMS41MS00MS41OXEwLTI3LjIxLTExLjQ3LTQxLjI3dC0zMy45LTE0LjA3cS0yMi41NiAwLTM0LjMgMTQuMTZ0LTExLjc0IDQxLjE4eiIvPjxwYXRoIGQ9Im01NTkuNTYgMjIuMTV2ODcuMjVxMCAyMy4wNS0xNCAzNi4yNXQtMzguNTYgMTMuMTlxLTI0LjUxIDAtMzcuOTItMTMuMjl0LTEzLjM4LTM2LjU1di04Ni44NWgxNS43OHY4OHEwIDE2Ljg4IDkuMjggMjUuOTF0MjcuMjkgOXExNy4xNiAwIDI2LjQ1LTkuMDh0OS4yOC0yNS45OHYtODcuODV6Ii8+PHBhdGggZD0ibTcwMy42IDE1Ny0xNi45LTQyLjloLTU0LjM5bC0xNi43MSA0Mi45aC0xNmw1My42OS0xMzUuNGgxMy4yN2w1My4zNyAxMzUuNHptLTIxLjgyLTU3LTE1Ljc4LTQxLjc5cS0zLjA3LTcuOTItNi4zMi0xOS40NmExNzIuNTUgMTcyLjU1IDAgMCAxIC01Ljg1IDE5LjQ2bC0xNiA0MS43OHoiLz48cGF0aCBkPSJtNzc3LjE5IDEwMC45MnY1Ni4wOGgtMTUuNzl2LTEzNC44NWgzNy4yM3EyNSAwIDM2Ljg5IDkuNXQxMS45MyAyOC41OXEwIDI2Ljc0LTI3LjI5IDM2LjE2bDM2Ljg0IDYwLjZoLTE4LjY1bC0zMi44Ni01Ni4wN3ptMC0xMy40N2gyMS42MnExNi43MSAwIDI0LjUxLTYuNnQ3Ljc5LTE5Ljc4cTAtMTMuMzctNy45My0xOS4yN3QtMjUuNDgtNS45MWgtMjAuNTF6Ii8+PHBhdGggZD0ibTk5OS43NSAxNTdoLTE4LjU3bC00OS40Ny02NS40LTE0LjIgMTIuNTR2NTIuODZoLTE1Ljc4di0xMzQuODVoMTUuNzh2NjYuODVsNjEuNTQtNjYuODdoMTguNjZsLTU0LjU4IDU4LjU5eiIvPjxwYXRoIGQ9Im0xMTQzLjY5IDIyLjE1djg3LjI1cTAgMjMuMDUtMTQgMzYuMjV0LTM4LjUyIDEzLjE5cS0yNC41IDAtMzcuOTItMTMuMjl0LTEzLjQzLTM2LjU1di04Ni44NWgxNS43OHY4OHEwIDE2Ljg4IDkuMjggMjUuOTF0MjcuMjkgOXExNy4xNyAwIDI2LjQ2LTkuMDh0OS4yOC0yNi4wNnYtODcuNzd6Ii8+PHBhdGggZD0ibTEyNzkgMTIxLjExcTAgMTcuOC0xMyAyNy43NnQtMzUuMjggMTBxLTI0LjEzIDAtMzcuMTMtNi4xOHYtMTUuMTZhOTcuODIgOTcuODIgMCAwIDAgMTguMiA1LjUzIDk1LjY3IDk1LjY3IDAgMCAwIDE5LjQ5IDJxMTUuNzggMCAyMy43Ni02dDgtMTYuNTVxMC03LTIuODMtMTEuNDh0LTkuNDYtOC4yNnEtNi42NS0zLjc4LTIwLjE5LTguNTgtMTguOTQtNi43Mi0yNy4wNi0xNnQtOC4xMi0yNC4wN3EwLTE1LjU4IDExLjc5LTI0LjgxdDMxLjE4LTkuMjJhOTIuNTUgOTIuNTUgMCAwIDEgMzcuMjIgNy4zN2wtNC45MSAxMy42NXEtMTYuODItNy0zMi42OC03LTEyLjUzIDAtMTkuNTggNS4zNXQtNy4wNiAxNC44NXEwIDcgMi42IDExLjQ4dDguNzcgOC4yMXE2LjE4IDMuNzMgMTguODkgOC4yNiAyMS4zNiA3LjU2IDI5LjM4IDE2LjIzdDguMDIgMjIuNjJ6Ii8+PC9nPjxwYXRoIGQ9Im0xMjYuMDUgMzQuNi0yOS40NCAxNi45OSAyOS40NCAxN3oiIGZpbGw9IiM0Njk1ZWIiLz48cGF0aCBkPSJtNjcuMTcgMzQuNnYzMy45OWwyOS40NC0xN3oiIGZpbGw9IiNmZjAwNGEiLz48cGF0aCBkPSJtMTI2LjA1IDY4LjU5LTI5LjQ0LTE3LTI5LjQ0IDE3IDI5LjQ0IDE3eiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Im0zNi4xMyA4OC4zNiAyOS40NCAxN3YtMzMuOTl6IiBmaWxsPSIjNDY5NWViIi8+PHBhdGggZD0ibTY1LjU3IDEzOS4zNSAyOS40NC0xNi45OS0yOS40NC0xN3oiIGZpbGw9IiNmZjAwNGEiLz48cGF0aCBkPSJtNjUuNTcgNzEuMzd2MzMuOTlsMjkuNDQgMTd2LTM0eiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Im0xMjcuNjUgMTM5LjM1di0zMy45OWwtMjkuNDQgMTd6IiBmaWxsPSIjNDY5NWViIi8+PHBhdGggZD0ibTE1Ny4wOSA4OC4zNi0yOS40NC0xNi45OXYzMy45OXoiIGZpbGw9IiNmZjAwNGEiLz48cGF0aCBkPSJtOTguMjEgMTIyLjM2IDI5LjQ0LTE3di0zMy45OWwtMjkuNDQgMTYuOTl6IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0ibTE2MC41IDFoLTEyNy43OGEzMS44MSAzMS44MSAwIDAgMCAtMzEuNzIgMzEuNzJ2MTI3Ljc4YTMxLjgxIDMxLjgxIDAgMCAwIDMxLjcyIDMxLjcyaDg3LjUxbC0yMy42Mi01Ny4zNy0xNy4xMyAzNi4yMmgtNDYuNzZhMTAuNzEgMTAuNzEgMCAwIDEgLTEwLjU3LTEwLjU3di0xMjcuNzhhMTAuNzEgMTAuNzEgMCAwIDEgMTAuNTctMTAuNTdoMTI3Ljc4YTEwLjcxIDEwLjcxIDAgMCAxIDEwLjU3IDEwLjU3djEyNy43OGExMC43MSAxMC43MSAwIDAgMSAtMTAuNTcgMTAuNTdoLTI3LjczbDguNzEgMjEuMTVoMTlhMzEuODEgMzEuODEgMCAwIDAgMzEuNzItMzEuNzJ2LTEyNy43OGEzMS44MSAzMS44MSAwIDAgMCAtMzEuNy0zMS43MnoiIGZpbGw9IiM0Njk1ZWIiLz48L3N2Zz4=" alt="Quarkus"></a>
+          </div>
+          <p>Supersonic Subatomic Java framework &mdash; CDI, fast startup, native-ready</p>
+        </div>
+        <div class="card tech">
+          <div class="tech-head">
+            <a href="https://www.graalvm.org/"><img class="logo logo--word" src="data:image/png;base64,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" alt="GraalVM"></a>
+          </div>
+          <p>Ahead-of-time compiled native binaries &mdash; instant startup, no JVM required</p>
+        </div>
+        <div class="card tech">
+          <div class="tech-head">
+            <a href="https://tamboui.dev/"><img class="logo logo--mark" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTAyNCIgaGVpZ2h0PSIxMDI0IiBpZD0iYXJ0d29yayIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0Ij4KICA8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMzAuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogMi4xLjEgQnVpbGQgMTIzKSAgLS0+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5zdDAgewogICAgICAgIGZpbGw6IHVybCgjbGluZWFyLWdyYWRpZW50MSk7CiAgICAgIH0KCiAgICAgIC5zdDEgewogICAgICAgIGZpbGw6IHVybCgjbGluZWFyLWdyYWRpZW50KTsKICAgICAgfQoKICAgICAgLnN0MiB7CiAgICAgICAgZmlsbDogI2ZmZjsKICAgICAgICBpc29sYXRpb246IGlzb2xhdGU7CiAgICAgICAgb3BhY2l0eTogLjM7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImxpbmVhci1ncmFkaWVudCIgeDE9IjM3LjciIHkxPSItNTI1LjIiIHgyPSI2NjEuNyIgeTI9Ijk4LjciIGdyYWRpZW50VHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCA3MDApIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzgxYzc4NiIvPgogICAgICA8c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjZWVlMjM0Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E5M2U4OCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0ibGluZWFyLWdyYWRpZW50MSIgeDE9IjEwNi4yIiB5MT0iLTU5My44IiB4Mj0iNzMwLjIiIHkyPSIzMC4yIiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDAgNzAwKSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4MWM3ODYiLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iI2VlZTIzNCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNhOTNlODgiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9InN0MSIgZD0iTTUzMy42LDQ1OS45bC0yMTMuMi0yMTMuMmMtMTMuOC0xMy44LTM2LjMtMTMuOC01MC4xLDBsLTQzLjcsNDMuN2MtMTMuOCwxMy44LTEzLjgsMzYuMywwLDUwLjFsMTE5LjMsMTE5LjNjMTMuOCwxMy44LDEzLjgsMzYuMywwLDUwLjFsLTExOS4zLDExOS4zYy0xMy44LDEzLjgtMTMuOCwzNi4zLDAsNTAuMWw0My42LDQzLjdjMTMuOCwxMy44LDM2LjMsMTMuOCw1MC4xLDBsNDYuOS00Ni45YzE0LjQtMTQuNCwzOS4xLTQuMiwzOS4xLDE2LjJ2MzAuMmMwLDE5LjYsMTUuOSwzNS40LDM1LjQsMzUuNGgzMjNjMTkuNiwwLDM1LjQtMTUuOSwzNS40LTM1LjR2LTg2LjRjMC0xOS42LTE1LjktMzUuNC0zNS40LTM1LjRoLTI2Ny40Yy0yMC4yLDAtMzAuMy0yNC40LTE2LTM4LjZsNTIuMi01Mi4yYzEzLjgtMTMuOCwxMy44LTM2LjMsMC01MC4xaC4xWiIvPgogICAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTUxMiwxNDEuMWM5NC4xLDAsMTg5LjUsNC40LDI4My42LDEzLjIsMTcuMSwxLjYsMzQuMiw2LjYsNTAuNywxNC43LDE1LjUsNy43LDMwLjEsMTgsNDMuNCwzMC42aDBjMTMuMywxMi45LDI0LjMsMjcsMzIuNyw0Mi4zLDguOSwxNi4zLDE0LjYsMzMuMywxNi44LDUwLjUsOS4yLDcyLjgsMTMuOSwxNDYuNywxMy45LDIxOS42cy00LjcsMTQ2LjctMTMuOSwyMTkuNmMtMi4yLDE3LjItNy44LDM0LjItMTYuOCw1MC41LTguMywxNS4yLTE5LjMsMjkuNC0zMi43LDQyLjJoMGMtMTMuMywxMi43LTI3LjksMjMtNDMuNSwzMC43LTE2LjUsOC4yLTMzLjYsMTMuMS01MC43LDE0LjctOTQuMSw4LjctMTg5LjUsMTMuMi0yODMuNiwxMy4ycy0xODkuNS00LjQtMjgzLjYtMTMuMmMtMTcuMS0xLjYtMzQuMi02LjUtNTAuNy0xNC43LTE1LjUtNy43LTMwLjEtMTgtNDMuNC0zMC43aDBjLTEzLjMtMTIuOC0yNC4zLTI3LTMyLjctNDIuMi04LjktMTYuMy0xNC42LTMzLjMtMTYuOC01MC41LTkuMi03Mi44LTEzLjktMTQ2LjctMTMuOS0yMTkuNnM0LjctMTQ2LjcsMTMuOS0yMTkuNmMyLjItMTcuMiw3LjgtMzQuMiwxNi44LTUwLjUsOC4zLTE1LjIsMTkuMy0yOS40LDMyLjctNDIuMmgwYzEzLjMtMTIuNywyNy45LTIzLDQzLjQtMzAuNywxNi41LTguMiwzMy42LTEzLjEsNTAuNy0xNC43LDk0LjEtOC43LDE4OS41LTEzLjIsMjgzLjYtMTMuMmguMVpNNTEyLDgwLjNjLTk2LDAtMTkzLjMsNC41LTI4OS4yLDEzLjQtMjQuNiwyLjMtNDguOSw5LjMtNzIuMSwyMC44LTIxLjEsMTAuNC00MC43LDI0LjMtNTguNCw0MS4yaDBjLTE3LjgsMTcuMi0zMi42LDM2LjMtNDMuOSw1Ny0xMi42LDIzLTIwLjYsNDcuMy0yMy44LDcyLjEtOS42LDc1LjQtMTQuNCwxNTEuOC0xNC40LDIyNy4yczQuOSwxNTEuOCwxNC40LDIyNy4yYzMuMSwyNC44LDExLjIsNDkuMSwyMy44LDcyLjEsMTEuMywyMC43LDI2LjEsMzkuOCw0My45LDU2LjloMGMxNy43LDE3LDM3LjQsMzAuOSw1OC40LDQxLjMsMjMuMiwxMS41LDQ3LjUsMTguNSw3Mi4xLDIwLjgsOTYsOC45LDE5My4zLDEzLjQsMjg5LjIsMTMuNHMxOTMuMy00LjUsMjg5LjItMTMuNGMyNC42LTIuMyw0OC44LTkuMyw3Mi4xLTIwLjgsMjEtMTAuNCw0MC43LTI0LjMsNTguNS00MS4yaDBjMTcuOC0xNy4yLDMyLjYtMzYuMyw0My45LTU3LDEyLjYtMjMsMjAuNi00Ny4zLDIzLjgtNzIuMSw5LjYtNzUuNCwxNC40LTE1MS44LDE0LjQtMjI3LjJzLTQuOC0xNTEuOS0xNC40LTIyNy4yYy0zLjItMjQuOC0xMS4yLTQ5LjEtMjMuOC03Mi4xLTExLjMtMjAuNy0yNi4xLTM5LjgtNDMuOS01Ni45aDBjLTE3LjctMTctMzcuNC0zMC45LTU4LjUtNDEuMy0yMy4yLTExLjUtNDcuNS0xOC41LTcyLjEtMjAuOC05Ni04LjktMTkzLjMtMTMuNC0yODkuMi0xMy40aDBaIi8+CiAgPC9nPgogIDxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik0yOTUuNCwyNDBjOC41LDAsMTYuNSwzLjMsMjIuNSw5LjNsMjEzLjIsMjEzLjJjNiw2LDkuMywxNCw5LjMsMjIuNXMtMy4zLDE2LjUtOS4zLDIyLjVsLTUyLjIsNTIuMmMtNy43LDcuNy05LjksMTguNi01LjcsMjguNiw0LjEsMTAsMTMuNSwxNi4yLDI0LjMsMTYuMmgyNjcuNGMxNy41LDAsMzEuOCwxNC4zLDMxLjgsMzEuOHY4Ni40YzAsMTcuNS0xNC4zLDMxLjgtMzEuOCwzMS44aC0zMjNjLTE3LjUsMC0zMS44LTE0LjMtMzEuOC0zMS44di0zMC4yYzAtMTYuNi0xMy42LTI2LjYtMjYuNy0yNi42cy0xMy42LDIuOC0xOC42LDcuOGwtNDYuOSw0Ni45Yy02LDYtMTQsOS4zLTIyLjUsOS4zcy0xNi41LTMuMy0yMi41LTkuM2wtNDMuNi00My43Yy0xMi40LTEyLjQtMTIuNC0zMi42LDAtNDVsMTE5LjMtMTE5LjNjNy40LTcuNCwxMS40LTE3LjIsMTEuNC0yNy42cy00LjEtMjAuMi0xMS40LTI3LjZsLTExOS4zLTExOS4zYy0xMi40LTEyLjQtMTIuNC0zMi42LDAtNDQuOWw0My43LTQzLjdjNi02LDE0LTkuMywyMi41LTkuM00yOTUuNCwyMzYuM2MtOS4xLDAtMTguMSwzLjUtMjUuMSwxMC40bC00My43LDQzLjdjLTEzLjgsMTMuOC0xMy44LDM2LjMsMCw1MC4xbDExOS4zLDExOS4zYzEzLjgsMTMuOCwxMy44LDM2LjMsMCw1MC4xbC0xMTkuMywxMTkuM2MtMTMuOCwxMy44LTEzLjgsMzYuMywwLDUwLjFsNDMuNiw0My43YzYuOSw2LjksMTYsMTAuNCwyNS4xLDEwLjRzMTguMS0zLjUsMjUtMTAuNGw0Ni45LTQ2LjljNC43LTQuNywxMC40LTYuOCwxNi02LjgsMTEuOCwwLDIzLjEsOS4yLDIzLjEsMjN2MzAuMmMwLDE5LjYsMTUuOSwzNS40LDM1LjQsMzUuNGgzMjNjMTkuNiwwLDM1LjQtMTUuOSwzNS40LTM1LjR2LTg2LjRjMC0xOS42LTE1LjktMzUuNC0zNS40LTM1LjRoLTI2Ny40Yy0yMC4yLDAtMzAuMy0yNC40LTE2LTM4LjZsNTIuMi01Mi4yYzEzLjgtMTMuOCwxMy44LTM2LjMsMC01MC4xbC0yMTMuMi0yMTMuMmMtNi45LTYuOS0xNi0xMC40LTI1LjEtMTAuNGguMloiLz4KICA8cGF0aCBjbGFzcz0ic3QyIiBkPSJNNTEyLDgzLjljOTUuOCwwLDE5Myw0LjUsMjg4LjksMTMuNCwyNC4xLDIuMiw0OCw5LjEsNzAuOCwyMC40LDIwLjcsMTAuMyw0MC4xLDIzLjksNTcuNiw0MC42aDBjMTcuNSwxNi45LDMyLjEsMzUuNyw0My4zLDU2LjEsMTIuNCwyMi42LDIwLjMsNDYuNCwyMy40LDcwLjgsOS41LDc1LjIsMTQuNCwxNTEuNSwxNC40LDIyNi44cy00LjgsMTUxLjUtMTQuNCwyMjYuOGMtMy4xLDI0LjMtMTEsNDguMi0yMy40LDcwLjgtMTEuMiwyMC40LTI1LjcsMzkuMi00My4zLDU2aDBjLTE3LjUsMTYuOC0zNi44LDMwLjQtNTcuNSw0MC43LTIyLjgsMTEuMy00Ni43LDE4LjItNzAuOCwyMC40LTk1LjgsOC45LTE5MywxMy40LTI4OC45LDEzLjRzLTE5My00LjUtMjg4LjktMTMuNGMtMjQuMS0yLjItNDcuOS05LjEtNzAuOC0yMC40LTIwLjctMTAuMy00MC4xLTIzLjktNTcuNi00MC42aDBjLTE3LjUtMTYuOS0zMi4xLTM1LjctNDMuMy01Ni4xLTEyLjQtMjIuNi0yMC4zLTQ2LjQtMjMuNC03MC44LTkuNS03NS4yLTE0LjQtMTUxLjUtMTQuNC0yMjYuOHM0LjgtMTUxLjUsMTQuNC0yMjYuOGMzLjEtMjQuNCwxMC45LTQ4LjIsMjMuNC03MC44LDExLjItMjAuNCwyNS43LTM5LjIsNDMuMy01NmgwYzE3LjUtMTYuOCwzNi44LTMwLjQsNTcuNi00MC43LDIyLjgtMTEuMyw0Ni43LTE4LjIsNzAuOC0yMC40LDk1LjgtOC45LDE5My0xMy40LDI4OC45LTEzLjRNNTEyLDgwLjNjLTk2LDAtMTkzLjMsNC41LTI4OS4yLDEzLjQtMjQuNiwyLjMtNDguOSw5LjMtNzIuMSwyMC44LTIxLjEsMTAuNC00MC43LDI0LjMtNTguNCw0MS4yaDBjLTE3LjgsMTcuMi0zMi42LDM2LjMtNDMuOSw1Ny0xMi42LDIzLTIwLjYsNDcuMy0yMy44LDcyLjEtOS42LDc1LjQtMTQuNCwxNTEuOC0xNC40LDIyNy4yczQuOSwxNTEuOCwxNC40LDIyNy4yYzMuMSwyNC44LDExLjIsNDkuMSwyMy44LDcyLjEsMTEuMywyMC43LDI2LjEsMzkuOCw0My45LDU2LjloMGMxNy43LDE3LDM3LjQsMzAuOSw1OC40LDQxLjMsMjMuMiwxMS41LDQ3LjUsMTguNSw3Mi4xLDIwLjgsOTYsOC45LDE5My4zLDEzLjQsMjg5LjIsMTMuNHMxOTMuMy00LjUsMjg5LjItMTMuNGMyNC42LTIuMyw0OC44LTkuMyw3Mi4xLTIwLjgsMjEtMTAuNCw0MC43LTI0LjMsNTguNS00MS4yaDBjMTcuOC0xNy4yLDMyLjYtMzYuMyw0My45LTU3LDEyLjYtMjMsMjAuNi00Ny4zLDIzLjgtNzIuMSw5LjYtNzUuNCwxNC40LTE1MS44LDE0LjQtMjI3LjJzLTQuOC0xNTEuOS0xNC40LTIyNy4yYy0zLjItMjQuOC0xMS4yLTQ5LjEtMjMuOC03Mi4xLTExLjMtMjAuNy0yNi4xLTM5LjgtNDMuOS01Ni45aDBjLTE3LjctMTctMzcuNC0zMC45LTU4LjUtNDEuMy0yMy4yLTExLjUtNDcuNS0xOC41LTcyLjEtMjAuOC05Ni04LjktMTkzLjMtMTMuNC0yODkuMi0xMy40aDBaIi8+CiAgPHBhdGggY2xhc3M9InN0MiIgZD0iTTUxMiwxNDEuMWM5NC4xLDAsMTg5LjUsNC40LDI4My42LDEzLjIsMTcuMSwxLjYsMzQuMiw2LjYsNTAuNywxNC43LDE1LjUsNy43LDMwLjEsMTgsNDMuNCwzMC42aDBjMTMuMywxMi45LDI0LjMsMjcsMzIuNyw0Mi4zLDguOSwxNi4zLDE0LjYsMzMuMywxNi44LDUwLjUsOS4yLDcyLjgsMTMuOSwxNDYuNywxMy45LDIxOS42cy00LjcsMTQ2LjctMTMuOSwyMTkuNmMtMi4yLDE3LjItNy44LDM0LjItMTYuOCw1MC41LTguMywxNS4yLTE5LjMsMjkuNC0zMi43LDQyLjJoMGMtMTMuMywxMi43LTI3LjksMjMtNDMuNSwzMC43LTE2LjUsOC4yLTMzLjYsMTMuMS01MC43LDE0LjctOTQuMSw4LjctMTg5LjUsMTMuMi0yODMuNiwxMy4ycy0xODkuNS00LjQtMjgzLjYtMTMuMmMtMTcuMS0xLjYtMzQuMi02LjUtNTAuNy0xNC43LTE1LjUtNy43LTMwLjEtMTgtNDMuNC0zMC43aDBjLTEzLjMtMTIuOC0yNC4zLTI3LTMyLjctNDIuMi04LjktMTYuMy0xNC42LTMzLjMtMTYuOC01MC41LTkuMi03Mi44LTEzLjktMTQ2LjctMTMuOS0yMTkuNnM0LjctMTQ2LjcsMTMuOS0yMTkuNmMyLjItMTcuMiw3LjgtMzQuMiwxNi44LTUwLjUsOC4zLTE1LjIsMTkuMy0yOS40LDMyLjctNDIuMmgwYzEzLjMtMTIuNywyNy45LTIzLDQzLjQtMzAuNywxNi41LTguMiwzMy42LTEzLjEsNTAuNy0xNC43LDk0LjEtOC43LDE4OS41LTEzLjIsMjgzLjYtMTMuMk01MTIsMTM3LjVjLTk0LjIsMC0xODkuNyw0LjQtMjgzLjksMTMuMi0xNy42LDEuNi0zNS4xLDYuNy01MiwxNS4xLTE1LjksNy45LTMwLjgsMTguNC00NC4zLDMxLjMtMTMuNywxMy4xLTI0LjksMjcuNi0zMy40LDQzLjEtOS4yLDE2LjctMTQuOSwzNC4xLTE3LjIsNTEuOC05LjMsNzMtMTQsMTQ3LTE0LDIyMHM0LjcsMTQ3LDE0LDIyMGMyLjIsMTcuNyw4LDM1LjEsMTcuMiw1MS44LDguNSwxNS42LDE5LjgsMzAsMzMuMyw0My4xbDIuNi0yLjUtMi41LDIuNmMxMy42LDEyLjksMjguNSwyMy41LDQ0LjMsMzEuMywxNi45LDguNCwzNC40LDEzLjUsNTIsMTUuMSw5NC4yLDguOCwxODkuNywxMy4yLDI4My45LDEzLjJzMTg5LjctNC40LDI4My45LTEzLjJjMTcuNi0xLjYsMzUuMS02LjcsNTItMTUuMSwxNS45LTcuOSwzMC44LTE4LjQsNDQuMy0zMS4zaDBjMTMuNi0xMy4xLDI0LjgtMjcuNSwzMy4zLTQzLjEsOS4yLTE2LjcsMTQuOS0zNC4xLDE3LjItNTEuOCw5LjMtNzMsMTQtMTQ3LDE0LTIyMHMtNC43LTE0Ny0xNC0yMjBjLTIuMi0xNy42LTgtMzUuMS0xNy4yLTUxLjgtOC41LTE1LjYtMTkuOC0zMC4xLTMzLjMtNDMuMWgwYy0xMy42LTEzLTI4LjUtMjMuNS00NC4zLTMxLjQtMTYuOS04LjQtMzQuNC0xMy41LTUyLTE1LjEtOTQuMi04LjgtMTg5LjctMTMuMi0yODMuOS0xMy4yaDBaIi8+Cjwvc3ZnPg==" alt="Tamboui"></a>
+            <span class="tech-name"><a href="https://tamboui.dev/">Tamboui</a> &amp; <a href="https://github.com/aeshell/aesh">Aesh</a></span>
+          </div>
+          <p>Terminal UI framework and CLI command engine &mdash; powering the interactive TUI</p>
+        </div>
+      </div>
+    </div></div>
   </section>
 
   <!-- ============================================ -->
   <!-- CLOSING -->
   <!-- ============================================ -->
-  <section class="statement" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(109, 169, 228, 0.1) 0%, var(--bg) 70%)">
-    <h2 style="font-size: 2.2em;"><span class="accent">Their machines.</span><br>Your machine.</h2>
-    <p style="margin-top: 2em; font-size: 0.9em;">
-      <span class="kw">isx.run</span>
-    </p>
+  <section class="statement center-slide" data-background-gradient="radial-gradient(ellipse at 50% 50%, rgba(34, 211, 238, 0.14) 0%, #070b14 70%)"><div class="slide-inner">
+    <h2><span class="accent">Their machines.</span><br>Your machine.</h2>
+    <p class="mt-lg"><a class="kw" href="https://isx.run">isx.run</a></p></div>
   </section>
 
 </div>
@@ -1315,9 +1780,9 @@ isx ask "which of my templates have Claude Code installed" --with-templates</cod
     slideNumber: true,
     progress: true,
     center: false,
-    width: 1100,
-    height: 700,
-    margin: 0.08,
+    width: 1280,
+    height: 720,
+    margin: 0.04,
     minScale: 0.2,
     maxScale: 1.5,
     transition: 'fade',
