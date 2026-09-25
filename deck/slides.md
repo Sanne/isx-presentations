@@ -846,7 +846,7 @@ Branch (seconds, from a primed template) → no secrets inside, yet everything a
 
 ## Others are working on <span class="accent">the same problem</span>
 
-<div class="cards three mt-4">
+<div class="cards three equal mt-4">
   <div class="card warn"><h4>Docker Sandboxes</h4><p>The closest: a microVM per agent on your machine, and a host-side proxy that adds API keys to requests. Your working tree is mounted in, read-write by default.</p></div>
   <div class="card warn"><h4>Process sandboxes</h4><p>Claude Code's sandbox, Anthropic's srt, Nono, Lince. They confine the agent's commands on your laptop, next to your files and tools, rather than giving it a machine.</p></div>
   <div class="card warn"><h4>Cloud sandboxes</h4><p>Anthropic's cloud sessions, E2B, Daytona. A machine per agent, on someone else's compute and account.</p></div>

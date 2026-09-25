@@ -131,6 +131,8 @@
 /* Cards: hug their content; the accent is a rule across the top */
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
 .cards.three { grid-template-columns: 1fr 1fr 1fr; }
+/* Cards in a row, all as tall as the tallest. */
+.cards.equal { align-items: stretch; }
 .card {
   background: var(--surface);
   border-radius: 6px;
