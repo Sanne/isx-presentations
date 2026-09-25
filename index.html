@@ -767,49 +767,40 @@
         <tbody>
           <tr>
             <td>Init system (systemd)</td>
-            <td class="danger">No</td>
-            <td class="accent">Yes</td>
+            <td class="warn">Not in Docker by default; Podman supports it</td>
+            <td class="accent">Every machine boots one</td>
           </tr>
           <tr>
-            <td>Real networking (ping, strace)</td>
-            <td class="danger">No</td>
-            <td class="accent">Yes</td>
+            <td>Nested containers (Testcontainers, compose)</td>
+            <td class="warn">Needs <span class="kw">--privileged</span> or extra setup</td>
+            <td class="accent">Work out of the box</td>
           </tr>
           <tr>
-            <td>Nested containers</td>
-            <td class="danger">Fragile</td>
-            <td class="accent">Native</td>
+            <td>Profilers (perf)</td>
+            <td class="warn">Blocked by the default seccomp profile</td>
+            <td class="accent">Work</td>
           </tr>
           <tr>
-            <td>dnf / apt install</td>
-            <td class="warn">Limited</td>
-            <td class="accent">Full OS</td>
-          </tr>
-          <tr>
-            <td>CoW branching</td>
-            <td class="danger">No</td>
-            <td class="accent">Instant</td>
-          </tr>
-          <tr>
-            <td>Composable tooling</td>
-            <td class="danger">Dockerfile layers</td>
-            <td class="accent">Declarative YAML tools</td>
+            <td>Branch a whole environment</td>
+            <td class="warn">Commit it to a new image</td>
+            <td class="accent"><span class="kw">isx branch</span> &mdash; a CoW clone in seconds</td>
           </tr>
           <tr>
             <td>Host integration</td>
-            <td class="danger">DIY</td>
-            <td class="accent">ssh, git fetch, IDE &mdash; just work</td>
+            <td class="warn">Dev Containers cover the IDE; git and SSH wiring is yours</td>
+            <td class="accent">ssh, git fetch, IDE &mdash; managed for you</td>
           </tr>
           <tr>
             <td>Credential isolation</td>
-            <td class="danger">Manual</td>
-            <td class="accent">Built-in</td>
+            <td class="warn">Up to you</td>
+            <td class="accent">Built in: real keys never enter</td>
           </tr>
         </tbody>
       </table>
     </div>
     <p class="fragment note">
-      Docker builds minimal images for deploying apps. isx builds full dev environments for agents to work in.
+      Docker can be configured to do most of this &mdash; it's built for shipping apps, so a workstation is not its default.
+      isx makes a complete dev machine the default.
     </p>
   </div>
   </section>
