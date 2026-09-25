@@ -1,0 +1,7 @@
+node_modules
+dist
+.slidev
+*.local
+
+# Simpsons frames: fetched by tools/fetch-memes.sh, not redistributed
+public/memes/

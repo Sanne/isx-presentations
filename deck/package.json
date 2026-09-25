@@ -1,0 +1,24 @@
+{
+  "name": "isx-deck",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npm run build:anim && slidev --open",
+    "build": "npm run build:anim && slidev build",
+    "export": "slidev export",
+    "anim": "vite --config animations/vite.config.ts",
+    "build:anim": "vite build --config animations/vite.config.ts"
+  },
+  "devDependencies": {
+    "@motion-canvas/2d": "^3.17.2",
+    "@motion-canvas/core": "^3.17.2",
+    "@motion-canvas/player": "^3.17.2",
+    "@motion-canvas/ui": "^3.17.2",
+    "@motion-canvas/vite-plugin": "^3.17.2",
+    "@slidev/cli": "^53.0.0",
+    "@slidev/theme-default": "^0.25.0",
+    "playwright-chromium": "^1.63.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.1"
+  }
+}
