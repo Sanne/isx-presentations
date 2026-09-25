@@ -8,7 +8,7 @@ import { useSlideContext } from '@slidev/client'
 const { $clicks } = useSlideContext()
 
 const rows = [
-  { when: 'Tue – Wed', a: '', m2: 'lib-1.2-SNAPSHOT', m2Kind: 'clean', b: 'Hunting a race: fails 1 run in 50. Collecting clues: logs, thread dumps, timings', bKind: '' },
+  { when: 'since Tue', a: '', m2: 'lib-1.2-SNAPSHOT', m2Kind: 'clean', b: 'Hunting a race: fails 1 run in 50. Collecting clues: logs, thread dumps, timings', bKind: '' },
   { when: 'Thu 14:05', a: 'Other task. Patches lib, runs mvn install', m2: "A's patch #1", m2Kind: 'dirty', b: '', bKind: '' },
   { when: 'Thu 14:20', a: '', m2: "A's patch #1", m2Kind: 'dirty', b: '0 failures in 200 runs. "It was the pool timeout I raised." Writes it up, commits the fix', bKind: 'good' },
   { when: 'Thu 15:40', a: 'Tries another idea, mvn install again', m2: "A's patch #2", m2Kind: 'dirty', b: '', bKind: '' },

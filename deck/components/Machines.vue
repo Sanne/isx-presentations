@@ -1,10 +1,13 @@
 <script setup lang="ts">
 // Worktrees vs. isx branches, drawn on the same geometry so the second
 // picture reads as a transformation of the first.
-//  mode="worktrees" (clicks: 3): one .git → three checkouts → all on one
-//    machine's ports, caches and tools → the collisions.
-//  mode="isx" (clicks: 2): one template → three machines, each carrying its
-//    own ports, caches and tools → the host underneath holds nothing shared.
+//  mode="worktrees" (clicks: 3): one .git → three checkouts, whose commits
+//    all land in that .git → all on one machine's ports, caches and tools →
+//    the collisions.
+//  mode="isx" (clicks: 3): one template → three machines, each carrying its
+//    own ports, caches and tools → the host underneath holds nothing shared →
+//    the same git workflow as worktrees: each machine is a git remote of your
+//    repository, so you fetch and push its branches.
 import { computed } from 'vue'
 import { useSlideContext } from '@slidev/client'
 
@@ -22,7 +25,7 @@ const W = 320
 </script>
 
 <template>
-  <svg class="m" viewBox="0 0 1160 430" role="img"
+  <svg class="m" viewBox="0 0 1160 470" role="img"
        :aria-label="wt
          ? 'One git repository with three worktrees, all sharing one machine: its ports, ~/.m2, installed tools and running services.'
          : 'One template with three isx branches, each a machine with its own checkout, ports, ~/.m2, tools and services.'">
@@ -30,6 +33,10 @@ const W = 320
     <rect class="src" x="460" y="10" width="240" height="64" rx="10" />
     <text class="lbl" x="580" y="40">{{ wt ? 'one repository' : 'tpl-java' }}</text>
     <text class="sub mid" x="580" y="62">{{ wt ? '.git' : 'template' }}</text>
+
+    <!-- worktrees share one .git, so their work meets there -->
+    <text v-if="wt" class="git-note reveal" :class="{ on: step >= 1 }" x="720" y="36">one .git: commit in any checkout,</text>
+    <text v-if="wt" class="git-note reveal" :class="{ on: step >= 1 }" x="720" y="58">merge it from any other</text>
 
     <g v-for="(c, i) in cols" :key="c.branch" class="reveal" :class="{ on: step >= 1 }">
       <path class="link" :d="`M580 74 C 580 110, ${c.x + W / 2} 100, ${c.x + W / 2} 140`" />
@@ -55,9 +62,18 @@ const W = 320
         <text class="sub mid" x="580" y="376">ports · ~/.m2 · installed tools · running services · yesterday's leftovers</text>
       </template>
       <template v-else>
-        <rect class="host" x="40" y="352" width="1080" height="58" rx="10" />
-        <text class="sub mid" x="580" y="387">the host underneath: nothing shared but the kernel</text>
+        <rect class="host" x="40" y="390" width="1080" height="70" rx="10" />
+        <text class="sub mid" x="580" :y="step >= 3 ? 416 : 431">the host underneath: nothing shared but the kernel</text>
+        <text class="sub mid git-t reveal" :class="{ on: step >= 3 }" x="580" y="444">and your repository, where each machine is a git remote</text>
       </template>
+    </g>
+
+    <!-- the worktree habit, kept: fetch and push between machine and repository -->
+    <g v-if="!wt" class="reveal" :class="{ on: step >= 3 }">
+      <g v-for="(c, i) in cols" :key="`g${c.branch}`">
+        <path class="git" :d="`M${c.x + W / 2} 340 L ${c.x + W / 2} 386`" />
+        <text class="git-cmd" :x="c.x + W / 2 + 12" y="368">git fetch · push</text>
+      </g>
     </g>
   </svg>
 </template>
@@ -79,6 +95,12 @@ const W = 320
 .host { fill: none; stroke: var(--line); stroke-width: 2; stroke-dasharray: 8 6; }
 
 .link { fill: none; stroke: var(--accent-edge); stroke-width: 2; }
+.git-note { font-family: 'JetBrains Mono', monospace !important; font-size: 15px; fill: var(--accent); }
+.git { stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 6 5; marker-start: none; animation: march 1s linear infinite; }
+.git-cmd { font-family: 'JetBrains Mono', monospace !important; font-size: 14px; fill: var(--accent); }
+.git-cmd.end { text-anchor: end; }
+.sub.git-t { fill: var(--accent); }
+@keyframes march { to { stroke-dashoffset: -11; } }
 .down { stroke: var(--warn); stroke-width: 2.5; stroke-dasharray: 6 5; }
 .clash { font-family: 'JetBrains Mono', monospace !important; font-size: 15px; font-weight: 700; fill: var(--danger); text-anchor: middle; }
 

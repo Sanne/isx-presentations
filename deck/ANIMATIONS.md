@@ -1,8 +1,44 @@
-# isx deck — the animations still to build
+# isx deck — the animations
 
-This is a hand-over plan. It assumes you have read nothing else; the first
-section is everything you need to work in this deck, the rest is one spec per
-animation, in the order they pay off. `STORYBOARD.md` has the story and the
+This started as a hand-over plan. It assumes you have read nothing else; the
+first section is everything you need to work in this deck, the rest is one
+spec per animation, in the order they pay off.
+
+## Status (2026-09-25)
+
+| # | Animation | Component | State |
+|---|-----------|-----------|-------|
+| 1 | Five agents, one of you | `FiveAgents.vue` | built |
+| 2 | The classifier gate | `ClassifierGate.vue` | built |
+| 3 | Set up once | `TemplateRace.vue` | built; MEASURE before quoting numbers |
+| 4 | Branch a live machine | `LiveBranch.vue` | built; CONFIRM with one real branch |
+| 5 | Network modes | `NetworkModes.vue` | built |
+| 6 | Caching without surprises | `CacheFlow.vue` | blocked: incus-spawn #555 still open |
+
+Where the build departed from the specs below, and why:
+
+- **Five agents:** the lanes aren't hand-drawn; the component simulates a
+  first-come, first-served queue with one rule (each answer costs you 1.5
+  minutes), so the picture is consistent. The side panel counts "now: N of 5
+  waiting" and, as the headline, the share of the agents' time spent waiting
+  for you (61% at the end), because the live count happens to read 0 when
+  the clip stops.
+- **Classifier gate:** eight commands, not ten, to keep the pace; the three
+  blocks that hand the decision back are the OpenJDK `sudo dnf install`
+  commands, which foreshadows the next slide. The sequence is illustrative,
+  not a claim about how the real classifier rules on those commands.
+- **Set up once:** no clocks at all, since any running clock is a number.
+  The first lead and the bullets moved to the speaker notes.
+- **Branch a live machine:** the code settles what carries over.
+  `isx branch --from <instance>` is an Incus copy of the instance's disk,
+  and the branch boots its own systemd, so the labels say "postgres started
+  on boot, same data", not "still running". The first lead moved to the
+  notes. Still to confirm with one real run: that the source keeps running
+  during the copy, and that Postgres comes up with the data.
+- **Network modes:** api.anthropic.com and github.com leave through the proxy
+  in `--proxy-only` too, because isx intercepts those hosts (github.com when
+  the template has `gh`); only other hosts are dropped. The spec's "only the
+  proxy packet leaves" undercounted. `STORYBOARD.md` has the story and the
 claims register; `slides.md` is the deck itself.
 
 ## How this deck works
@@ -38,14 +74,15 @@ claims register; `slides.md` is the deck itself.
 - **Verify every change:** `node tools/audit.mjs <dir>` screenshots every slide
   with all clicks revealed and flags overflow (content below 700px) and a
   pinned footnote colliding with content. `node tools/shot.mjs <dir> 9:1 19:2`
-  screenshots specific slide:click pairs. A full-bleed overlay is exempted
+  screenshots specific slide:click pairs; `9:1@12000` waits 12 s first, to
+  catch a real-time animation mid-play. A full-bleed overlay is exempted
   with `data-overlay`. Look at the screenshots; the audit doesn't judge taste.
 - **Honesty is the deck's brand.** Nothing goes on a slide that the isx code
   or docs don't support; roadmap items carry the `roadmap` tag; numbers that
   are estimates say so in the speaker notes. See the claims register in
   `STORYBOARD.md` before drawing anything about caching, Docker, or timings.
-- **Placeholders.** Each unbuilt animation is a `<Todo>` block on its slide
-  (grep `<Todo` in `slides.md`). Replace the block with the component and set
+- **Placeholders.** An unbuilt animation is a `<Todo>` block on its slide
+  (grep `<Todo` in `slides.md`; only the cache flow is left). Replace the block with the component and set
   the slide's `clicks:`; keep the slide's heading and speaker notes unless
   the spec below says otherwise.
 - **Measured vs estimated timings.** `make images` for OpenJDK was measured at
@@ -235,8 +272,9 @@ cache hit, served locally, with the two measured figures from the slide
 - Measure the rest of the OpenJDK scenario (clone, configure, tests, and how
   many prompts the sandbox really raises) and update the four places listed
   above.
-- Re-verify two wordings on "Others are building the same boundary" against
-  the current docs: Docker Sandboxes' supported-agent list and Claude Code's
-  credential-mask mode.
+- Re-verify the wordings on "Others are working on the same problem" against
+  each project's current docs: Docker Sandboxes (microVM, credential proxy,
+  read-write mount by default), and the one-line descriptions of the process
+  sandboxes (Claude Code's, srt, Nono, Lince) and cloud sandboxes.
 - The `▶`-less **Demo** slide expects a primed template on the presenter's
   laptop so that `isx branch` is the seconds-long moment the deck promises.

@@ -247,11 +247,11 @@
 
 /* The growing allowlist: what it asked, why you said yes, and the rule that
    got saved (arriving a beat later, so it reads as cause and effect). */
-.rules li { display: grid; grid-template-columns: 470px 1fr 250px; align-items: baseline; gap: 22px; padding-left: 0 !important; }
+.rules li { display: grid; grid-template-columns: 490px 1fr 250px; align-items: baseline; gap: 22px; padding-left: 0 !important; }
 .rules li::before { content: none !important; }
 .rules li.head span { font-size: 15px !important; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-style: normal; }
 .rules li.head .why { color: var(--text-muted); }
-.rules li > code { font-size: 21px; }
+.rules li > code { font-size: 21px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rules li span { color: var(--text-muted); font-size: 21px; font-style: italic; }
 .rules li .rule { font-style: normal; transition: opacity .4s .7s, transform .4s .7s; }
 .rules li .rule code { font-size: 20px; color: var(--warn); border-color: var(--warn); }
@@ -280,12 +280,14 @@
    appears after the rule, so the columns become: asked, saved, allows. */
 .rules li .is { display: none; color: var(--danger); font-size: 21px; font-style: normal; }
 .rules li .is.ok { color: var(--accent); }
-.rules.real li { grid-template-columns: 470px 250px 1fr; }
+.rules.real li { grid-template-columns: 490px 250px 1fr; }
 .rules.real li .why { display: none; }
 .rules.real li .is { display: inline; }
 
 /* The closing slide: the website, and isx ask for questions later */
-.ask { display: inline-flex; align-items: center; gap: 18px; font-size: 24px; }
+.ask { display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 24px; }
+.ask .site { font-family: 'JetBrains Mono', monospace; font-size: 40px; font-weight: 700; color: var(--accent); text-decoration: none; border-bottom: 2px solid var(--accent-edge); }
+.ask .site:hover { border-bottom-color: var(--accent); }
 .ask .or { color: var(--text-muted); font-size: 20px; }
 
 /* Numbered steps */
@@ -298,3 +300,15 @@
   border: 2px solid var(--accent); color: var(--accent);
   font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 700;
 }
+
+/* A visible correction in a title: the struck word stays readable. */
+.struck { color: var(--text-muted); text-decoration-thickness: 3px; text-decoration-color: var(--danger); }
+
+/* A statement said in beats, one line per click. */
+.slidev-layout .statement.giveup { margin: 0 auto 14px; font-size: 56px; max-width: none; }
+
+/* A shell command or a few, as a block. */
+.cmd { font-family: 'JetBrains Mono', monospace; font-size: 17px; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-top: 8px; }
+.cmd.hero { font-size: 34px; font-weight: 700; color: var(--accent); text-align: center; border-color: var(--accent-edge); padding: 14px; width: fit-content; margin-left: auto; margin-right: auto; }
+.cmd.small { font-size: 15px; }
+.cards > .card { min-width: 0; }

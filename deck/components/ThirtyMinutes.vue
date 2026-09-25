@@ -19,7 +19,7 @@ const END = 36 // minutes on the axis: with prompts the task ends at 10:36
 const END_B = 24.5 // on isx the agent is done at 10:24, and the clip stops there
 const DUR_A = 28000, DUR_B = 14000 // real milliseconds per animation, slow enough to talk over
 
-type Seg = { from: number; to: number; kind: string; text?: string }
+type Seg = { from: number; to: number; kind: string; text?: string; live?: string }
 
 const agentA: Seg[] = [
   { from: 0, to: 1, kind: 'work' }, { from: 1, to: 2.5, kind: 'wait' },
@@ -53,9 +53,31 @@ const moods = [
 ]
 const focusLeft = [100, 82, 66, 48, 34, 18, 6]
 
-const agentB: Seg[] = [{ from: 0, to: 24.5, kind: 'work', text: 'clone · deps · configure · make images (15 min) · test · commit' }]
+// The same work as the prompted run, back to back: every step still happens,
+// including the three missing libraries, but the agent installs them itself
+// and never stops. Durations match agentA's work segments (24.5 min in total).
+const agentB: Seg[] = [
+  { from: 0, to: 1, kind: 'work', text: 'clone' },
+  { from: 1, to: 2, kind: 'work', text: 'JDK' },
+  { from: 2, to: 4.5, kind: 'work', text: 'configure' },
+  { from: 4.5, to: 5.5, kind: 'work', text: 'cups' },
+  { from: 5.5, to: 6.5, kind: 'work', text: 'fonts' },
+  { from: 6.5, to: 21.5, kind: 'work', text: 'make images (15 min)' },
+  { from: 21.5, to: 24.5, kind: 'work', text: 'test' },
+]
+// What the agent just did, for the status line: the same bumps as the
+// prompted run, handled without asking anyone.
+const stepsB = [
+  { at: 0, text: 'agent: git clone https://github.com/openjdk/jdk' },
+  { at: 1, text: 'agent: curl -LO https://download.java.net/…  (no prompt: it has its own network)' },
+  { at: 2, text: 'agent: bash configure …  → Could not find cups!' },
+  { at: 4.5, text: 'agent: sudo dnf install -y cups-devel  (root on its own machine: no prompt)' },
+  { at: 5.5, text: 'agent: sudo dnf install -y fontconfig-devel alsa-lib-devel' },
+  { at: 6.5, text: 'agent: configure ✓  make images' },
+  { at: 21.5, text: 'agent: mvn verify  (Testcontainers: Podman inside the machine)' },
+]
 const youB: Seg[] = [
-  { from: 0, to: 16, kind: 'task', text: 'reviewed the PR ✓' },
+  { from: 0, to: 16, kind: 'task', text: 'reviewed the PR ✓', live: 'reviewing the PR' },
   { from: 16, to: 24.5, kind: 'task', text: 'started a second agent' },
 ]
 
@@ -97,6 +119,10 @@ const current = computed(() => {
   return null
 })
 const doneB = computed(() => mB.value >= END_B)
+// Where the prompted run stopped to ask (its ⚡ moments), the agent here just
+// carried on: clone, the JDK download, the three libraries, and mvn verify.
+const fixesB = [1, 2, 5.5, 6.5, 24.5]
+const nowB = computed(() => [...stepsB].reverse().find(st => st.at <= mB.value) ?? null)
 </script>
 
 <template>
@@ -140,8 +166,9 @@ const doneB = computed(() => mB.value >= END_B)
         <div class="who">the agent</div>
         <div class="track">
           <div v-for="(s, i) in agentB" v-show="mB > s.from" :key="i" class="seg a-work" :style="shown(s, mB)">
-            <span v-if="mB >= 8">{{ s.text }}</span>
+            <span v-if="mB >= s.to && s.to - s.from >= 3">{{ s.text }}</span>
           </div>
+          <span v-for="f in fixesB" v-show="f <= mB" :key="f" class="fix" :style="{ left: pct(f) }">✓</span>
           <span class="mark" :class="{ on: doneB }" :style="{ left: pct(36) }">10:36 with prompts</span>
         </div>
         <div class="mind" />
@@ -150,7 +177,7 @@ const doneB = computed(() => mB.value >= END_B)
         <div class="who">you</div>
         <div class="track">
           <div v-for="(s, i) in youB" v-show="mB > s.from" :key="i" class="seg y-task" :style="shown(s, mB)">
-            <span v-if="mB >= Math.min(s.to, s.from + 6)">{{ s.text }}</span>
+            <span v-if="mB >= Math.min(s.to, s.from + 6)">{{ mB < s.to && s.live ? s.live : s.text }}</span>
           </div>
         </div>
         <div class="mind">
@@ -158,7 +185,7 @@ const doneB = computed(() => mB.value >= END_B)
           <span class="mood">focused<i style="width: 100%" /></span>
         </div>
       </div>
-      <div class="status ok">{{ doneB ? 'Done at 10:24, not 10:36. Zero approvals. The PR is reviewed, and a second agent is running.' : ' ' }}</div>
+      <div class="status ok" :class="{ sum: doneB }">{{ doneB ? 'Done at 10:24, not 10:36. Zero approvals. The PR is reviewed, and a second agent is running.' : nowB?.text ?? ' ' }}</div>
     </div>
   </div>
 </template>
@@ -189,6 +216,7 @@ const doneB = computed(() => mB.value >= END_B)
 .y-watch { background: rgba(255, 77, 109, .10); border: 1px dashed var(--danger); color: var(--danger); }
 .mark { position: absolute; top: -4px; bottom: -4px; border-left: 2px dashed var(--warn); padding-left: 6px; font-size: 12px; color: var(--warn); white-space: nowrap; line-height: 1.2; opacity: 0; transition: opacity .6s; }
 .mark.on { opacity: 1; }
+.fix { position: absolute; top: -10px; transform: translateX(-50%); font-size: 15px; font-weight: 800; color: var(--accent); filter: drop-shadow(0 0 6px var(--accent)); }
 .zap { position: absolute; top: -8px; transform: translateX(-50%); font-size: 18px; filter: drop-shadow(0 0 6px var(--danger)); }
 
 .mind { display: flex; align-items: center; gap: 8px; padding-left: 14px; }
@@ -207,6 +235,7 @@ const doneB = computed(() => mB.value >= END_B)
 .status.wait { color: var(--warn); }
 .status.ok { color: var(--accent); }
 .status.bad { color: var(--danger); }
+.status.ok.sum { color: var(--accent); font-family: 'Inter', sans-serif; font-size: 19px; font-weight: 600; white-space: normal; }
 .status.sum { color: var(--danger); font-family: 'Inter', sans-serif; font-size: 19px; font-weight: 600; white-space: normal; }
 
 .reveal { opacity: 0; transition: opacity .5s; }
