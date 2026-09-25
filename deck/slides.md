@@ -185,20 +185,16 @@ layout: center
 
 ---
 layout: center
-clicks: 2
 ---
 
-<h1 class="statement">Or you turn on auto mode, and<br><span class="warn">a second model</span> decides what's safe.</h1>
+<h1 class="statement">Or you turn on "auto mode", and<br><span class="warn">a second model</span> decides what's safe.</h1>
 
-<p class="lead">It's usually right.</p>
+<p class="lead" style="margin-top: 28px">It's usually right.</p>
 
-<ClassifierGate class="mt-6" />
-
-<p class="note mt-6">Anthropic publishes a 17% miss rate on real overeager actions, and calls it "a per-action control, not an isolation boundary".</p>
+<p class="note" style="margin-top: 48px">Anthropic publishes a 17% miss rate on real overeager actions, and calls it "a per-action control, not an isolation boundary".</p>
 
 <!--
 Be fair: auto mode is a real improvement for interactive work. The classifier is Sonnet 5 by default, a separate call that doesn't see tool outputs; when the session also runs Sonnet 5 it is literally another instance of the same model. It goes back to prompting after 3 blocks in a row or 20 per session. On API/Enterprise accounts its calls count toward token usage.
-Click 1 plays ten commands through the gate (about 15 seconds): watch it block a harmless clean, then wave through a script the agent called a formatter. Click 2: three blocks in a row, and it hands the decision back to you. One mistake of each kind in ten is there to be seen, not a rate; the rates are in the footnote.
 Sources: anthropic.com/engineering/claude-code-auto-mode; code.claude.com/docs/en/permission-modes; code.claude.com/docs/en/sandbox-environments.
 -->
 

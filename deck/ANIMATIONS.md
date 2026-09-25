@@ -9,7 +9,7 @@ spec per animation, in the order they pay off.
 | # | Animation | Component | State |
 |---|-----------|-----------|-------|
 | 1 | Five agents, one of you | `FiveAgents.vue` | built |
-| 2 | The classifier gate | `ClassifierGate.vue` | built |
+| 2 | The classifier gate | (removed) | built, then dropped: the slide reads better as a plain statement with the published figures |
 | 3 | Set up once | `TemplateRace.vue` | built; MEASURE before quoting numbers |
 | 4 | Branch a live machine | `LiveBranch.vue` | built; CONFIRM with one real branch |
 | 5 | Network modes | `NetworkModes.vue` | built |
@@ -23,7 +23,7 @@ Where the build departed from the specs below, and why:
   waiting" and, as the headline, the share of the agents' time spent waiting
   for you (61% at the end), because the live count happens to read 0 when
   the clip stops.
-- **Classifier gate:** eight commands, not ten, to keep the pace; the three
+- **Classifier gate (since removed from the deck; it's in git history):** eight commands, not ten, to keep the pace; the three
   blocks that hand the decision back are the OpenJDK `sudo dnf install`
   commands, which foreshadows the next slide. The sequence is illustrative,
   not a claim about how the real classifier rules on those commands.
