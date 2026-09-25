@@ -316,8 +316,11 @@
 .cards > .card { min-width: 0; }
 
 /* Two voices, one choice. */
-.dilemma .card h4 { font-size: 30px; }
-.dilemma .voice { font-size: 22px; line-height: 1.45; color: var(--text); }
+.dilemma .card h4 { font-size: 26px; }
+.dilemma .voice { font-size: 20px; line-height: 1.45; color: var(--text); }
+.card.you { border-top-color: var(--text-muted); box-shadow: 0 -7px 18px -12px var(--text-muted); }
+.card.you h4 { color: var(--text); }
+.card.you .voice { font-style: italic; }
 .card.danger { border-top-color: var(--danger); box-shadow: 0 -7px 18px -12px var(--danger); }
 .card.danger h4 { color: var(--danger); }
 .slidev-layout .statement.dilemma-q { margin-top: 40px; font-size: 52px; }
