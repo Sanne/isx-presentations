@@ -779,6 +779,24 @@ If asked why there's a bash shim in front of the native helper: git's helper pro
 -->
 
 ---
+clicks: 2
+---
+
+## To cache, <span class="warn">or not to cache?</span>
+
+<div class="cards equal dilemma mt-4">
+  <div class="card warn"><h4>"Cache it, obviously."</h4><p class="voice">Every build downloads the same internet again. Every agent, its own copy of every dependency: slow builds, rate limits, and a flaky network deciding whether your tests pass.</p></div>
+  <div v-click="1" class="card danger"><h4>"Never cache anything."</h4><p class="voice">Caches bite, in ways you can't predict. Remember Thursday afternoon: one shared <span class="kw">~/.m2</span>, and two days of evidence poisoned. A build you can't reproduce is a build you can't trust.</p></div>
+</div>
+
+<h1 v-click="2" class="statement dilemma-q">Could we have <span class="accent">both</span>?</h1>
+
+<!--
+Play both colleagues straight: each is right. The first is the one who waited for Maven Central again (and it's the "Set up once" argument, per task). The second is the one who lost Thursday afternoon. Let the room feel it's a real trade-off, then click: could we have both? The next slide is the answer.
+DO NOT PRESENT this slide without the next one, and that one waits for incus-spawn #555.
+-->
+
+---
 
 ## Caching, <span class="accent">without surprises</span>
 
