@@ -872,10 +872,10 @@ class: glow-accent
 
 <p class="lead mt-8 muted">Your hardware. Your network. Your repos.</p>
 
-<p class="lead mt-6">The cheapest machine is <span class="accent">the one you already own</span>.<br>Light enough to run five agents on it.</p>
+<p class="lead mt-6">The cheapest machine is <span class="accent">the one you already own</span>.<br>Light enough to run multiple agents on it.</p>
 
 <!--
-The cost point, said plainly: no per-minute cloud meter and no subscription for the machines; isx is open source, and a branch shares its template's disk and reserves no RAM up front, so a laptop holds several. Be honest if asked: the model's tokens still cost what they cost; isx doesn't change that.
+The cost point, said plainly: no per-minute cloud meter and no subscription for the machines; isx is open source, and a branch shares its template's disk and reserves no RAM up front, so a laptop holds several. How many depends on the workload and the RAM; don't quote a number without measuring it. Be honest if asked: the model's tokens still cost what they cost; isx doesn't change that.
 -->
 
 ---
