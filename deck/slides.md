@@ -191,11 +191,18 @@ layout: center
 
 <p class="lead" style="margin-top: 28px">It's usually right.</p>
 
-<p class="note" style="margin-top: 48px">Anthropic publishes a 17% miss rate on real overeager actions, and calls it "a per-action control, not an isolation boundary".</p>
+<div class="stats autostat" style="margin-top: 44px">
+  <div class="stat"><b class="warn">17%</b><span>of real overeager actions get through, per Anthropic</span></div>
+</div>
+
+<div class="quote" style="margin: 26px auto 0; max-width: 720px; text-align: left">"A per-action control, not an isolation boundary."<cite>Anthropic, on what auto mode is</cite></div>
 
 <!--
-Be fair: auto mode is a real improvement for interactive work. The classifier is Sonnet 5 by default, a separate call that doesn't see tool outputs; when the session also runs Sonnet 5 it is literally another instance of the same model. It goes back to prompting after 3 blocks in a row or 20 per session. On API/Enterprise accounts its calls count toward token usage.
-Sources: anthropic.com/engineering/claude-code-auto-mode; code.claude.com/docs/en/permission-modes; code.claude.com/docs/en/sandbox-environments.
+Be fair: auto mode is a real improvement for interactive work.
+- The classifier is a second model, Sonnet 5 by default, in a separate call that doesn't see tool outputs. When the session also runs Sonnet 5, it is literally another instance of the same model.
+- It costs tokens. Every shell command and network call goes to that second model first, with a portion of the transcript, and the answer comes back before the action runs. On the API, Enterprise, Bedrock, Vertex and Foundry accounts those calls count toward token usage. On Pro/Max the review happens server-side and isn't billed separately, but the round trip per action is still there.
+- It gives up: after 3 blocks in a row, or 20 in a session, it goes back to prompting you.
+Sources: anthropic.com/engineering/claude-code-auto-mode; code.claude.com/docs/en/permission-modes ("Cost and latency"; "Server-side classifier review"); code.claude.com/docs/en/sandbox-environments.
 -->
 
 ---
