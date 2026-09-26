@@ -615,10 +615,26 @@ Sources: Saltzer & Schroeder 1975; genai.owasp.org/llmrisk/llm062025-excessive-a
 -->
 
 ---
+layout: center
+clicks: 2
+---
+
+<h1 class="statement giveup">It pushed at 3 a.m. <span class="kw">git blame</span> says: <span class="danger">you</span>.</h1>
+
+<h1 v-click="1" class="statement giveup">"My agent did it" is not a defence.</h1>
+
+<h1 v-click="2" class="statement giveup">Your name on work you never read<br>isn't delegation. <span class="warn">It's deception.</span></h1>
+
+<!--
+Beat by beat. "It pushed at 3 a.m. git blame says: you." Pause. Click: "My agent did it" is not a defence. Click: the point that matters more than blame: honesty. A commit, a PR, a review comment under your name that you never read misleads everyone downstream. Reviewers calibrate on the author; they lend your name your reputation and skim. The audit log shows one actor and can't tell which of you it was. Even when nothing breaks, the record is a lie, and your team is working from it.
+Accurate to isx: with your personal PAT, isx generates the container's git identity from your account, so commits and pushes really are authored as you. The next slide is the fix: a dedicated bot account, provided during isx init.
+-->
+
+---
 
 ## The agent acts <span class="accent">as itself</span>
 
-<p class="lead">It should read issues on your private repos. It shouldn't sign off anything <em>as you</em>.</p>
+<p class="lead">With your token, everything it does is you: every commit, every comment, every push. Honest work says who did it.</p>
 
 <div class="cards mt-6">
   <div class="card"><h4>Its own account <span class="tag shipped">shipped</span></h4><p>Each instance can use its own bot account: commits are authored by it, and it can do only what you granted the bot. Its outward-facing work comes to you for review.</p></div>
@@ -805,21 +821,22 @@ DO NOT PRESENT this slide without the next one, and that one waits for incus-spa
 -->
 
 ---
-clicks: 5
+clicks: 6
 ---
 
 ## Both: <span class="accent">cached, and never stale</span>
 
-<p class="lead">The rule: a cached file is served <span class="accent">only if a fresh download would return the same bytes</span>. Upstream is asked every time.</p>
+<p class="lead">One rule: a cached file is served <span class="accent">only if a fresh download would return the same bytes</span>.</p>
 
-<CacheFlow class="mt-8" />
+<CacheFlow class="mt-6" />
 
 <p class="note pin">Container layers and tool downloads are keyed by their SHA-256 digest. And the last resort is a command: <span class="kw">isx clean cache</span> throws the whole cache away; all you lose is a download.</p>
 
 <!--
 The answer to the dilemma, as a story of how the design got here. Start with what a cache must never touch (row 1: anything that can change, and anything private, since the cache is shared by every machine). Then the obvious half (row 2): download once, but keep the copy only if the bytes match the checksum upstream sent with them; with no checksum, serve but don't store. Then the part that makes it safe (row 3): a hit doesn't trust the disk, it asks Central "is this still what you'd send?" with one HEAD and compares checksums; only a match serves the stored copy. Row 4 is why that matters: a republished or withdrawn artifact is evicted on the spot and fetched fresh, whichever build tool asks. Row 5 is the honest edge: with Central unreachable, the copy is served unconfirmed, and only then, with a 30-second backoff so a dead network doesn't cost a timeout per request.
 The efficiency claim, stated carefully: what's saved is the download, not the round trip; a hit still costs one HEAD. For Maven 3.9+ that HEAD replaces the .sha1 request the client would have made anyway. Don't quote the old ~2.8 ms vs ~177 ms figures (docs/PERFORMANCE-NOTES.md, 2026-08-28): they predate the HEAD per hit and the bench notes say they're not comparable any more.
-Source: incus-spawn PR #792 (fixes #555), its DESIGN.md section "Maven/Gradle cache integrity". STATUS 2026-09-26: the PR is open, not merged. Present this and the dilemma slide only once it has merged and is in the release you demo. Scope: Maven Central, the Gradle Plugin Portal and Gradle distributions; other domains are never cached. npm's tarball check is a follow-up (#787).
+Then the second group, one click: OCI registries work the other way round. A layer is requested by its sha256 digest, so the name is the checksum: the proxy verifies the bytes against it before storing (MitmProxy, BLOB_DIGEST_PATTERN / finalizeCacheFile) and a hit is served from disk with nothing to ask; manifests, tags and auth tokens are relayed, never cached, because a tag can move. That's the contrast to say out loud: Maven names a coordinate, OCI names the bytes; the rule is the same, the check follows the protocol. Gradle (Plugin Portal, distributions) is Maven-like but has no checksum header, so a hit re-fetches the .sha1/.sha256 sidecar instead of a HEAD.
+Source: incus-spawn PR #792 (fixes #555), its DESIGN.md section "Maven/Gradle cache integrity"; OCI: proxy/MitmProxy.java (shipped, unchanged by #792). STATUS 2026-09-26: the PR is open, not merged. Present this and the dilemma slide only once it has merged and is in the release you demo. Scope: Maven Central, the Gradle Plugin Portal and Gradle distributions; other domains are never cached. npm's tarball check is a follow-up (#787).
 -->
 
 

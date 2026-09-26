@@ -247,13 +247,17 @@ merged design differs, fix the rows in `CacheFlow.vue` and the notes.
 
 **Component:** `CacheFlow.vue`. **Slide:** `clicks: 4`.
 
-**Scene, as built.** Five rows, one per click, each the same three boxes
-(`agent-1` → proxy with its cache drawer → Maven Central): never cached
-(metadata, SNAPSHOTs, private repositories); first download, stored only if
-the bytes match upstream's checksum; the same jar again, one `HEAD` confirms
-the checksum and the stored copy is served; upstream changed or withdrew
-it, evicted and fetched fresh; upstream unreachable, served unconfirmed. The
-newest row's wires march. The old ~2.8 ms vs ~177 ms figures are not on the
+**Scene, as built.** Seven rows in two groups, each row the same three boxes
+(`agent-1` → proxy with its cache drawer → upstream). Maven Central, one row
+per click: never cached (metadata, SNAPSHOTs, private repositories); first
+download, stored only if the bytes match upstream's checksum; the same jar
+again, one `HEAD` confirms the checksum and the stored copy is served;
+upstream changed or withdrew it, evicted and fetched fresh; upstream
+unreachable, served unconfirmed. OCI registries, one click for both rows:
+manifests, tags and tokens never cached; a blob by `sha256` digest verified
+against the digest on store, then served from disk with nothing to ask
+(`MitmProxy`, shipped before #792). The group subtitles carry the contrast:
+Maven names a coordinate, OCI names the bytes. The newest rows' wires march. The old ~2.8 ms vs ~177 ms figures are not on the
 slide: a hit now costs a `HEAD`, and the PR's bench notes say the earlier
 numbers aren't comparable. The saving is stated as bandwidth, not latency.
 Say "checksum", never "signature". The slide before it ("To cache, or not
