@@ -334,3 +334,8 @@
 .works { display: inline-block; text-align: left; margin: 0 auto; }
 .works li { font-size: 25px; line-height: 1.5; color: var(--text-muted); }
 .works li b { color: var(--text); font-weight: 600; }
+
+/* The closing command types itself in when its click arrives. */
+.ask .kw.typed { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; max-width: 0; }
+.ask .kw.typed:not(.slidev-vclick-hidden) { animation: type 1.6s steps(48, end) .2s forwards; }
+@keyframes type { to { max-width: 760px; } }

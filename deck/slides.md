@@ -989,19 +989,21 @@ Per the isx README: on Linux, isx init installs Incus through your package manag
 ---
 layout: center
 class: glow-accent
+clicks: 3
 ---
 
-<h1 class="statement"><span class="accent">Their machines.</span><br>Your machine.</h1>
+<h1 class="statement"><span class="accent">Their machines.</span><br><span v-click="1">Your machine.</span></h1>
 
-<p class="lead mt-10">Questions?</p>
+<p v-click="2" class="lead mt-10">Questions?</p>
 
 <div class="ask mt-4">
-  <a class="site" href="https://isx.run" target="_blank">isx.run</a>
-  <span class="or">or, later</span>
-  <span class="kw">isx ask "how do I set up a template for my repo?"</span>
+  <a v-click="2" class="site" href="https://isx.run" target="_blank">isx.run</a>
+  <span v-click="3" class="or">or, later</span>
+  <span v-click="3" class="kw typed">isx ask "how do I set up a template for my repo?"</span>
 </div>
 
 <!--
+Three beats. "Their machines." Pause. Click: "Your machine." Click: questions, and the site. Click, as an afterthought: the command types itself. Say: and if you think of one later, ask isx itself.
 isx ask answers questions about isx itself, from its own documentation, using the AI account you configured (it spends tokens). Also reachable as ? in the TUI.
 -->
 
