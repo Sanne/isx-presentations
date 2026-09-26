@@ -794,30 +794,27 @@ clicks: 3
 
 <!--
 Play both colleagues straight: each is right. Left first, then right, then you, stuck in the middle. The first is the "Set up once" argument again: without a cache, every machine downloads its own copy and keeps it, so nothing is shared, not even on disk. The second is the one who lost Thursday afternoon. Then click: could we have both? The next slide is the answer.
-DO NOT PRESENT this slide without the next one, and that one waits for incus-spawn #555.
+DO NOT PRESENT this slide without the next one, and that one waits for incus-spawn PR #792 to merge.
 -->
 
 ---
+clicks: 5
+---
 
-## Caching, <span class="accent">without surprises</span>
+## Both: <span class="accent">cached, and never stale</span>
 
-<ul class="mt-2">
-  <li>Maven metadata and <span class="kw">-SNAPSHOT</span>s <span class="accent">always go upstream</span>: they can change</li>
-  <li>Release artifacts are cached, and <span class="accent">checked against upstream's checksum</span> before they're stored</li>
-  <li>Container layers are keyed and verified by their SHA-256 digest</li>
-</ul>
+<p class="lead">The rule: a cached file is served <span class="accent">only if a fresh download would return the same bytes</span>. Upstream is asked every time.</p>
 
-<div class="stats mt-6">
-  <div class="stat"><b class="accent">~2.8 ms</b><span>a 642 KB artifact from the cache, over TLS</span></div>
-  <div class="stat"><b class="muted">~177 ms</b><span>the same artifact from Maven Central</span></div>
-</div>
+<CacheFlow class="mt-8" />
 
-<Todo class="mt-6">Metadata requests pass straight through; artifact requests check the cache, compare checksums, then serve locally or fetch fresh.</Todo>
+<p class="note pin">Container layers and tool downloads are keyed by their SHA-256 digest. And the last resort is a command: <span class="kw">isx clean cache</span> throws the whole cache away; all you lose is a download.</p>
 
 <!--
-DO NOT PRESENT until incus-spawn #555 ships: today, release artifacts fetched from upstream are cached without verification.
-Figures: docs/PERFORMANCE-NOTES.md, measured 2026-08-28 on 2 proxy cores.
+The answer to the dilemma, as a story of how the design got here. Start with what a cache must never touch (row 1: anything that can change, and anything private, since the cache is shared by every machine). Then the obvious half (row 2): download once, but keep the copy only if the bytes match the checksum upstream sent with them; with no checksum, serve but don't store. Then the part that makes it safe (row 3): a hit doesn't trust the disk, it asks Central "is this still what you'd send?" with one HEAD and compares checksums; only a match serves the stored copy. Row 4 is why that matters: a republished or withdrawn artifact is evicted on the spot and fetched fresh, whichever build tool asks. Row 5 is the honest edge: with Central unreachable, the copy is served unconfirmed, and only then, with a 30-second backoff so a dead network doesn't cost a timeout per request.
+The efficiency claim, stated carefully: what's saved is the download, not the round trip; a hit still costs one HEAD. For Maven 3.9+ that HEAD replaces the .sha1 request the client would have made anyway. Don't quote the old ~2.8 ms vs ~177 ms figures (docs/PERFORMANCE-NOTES.md, 2026-08-28): they predate the HEAD per hit and the bench notes say they're not comparable any more.
+Source: incus-spawn PR #792 (fixes #555), its DESIGN.md section "Maven/Gradle cache integrity". STATUS 2026-09-26: the PR is open, not merged. Present this and the dilemma slide only once it has merged and is in the release you demo. Scope: Maven Central, the Gradle Plugin Portal and Gradle distributions; other domains are never cached. npm's tarball check is a follow-up (#787).
 -->
+
 
 ---
 

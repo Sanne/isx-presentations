@@ -13,7 +13,7 @@ spec per animation, in the order they pay off.
 | 3 | Set up once | `TemplateRace.vue` | built; MEASURE before quoting numbers |
 | 4 | Branch a live machine | `LiveBranch.vue` | built; CONFIRM with one real branch |
 | 5 | Network modes | `NetworkModes.vue` | built |
-| 6 | Caching without surprises | `CacheFlow.vue` | blocked: incus-spawn #555 still open |
+| 6 | Both: cached, and never stale | `CacheFlow.vue` | built against incus-spawn PR #792 (fixes #555); present only once it has merged |
 
 Where the build departed from the specs below, and why:
 
@@ -237,22 +237,27 @@ light the panels one at a time.
 
 ## 6. Caching without surprises (Under the hood, slide "Caching…")
 
-**Do not build or present until incus-spawn #555 ships.** Today release
-artifacts fetched from upstream are cached *without* verification; the slide
-describes the post-#555 behaviour. Check the issue first; if it has shipped,
-re-read `MitmProxy.java` (`isMavenCacheable`, `fetchCacheAndServe`) and
-confirm the checksum step exists before drawing it.
+**Built from incus-spawn PR #792 (2026-09-26, open at the time).** Present
+it only once the PR has merged and is in the release being demoed. The
+design it draws: a cached artifact is served only when a fresh download
+would return the same bytes; every hit is confirmed with upstream (a `HEAD`
+on Maven Central, the checksum sidecar elsewhere); a changed or withdrawn
+artifact is evicted; only an unreachable upstream serves unconfirmed. If the
+merged design differs, fix the rows in `CacheFlow.vue` and the notes.
 
 **Component:** `CacheFlow.vue`. **Slide:** `clicks: 4`.
 
-**Scene.** The proxy in the middle, Maven Central on the right, `agent-1` on
-the left. Click 1: a `maven-metadata.xml` request goes straight through and
-back (label: *always upstream: it can change*). Click 2: a `-SNAPSHOT` jar
-does the same. Click 3: a release jar: cache miss → fetch → **checksum
-compared with upstream's** → stored → served. Click 4: the same jar again:
-cache hit, served locally, with the two measured figures from the slide
-(~2.8 ms vs ~177 ms, `docs/PERFORMANCE-NOTES.md`) as the payoff. Say
-"checksum", never "signature".
+**Scene, as built.** Five rows, one per click, each the same three boxes
+(`agent-1` → proxy with its cache drawer → Maven Central): never cached
+(metadata, SNAPSHOTs, private repositories); first download, stored only if
+the bytes match upstream's checksum; the same jar again, one `HEAD` confirms
+the checksum and the stored copy is served; upstream changed or withdrew
+it, evicted and fetched fresh; upstream unreachable, served unconfirmed. The
+newest row's wires march. The old ~2.8 ms vs ~177 ms figures are not on the
+slide: a hit now costs a `HEAD`, and the PR's bench notes say the earlier
+numbers aren't comparable. The saving is stated as bandwidth, not latency.
+Say "checksum", never "signature". The slide before it ("To cache, or not
+to cache?") sets up the dilemma this one answers.
 
 ## Smaller polish, if there's time
 
