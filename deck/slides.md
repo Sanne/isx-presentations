@@ -663,6 +663,28 @@ It's accurate, not a caricature: a working tree is full of things your tools exe
 -->
 
 ---
+layout: center
+clicks: 4
+---
+
+<h1 class="statement">"It works on my machine."</h1>
+
+<p class="lead mt-6" style="opacity: 1">It does. On <em class="accent">its</em> machine.</p>
+
+<ul class="works mt-8">
+  <li v-click="1"><b>Its tools</b>, at its versions: the JDK from the bug report, not yours.</li>
+  <li v-click="2"><b>Its SNAPSHOT dependencies</b>, with its patches inside them, not yours.</li>
+  <li v-click="3"><b>Its OS</b>: Fedora inside, whatever you run outside.</li>
+</ul>
+
+<p v-click="4" class="lead mt-8" style="text-align: center">A mounted folder shows you the files. <span class="warn">Not the machine they ran on.</span></p>
+
+<!--
+The second argument against the mount, after safety: meaning. The oldest excuse in the trade, and for once it's literally true: the agent's build passed on its machine, with its toolchain, its ~/.m2 and its OS. Click through the three. A read-write mount hands you the files and none of that context, so "the tests pass" tells you about a machine you don't have. (The isx README's FAQ makes the same point: the agent's SNAPSHOTs and node_modules don't come through a mount.)
+Echo the Wednesday line on purpose: a worktree isolates your checkout, not the machine it runs on; a mount shows the files, not the machine they ran on. The fix is two slides on: what comes back is a commit, and you re-run its tests on a fresh branch of the same template, so the environment is part of the evidence.
+-->
+
+---
 clicks: 3
 ---
 

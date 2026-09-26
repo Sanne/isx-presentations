@@ -329,3 +329,8 @@
 .stats.autostat { justify-content: center; }
 .stats.autostat .stat { flex: 0 1 620px; text-align: left; }
 .stat b.warn { color: var(--warn); }
+
+/* Three short lines on a centred statement slide. */
+.works { display: inline-block; text-align: left; margin: 0 auto; }
+.works li { font-size: 25px; line-height: 1.5; color: var(--text-muted); }
+.works li b { color: var(--text); font-weight: 600; }
