@@ -1,12 +1,38 @@
 # isx deck — storyboard
 
+## The spine (rewritten 2026-09-27; the earlier deck is at tag `deck-v1-three-questions`)
+
+Not a feature tour and not a checklist: a week with an agent, in which each
+problem you hit is answered by one choice, and the six choices add up to isx.
+A **blueprint** of your laptop (`Blueprint.vue`) is built up over the talk;
+each day ends with it lit one stage further, beside a ledger that says
+*problem → choice*. The last line of Friday completes the picture and the slide
+retitles itself "This is isx." Nothing appears at the end that the room didn't
+watch arrive; the reasons stay attached to the parts.
+
+| # | Day | The problem you hit | The choice | What it is in isx |
+|---|---|---|---|---|
+| 1 | Monday: one agent, on my laptop | fix one failing test (approval counter) → "you became the approve button" → the coffee break → Homer (the stick, the drinking bird) → **your turn: yes or no?** (the audience game; the return overlay) → the allowlist you wrote one tired click at a time → "auto mode": a second model, usually right, 17% → "Usually?" / "My parachute usually opens." → the OpenJDK task in a process sandbox (10:00–10:36, six approvals) → "Fine. I give up. Do whatever you want. Just not on my machine. Here's one of your own." → meet the isx machine → where did your 36 minutes go → **Monday's choice**: the blueprint, stage 1 |
+| 2 | Wednesday: five agents at once | five agents, one of you (you're the bottleneck) → git worktrees (one .git, shared) → Thursday afternoon (the poisoned ~/.m2) → "a worktree isolates your checkout, not the machine it runs on" → isx branching hero → every branch is a whole machine (and a git remote) → CoW clip → set up once → branch a live machine → a template declares the whole machine → to cache, or not to cache? → both: cached, and never stale → **Wednesday's choices**: stages 2 and 3 |
+| 3 | Friday: code from strangers | "reproducer attached" → what that build can see (`env`) → the same look from isx → credentials never enter → an old principle, a new kind of ~~program~~ user → "it pushed at 3 a.m.; git blame says: you" → the agent acts as itself → the USB stick → "it works on my machine" → what comes back: a commit → getting it back is just git → "trust it like a PR from a new colleague" → **Friday's choices**: stages 4–6, then "This is isx." |
+| 4 | After the week | the architecture on Linux and on macOS (the same picture, exactly as built) → every request passes one point (live account swap; the roadmap) → demo → others are working on the same problem → local-first → get started → then: `isx init` → built on → close (three beats; `isx ask` last) → backup |
+| 5 | Fri | Everything it does is in your name. | An identity of its own. | a bot account per instance (signing: roadmap #271) |
+| 6 | Fri | Getting the work back. | A commit, over git. Not a mount. | isx:// git remotes, review like a PR, rebuild the tests in a fresh branch |
+
+After Friday: the same picture exactly as built (Linux, macOS), every request
+passes one point, demo, the landscape, local-first, get started, close.
+Backup holds what the story no longer needs on stage: the Docker and VM
+tables, why a system container, network modes, what `isx branch` does, under
+`git fetch`.
+
+
 The deck makes the case for isx by walking a developer's path in small steps:
 **a practical situation → the limitation it hits → the wish → how isx is designed
 for it → what that looks like to use.** Every step earns the next one.
 
-The yardstick, set up on the first slides and reused throughout:
-
-> Can I **leave it alone**? Can I run **five at once**? Can I **trust its work**?
+The device that ties it together is the blueprint (see "The spine" above): a picture of
+your laptop that gains a part each time a choice is made, beside a ledger of *problem →
+choice*. The three-questions yardstick it replaced is at tag `deck-v1-three-questions`.
 
 Status tags used below: **shipped** (in isx today), **roadmap** (open issue — must be
 labelled as such on the slide), **verify** (claim needs checking before it goes on a slide).
@@ -28,11 +54,11 @@ The acts are the days of one week with coding agents:
 
 | Act | Day | Scenes |
 |---|---|---|
-| 0 | — | title → the promise, with the three questions under it (one slide) |
-| 1 | Monday: one agent, on my laptop | fix one failing test (approval counter) → "you became the approve button" → the coffee break (the prompt waited 29 minutes) → "it's the AI era, and everyone expects more from you" (the bridge: so run five) → five agents (the human is the bottleneck) → Homer: the stick, the drinking bird, the meltdown (three original frames from "King-Size Homer", fetched by `tools/fetch-memes.sh`, not committed; an original drawing is the fallback) → **your turn: yes or no?** (the audience game: a command every couple of seconds, from `mvn -q test` to `sudo dd`, the room shouts, Y/N records its verdict, the drinking bird approves every one; starts on a click so the game can be explained first, and freezes on the next click to reveal what Homer came back to) → the allowlist you wrote one tired click at a time (the drinking bird, in Claude Code's terms): what it asked, why you said yes, the prefix rule it saved, then read back as what each rule really permits → "and tomorrow?" (rules are saved per repository: new project, new prompts) → "too broad to be safe, too narrow to leave it alone" → auto mode ("it's usually right", then Anthropic's published miss rate) → "Usually?" / "My parachute usually opens." → the patched-OpenJDK task in the sandbox (configure fails one missing library at a time, 10:00–10:36, six approvals; `make images` measured at ~15 min) → "Fine. I give up. / Do whatever you want. / Just not on my machine. / Here's one of your own. Go work. Leave me alone." → **meet the isx machine** (diagram: your laptop, your things, agentuser with passwordless sudo, what it can't reach) → the same task on isx → where did your 30 minutes go (animated: with prompts the agent stalls and you end up fried; on isx both run smoothly) → why a system container (three cards: Docker, a VM, an isx machine; the two comparison tables are backup slides) → tick, with its three reasons |
-| 2 | Wednesday: five agents at once | worktrees (diagram: one .git, three checkouts, one shared machine) → **two agents, one localhost** (B's integration tests quietly run against A's database, then its teardown empties it) → **Thursday afternoon**: the shared SNAPSHOT poisons B's evidence and it commits a wrong fix → "a worktree isolates your checkout, not the machine it runs on" → isx branching → every branch is a whole machine (same diagram, the shared machine moved inside each box) → CoW → set up once, every branch starts ready → branch a live reproducer → YAML → tick, with reasons |
-| 3 | Friday: code from strangers | "reproducer attached" → what that build can see (`env`) → the same look from isx → how: the proxy → network modes → principles (Saltzer & Schroeder, OWASP LLM06, the lethal trifecta) → "it pushed at 3 a.m.; git blame says: you" / "my agent did it" is not a defence / your name on work you never read is deception → identity (its own account, shipped; signing, roadmap; a principal, not a process) → you still review its work → the USB stick (a trench coat lined with sticks: "Psst. Skip the git dance. Just mount it read-write." / "It's just… executable code. Trust me." / "Only some of it was downloaded from the internet." / your security training says never plug it in) → "it works on my machine" (it does: on *its* machine; its tools, its SNAPSHOTs, its OS; a mount shows the files, not the machine they ran on) → why not a shared mount (the review/build race) → what comes back: a commit → getting it back is just git (`isx branch` adds the remote, `git fetch`, `isx destroy` removes it) → "trust it like a PR from a new colleague" → tick, with reasons |
-| 4 | Under the hood | architecture on Linux → what `isx branch` does → architecture on macOS (the appliance VM, vsock, the proxy on the Mac, the recovery agent) → under `git fetch agent-1` (the remote helper, which crosses the vsock tunnel on a Mac) → "to cache, or not to cache?" (two colleagues, both right: cache it / never cache, and you in the middle without fibre; could we have both?) → "both: cached, and never stale" (the rule, five request kinds through the cache, `isx clean cache` as the last resort; both slides wait for PR #792 to merge) → every request passes one point: live account swap (shipped) and the roadmap (#322) → demo → **others are working on the same problem** (Docker Sandboxes as the one close match; process sandboxes: Claude Code's, srt, Nono, Lince; cloud sandboxes: cloud sessions, E2B, Daytona; where isx differs) → local-first → get started (Fedora, macOS, any Linux, Debian/Ubuntu) → then: `isx init`, and the CLI or the TUI → built on → close → backup: the Docker and VM tables |
+| 0 | Hook | title → "hand the agent a task, walk away, come back to finished work" → every part of isx answers a problem from your first week; let's have that week |
+| 1 | Monday: one agent, on my laptop | fix one failing test (approval counter) → "you became the approve button" → the coffee break → Homer (the stick, the drinking bird) → **your turn: yes or no?** (the audience game; the return overlay) → the allowlist you wrote one tired click at a time → "auto mode": a second model, usually right, 17% → "Usually?" / "My parachute usually opens." → the OpenJDK task in a process sandbox (10:00–10:36, six approvals) → "Fine. I give up. Do whatever you want. Just not on my machine. Here's one of your own." → meet the isx machine → where did your 36 minutes go → **Monday's choice**: the blueprint, stage 1 |
+| 2 | Wednesday: five agents at once | five agents, one of you (you're the bottleneck) → git worktrees (one .git, shared) → Thursday afternoon (the poisoned ~/.m2) → "a worktree isolates your checkout, not the machine it runs on" → isx branching hero → every branch is a whole machine (and a git remote) → CoW clip → set up once → branch a live machine → a template declares the whole machine → to cache, or not to cache? → both: cached, and never stale → **Wednesday's choices**: stages 2 and 3 |
+| 3 | Friday: code from strangers | "reproducer attached" → what that build can see (`env`) → the same look from isx → credentials never enter → an old principle, a new kind of ~~program~~ user → "it pushed at 3 a.m.; git blame says: you" → the agent acts as itself → the USB stick → "it works on my machine" → what comes back: a commit → getting it back is just git → "trust it like a PR from a new colleague" → **Friday's choices**: stages 4–6, then "This is isx." |
+| 4 | After the week | the architecture on Linux and on macOS (the same picture, exactly as built) → every request passes one point (live account swap; the roadmap) → demo → others are working on the same problem → local-first → get started → then: `isx init` → built on → close (three beats; `isx ask` last) → backup |
 
 `slides.md` is the source of truth for the exact order; the sections below keep the reasoning,
 the planned animations and the claims register. **`ANIMATIONS.md` specifies the animations**;
@@ -43,8 +69,8 @@ all are built; the cache flow follows incus-spawn PR #792 and is presented only 
 1. **Title.** isx — safe machines for AI agents.
 2. **The promise of agentic coding** is not a faster autocomplete; it's *dispatch several
    tasks, walk away, come back to finished work*. Hand the agent a terminal and it can do real work.
-3. **The yardstick** — the three questions above, shown as three empty checkboxes that
-   get ticked as the talk progresses (reused as a small progress motif on section dividers).
+3. **The promise of the week**: every part of isx answers a problem from your first week
+   with an agent; the talk is that week, and the blueprint fills in as it goes.
 
 ## Act 1 — "Let it run on my laptop"
 
@@ -271,7 +297,7 @@ A worktree isolates **files in the repo**. Everything else on the machine is sti
 - **[demo]** The loop from the demo script: `isx branch` (seconds) → no secrets inside, yet
   everything authenticates → the agent fixes and commits alone → `git fetch fix-bug`, review the
   diff, cherry-pick → `isx destroy`.
-- Tick the three yardstick boxes.
+- Friday's choices complete the blueprint: "This is isx."
 - Local-first, by conviction. Install (one slide).
 - **Built on great open source**: Incus, Quarkus, GraalVM, Java, Tamboui & Aesh, with links. A
   thank-you to the communities isx stands on.
@@ -293,10 +319,10 @@ conviction"; "Their machines. Your machine."
 
 | # | Claim | Status | Action |
 |---|---|---|---|
-| 1 | Maven cache "only properly signed releases" (old deck) / "served only if it matches signatures" (plan) / README: every artifact "verified against its content digest or upstream checksum before being committed" | **Wrong for Maven today.** `MitmProxy.fetchCacheAndServe` caches release artifacts from upstream *unconditionally* (code comment: "immutable Maven artifacts"). Only reuse of the host `~/.m2` is SHA-1-checked against upstream. No PGP (`.asc`) verification anywhere. Metadata/SNAPSHOT pass-through is correct. | Fix: [PR #792](https://github.com/Sanne/incus-spawn/pull/792) (fixes #555): verify on store, confirm every hit with upstream, evict on change. The slides describe that design; present them only once it has merged. Say "checksum", not "signature". |
-| 2 | Docker: no ping, no strace, "no real networking" | **Wrong.** Docker sets `ping_group_range` by default (since 2020), and allows ptrace on kernel ≥ 4.8 (since Docker 19.03). | **Fixed** in `index.html`: table rewritten, and the Docker column uses `warn` (conditional) instead of `danger`. isx's own `DESIGN.md` ("Why not Docker?") makes the same ping/strace claim; worth correcting there too. |
-| 3 | Proxy "control plane": activity, spend, audit, policy, model routing | **Roadmap** (#322 open). | Label clearly as direction. |
-| 4 | Commit signing / "own signing key" | **Roadmap** (#271 open). Per-instance bot accounts are shipped. | Show the bot identity as shipped, signing as roadmap. |
+| 1 | Monday: one agent, on my laptop | fix one failing test (approval counter) → "you became the approve button" → the coffee break → Homer (the stick, the drinking bird) → **your turn: yes or no?** (the audience game; the return overlay) → the allowlist you wrote one tired click at a time → "auto mode": a second model, usually right, 17% → "Usually?" / "My parachute usually opens." → the OpenJDK task in a process sandbox (10:00–10:36, six approvals) → "Fine. I give up. Do whatever you want. Just not on my machine. Here's one of your own." → meet the isx machine → where did your 36 minutes go → **Monday's choice**: the blueprint, stage 1 |
+| 2 | Wednesday: five agents at once | five agents, one of you (you're the bottleneck) → git worktrees (one .git, shared) → Thursday afternoon (the poisoned ~/.m2) → "a worktree isolates your checkout, not the machine it runs on" → isx branching hero → every branch is a whole machine (and a git remote) → CoW clip → set up once → branch a live machine → a template declares the whole machine → to cache, or not to cache? → both: cached, and never stale → **Wednesday's choices**: stages 2 and 3 |
+| 3 | Friday: code from strangers | "reproducer attached" → what that build can see (`env`) → the same look from isx → credentials never enter → an old principle, a new kind of ~~program~~ user → "it pushed at 3 a.m.; git blame says: you" → the agent acts as itself → the USB stick → "it works on my machine" → what comes back: a commit → getting it back is just git → "trust it like a PR from a new colleague" → **Friday's choices**: stages 4–6, then "This is isx." |
+| 4 | After the week | the architecture on Linux and on macOS (the same picture, exactly as built) → every request passes one point (live account swap; the roadmap) → demo → others are working on the same problem → local-first → get started → then: `isx init` → built on → close (three beats; `isx ask` last) → backup |
 | 5 | Credential swapping as unique to isx | **Not unique.** Claude Code sandbox `mask` mode and cloud-session git proxy exist. | Frame as "on by default, any agent, proxy outside the agent's machine, local". |
 | 6 | "There is no audit trail" (old deck) | Overstated: git history and provider logs exist. | Rephrase: you can't tell *who* acted, the agent or you. |
 | 7 | OpenJDK example timings and prompt count | `make images` measured at ~15 min with dependencies in place (2026-09-25). Clone/configure/test durations and the prompt count are still estimates. | Run it once under Claude Code's sandbox and count. |

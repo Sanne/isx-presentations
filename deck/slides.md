@@ -25,9 +25,11 @@ layout: center
 
 <h1 class="statement">Hand the agent a task, <span class="accent">walk away</span>, come back to finished work.</h1>
 
-<p class="lead mt-6 mb-8 muted">Before I'd do that, three questions:</p>
+<p class="lead mt-8">Every part of isx answers a problem from your first week with an agent.<br>Let's have that week.</p>
 
-<Yardstick :done="0" />
+<!--
+The promise, and the shape of the talk: not a feature tour, a week. Monday, Wednesday, Friday; each day a problem you'll recognise, and the choice that answers it. By Friday the choices add up to a picture, and the picture is isx.
+-->
 
 <!--
 The yardstick for the whole talk: every act ends by ticking one box. Then: here's how that week actually goes.
@@ -82,33 +84,6 @@ It can't finish without you, so you can't leave. This is the real cost, more tha
 -->
 
 ---
-layout: center
----
-
-<h1 class="statement">Meanwhile, it's the AI era,<br>and <span class="warn">everyone expects more from you.</span></h1>
-
-<p class="lead mt-8">Agents are cheap and never get tired. Running one at a time starts to look like a waste.<br>So the obvious move: run five.</p>
-
-<!--
-The bridge from one agent to five. It's not greed, it's the expectation now: the tools are cheap, the demos show five agents in parallel, and someone is asking why your output didn't go up. Say it with a straight face, then click on and let the next slide answer it.
--->
-
----
-clicks: 2
----
-
-## And now run <span class="warn">five of them</span>
-
-<p class="lead">Five agents, five streams of prompts. One of you, switching between them.</p>
-
-<FiveAgents class="mt-6" />
-
-<!--
-Click 1 plays 30 minutes in about 25 seconds; let it run and narrate the face. Click 2: the verdict.
-Illustrative, not measured: the lanes are simulated with one rule, that you answer prompts in the order they arrive and each one costs you a minute and a half of reading and switching back. Nothing else is tuned; the queue does the rest.
--->
-
----
 clicks: 1
 ---
 
@@ -140,8 +115,6 @@ Explain the game before the first click: I'll show a command, you shout YES or N
 -->
 
 ---
-
----
 clicks: 7
 ---
 
@@ -164,24 +137,6 @@ Rule syntax per code.claude.com/docs/en/permissions: "Yes, and don't ask again" 
 Verified against Claude Code 2.1.282 (2026-09-25): the interactive prompt's option reads "Yes, and don't ask again for:" with an editable field pre-filled with a prefix. It keeps the command's first word and at most one following word, and stops at the first flag (docker is allowed one more word). So "mvn -q test" pre-fills "mvn *", "git commit -am" gives "git commit *", "curl -LO …" gives "curl *", "docker run -d …" gives "docker run *", and "rm -rf target/" gives "rm *". You can edit the prefix; the point is that nobody does. (Headless -p mode suggests the exact command instead; this slide is about the interactive prompt.)
 If asked: docker run * still covers docker run --privileged -v /:/host, hence "root on your laptop".
 -->
-
----
-clicks: 3
----
-
-## And tomorrow?
-
-<Term scene="nextRepo" class="mt-2" />
-
-<!--
-Claude Code saves "Yes, and don't ask again" for Bash "permanently per repository and command" (code.claude.com/docs/en/permissions). A new repository, a new tool, a new host: new prompts.
--->
-
----
-layout: center
----
-
-<h1 class="statement">Too broad to be safe.<br><span class="warn">Too narrow to leave it alone.</span></h1>
 
 ---
 layout: center
@@ -268,18 +223,6 @@ Honest limit, for the VM slide: a container shares the host kernel.
 -->
 
 ---
-clicks: 3
----
-
-## The same task, <span class="accent">on its own machine</span>
-
-<Term scene="openjdkIsx" class="mt-2" />
-
-<!--
-Same request as the sandbox scene. The same configure failures happen; the agent just installs what is missing and carries on. Keep the clock in view: 10:24, and you were not there.
--->
-
----
 clicks: 2
 ---
 
@@ -294,31 +237,15 @@ make images is measured (~15 min); the rest is estimated. The gap between the tw
 -->
 
 ---
-
-## Why <span class="accent">a system container</span>?
-
-<div class="cards three mt-4">
-  <div class="card warn"><h4>Docker / Podman</h4><p>Built to ship one app. No init by default, nested containers need <span class="kw">--privileged</span>, <span class="kw">perf</span> is blocked by the default seccomp profile. All of it configurable; none of it the default.</p></div>
-  <div class="card warn"><h4>A VM per agent</h4><p>The strongest boundary: its own kernel. Also a memory guess per agent, and a guest kernel's worth of cost each, so fewer fit on a laptop.</p></div>
-  <div class="card"><h4>An isx machine</h4><p>A full distribution with its own init, where nested containers and profilers just work. It shares the host kernel, so it's cheap enough to branch one per task.</p></div>
-</div>
-
-<p class="note pin">Containers share the host kernel. For code you believe is malicious, build the template as a VM: <span class="kw">isx build tpl-java --type vm</span>. Full comparison: backup slides.</p>
-
-<!--
-The two comparison tables are in the backup section at the end, for questions.
-Docker: ping and strace work by default (ping_group_range since 2020, ptrace allowed on kernel ≥ 4.8); only say what's true. Podman supports systemd in containers.
-VM memory: a guest reserves its RAM and its kernel fills it with page cache; containers get a ceiling (isx: 60% of host RAM), not a reservation, and one kernel shares cache, swap and priorities across all of them.
--->
-
----
-layout: center
+clicks: 1
 ---
 
-<Yardstick :done="1" :why="[]" />
+## Monday's choice
+
+<Blueprint :stage="1" class="mt-2" />
 
 <!--
-No list here: the last three slides made the case. If you want one line: it didn't need you, because it had a machine of its own and nothing of yours was in it.
+The first part of the picture. Not a checklist: a problem, and the choice that answers it. You were the approve button; the choice is to stop judging commands one at a time and give the agent a machine of its own, where "yes" is safe because nothing of yours is inside. Everything else in the talk builds on this picture.
 -->
 
 ---
@@ -333,6 +260,21 @@ class: divider
 <p>Parallel work, without stepping on each other</p>
 
 ---
+clicks: 2
+---
+
+## And now run <span class="warn">five of them</span>
+
+<p class="lead">Five agents, five streams of prompts. One of you, switching between them.</p>
+
+<FiveAgents class="mt-6" />
+
+<!--
+Click 1 plays 30 minutes in about 25 seconds; let it run and narrate the face. Click 2: the verdict.
+Illustrative, not measured: the lanes are simulated with one rule, that you answer prompts in the order they arrive and each one costs you a minute and a half of reading and switching back. Nothing else is tuned; the queue does the rest.
+-->
+
+---
 clicks: 3
 ---
 
@@ -343,21 +285,6 @@ clicks: 3
 <!--
 For those who haven't used them: one repository, several branches checked out side by side in separate directories, all sharing one .git. It's how most people run parallel agents today.
 Click by click: the repository; three checkouts, and the thing everyone likes about worktrees: they share one .git, so a commit in any checkout can be merged from any other; they all sit on one machine; the collisions.
--->
-
----
-clicks: 4
----
-
-## Two agents, <span class="warn">one localhost</span>
-
-<PortStory class="mt-2" />
-
-<p v-click="4" class="lead mt-4">Two agents, both confidently wrong, and <span class="danger">neither can see why.</span></p>
-
-<!--
-Tell it click by click. A's database is up on 5432 and migrated to A's new schema. B brings up its own database: the port is taken, but B's wait-for-db check passes, because something answers on 5432. B's integration tests pass, against A's database. B's teardown truncates the tables, and A's tests start failing: A goes debugging its own code.
-The easy case, a server that can't bind its port, fails loudly. This one doesn't.
 -->
 
 ---
@@ -412,6 +339,7 @@ Click 3, the callback to worktrees: you keep the git workflow. Each machine is a
 
 ---
 
+
 ## Branching: <span class="accent">shared, not copied</span>
 
 <McPlayer src="/mc/cow.js" />
@@ -457,6 +385,7 @@ The demo's Postgres fork shows the same mechanism live.
 
 ---
 
+
 ## A template <span class="accent">declares the whole machine</span>
 
 <div class="dense">
@@ -490,18 +419,53 @@ Don't say "deterministic" or "reproducible": the base image tracks the newest re
 -->
 
 ---
-layout: center
-clicks: 4
+clicks: 3
 ---
 
-<Yardstick :done="2" :why="[
-  'They can\'t interfere: each has its own ports, caches, services and files',
-  'They share the hardware: one kernel, copy-on-write disks, no RAM reserved up front',
-  'And they don\'t need you: no prompts to juggle, so five agents aren\'t five tabs to babysit',
-]" />
+## To cache, <span class="warn">or not to cache?</span>
+
+<div class="cards three equal dilemma mt-4">
+  <div class="card warn"><h4>"Cache it, obviously."</h4><p class="voice">Every build downloads the same internet again, and keeps its own copy. Nothing shared, on the wire or on disk: slow builds, rate limits, and a flaky network deciding whether your tests pass.</p></div>
+  <div v-click="2" class="card you"><h4>You</h4><p class="voice">"I don't have fibre. I can't download 1,500 dependencies again for every reproducer. And I don't want cache problems either."</p></div>
+  <div v-click="1" class="card danger"><h4>"Never cache anything."</h4><p class="voice">Caches bite, in ways you can't predict. Remember Thursday afternoon: one shared <span class="kw">~/.m2</span>, and two days of evidence poisoned. A build you can't reproduce is one you can't trust.</p></div>
+</div>
+
+<h1 v-click="3" class="statement dilemma-q">Could we have <span class="accent">both</span>?</h1>
 
 <!--
-One reason per click, then the tick on the last click. Three things had to be true, and each was shown: isolation (the port story, Thursday afternoon, every branch a whole machine), density (the CoW clip, the system-container card), and your own attention (the 36-minutes animation from Monday, now multiplied by five).
+Play both colleagues straight: each is right. Left first, then right, then you, stuck in the middle. The first is the "Set up once" argument again: without a cache, every machine downloads its own copy and keeps it, so nothing is shared, not even on disk. The second is the one who lost Thursday afternoon. Then click: could we have both? The next slide is the answer.
+DO NOT PRESENT this slide without the next one, and that one waits for incus-spawn PR #792 to merge.
+-->
+
+---
+clicks: 6
+---
+
+## Both: <span class="accent">cached, and never stale</span>
+
+<p class="lead">One rule: a cached file is served <span class="accent">only if a fresh download would return the same bytes</span>.</p>
+
+<CacheFlow class="mt-6" />
+
+<p class="note pin">Container layers and tool downloads are keyed by their SHA-256 digest. And the last resort is a command: <span class="kw">isx clean cache</span> throws the whole cache away; all you lose is a download.</p>
+
+<!--
+The answer to the dilemma, as a story of how the design got here. Start with what a cache must never touch (row 1: anything that can change, and anything private, since the cache is shared by every machine). Then the obvious half (row 2): download once, but keep the copy only if the bytes match the checksum upstream sent with them; with no checksum, serve but don't store. Then the part that makes it safe (row 3): a hit doesn't trust the disk, it asks Central "is this still what you'd send?" with one HEAD and compares checksums; only a match serves the stored copy. Row 4 is why that matters: a republished or withdrawn artifact is evicted on the spot and fetched fresh, whichever build tool asks. Row 5 is the honest edge: with Central unreachable, the copy is served unconfirmed, and only then, with a 30-second backoff so a dead network doesn't cost a timeout per request.
+The efficiency claim, stated carefully: what's saved is the download, not the round trip; a hit still costs one HEAD. For Maven 3.9+ that HEAD replaces the .sha1 request the client would have made anyway. Don't quote the old ~2.8 ms vs ~177 ms figures (docs/PERFORMANCE-NOTES.md, 2026-08-28): they predate the HEAD per hit and the bench notes say they're not comparable any more.
+Then the second group, one click: OCI registries work the other way round. A layer is requested by its sha256 digest, so the name is the checksum: the proxy verifies the bytes against it before storing (MitmProxy, BLOB_DIGEST_PATTERN / finalizeCacheFile) and a hit is served from disk with nothing to ask; manifests, tags and auth tokens are relayed, never cached, because a tag can move. That's the contrast to say out loud: Maven names a coordinate, OCI names the bytes; the rule is the same, the check follows the protocol. Gradle (Plugin Portal, distributions) is Maven-like but has no checksum header, so a hit re-fetches the .sha1/.sha256 sidecar instead of a HEAD.
+Source: incus-spawn PR #792 (fixes #555), its DESIGN.md section "Maven/Gradle cache integrity"; OCI: proxy/MitmProxy.java (shipped, unchanged by #792). STATUS 2026-09-26: the PR is open, not merged. Present this and the dilemma slide only once it has merged and is in the release you demo. Scope: Maven Central, the Gradle Plugin Portal and Gradle distributions; other domains are never cached. npm's tarball check is a follow-up (#787).
+-->
+
+---
+clicks: 2
+---
+
+## Wednesday's choices
+
+<Blueprint :stage="3" :from="1" class="mt-2" />
+
+<!--
+Two more parts. Click: five agents on one laptop collide, so the choice is to branch the whole machine, not the checkout: a template, and copy-on-write branches of it. Click: five machines would download the same internet, so the choice is a cache that only serves what upstream would send again; it lives in the proxy, which appears here for the first time as "the point every request passes". The keys come on Friday.
 -->
 
 ---
@@ -544,12 +508,6 @@ Values are truncated fakes. The point: the agent needs to clone, push and call t
 -->
 
 ---
-layout: center
----
-
-<h1 class="statement">The agent doesn't need to see any key.<br><span class="accent">So on isx, it can't.</span></h1>
-
----
 clicks: 3
 ---
 
@@ -570,32 +528,12 @@ clicks: 5
 <ProxyFlow class="mt-10" />
 
 <!--
+If asked what else the one point gives you: --proxy-only drops every outbound packet except to the proxy and DNS (iptables inside the machine), and --airgap removes the network device; the network-modes slide is in backup.
 To extend: show the request as an HTTP message with headers, and the x-api-key line rewriting at the proxy; a second pass for git push with a GitHub token.
 -->
 
 ---
-clicks: 3
----
 
-## Network modes
-
-<table class="mt-2">
-  <thead><tr><th>Mode</th><th>Flag</th><th>What it does</th></tr></thead>
-  <tbody>
-    <tr><td>Full internet</td><td class="muted">(default)</td><td>Unrestricted access; authentication via the proxy</td></tr>
-    <tr><td>Proxy only</td><td><span class="kw">--proxy-only</span></td><td>All outbound traffic dropped except the proxy and DNS</td></tr>
-    <tr><td>Airgapped</td><td><span class="kw">--airgap</span></td><td>Network device removed</td></tr>
-  </tbody>
-</table>
-
-<NetworkModes class="mt-6" />
-
-<!--
-One click per panel: the same machine and the same three requests each time. api.anthropic.com and github.com go through the proxy because isx intercepts them (github.com when the template has gh); evil.example stands for any other host.
-Airgapped runs no agent: the agent needs its model's API, and there's no network at all. It's for running code you don't trust, like Friday's reproducer: let the agent prepare a machine with network, then branch it with --airgap (isx branch run-1 --from repro-1 --airgap) and run only the tests. Dependencies have to be there already, from the template's prime step or the agent's earlier build. (An agent with a local model inside the machine could work offline, but isx doesn't set that up.)
--->
-
----
 
 ## An old principle, <span class="accent">a new kind of <s class="struck">program</s> user</span>
 
@@ -632,6 +570,7 @@ Accurate to isx: with your personal PAT, isx generates the container's git ident
 
 ---
 
+
 ## The agent acts <span class="accent">as itself</span>
 
 <p class="lead">With your token, everything it does is you: every commit, every comment, every push. Honest work says who did it.</p>
@@ -642,12 +581,6 @@ Accurate to isx: with your personal PAT, isx generates the container's git ident
 </div>
 
 <p class="lead mt-8">An agent is <span class="accent">a principal</span>, not a process: it gets an identity, and the identity gets exactly the access it needs.</p>
-
----
-layout: center
----
-
-<h1 class="statement">You still review its work.<br>The question is <span class="accent">what</span> you're reviewing.</h1>
 
 ---
 clicks: 3
@@ -681,26 +614,8 @@ clicks: 4
 
 <!--
 The second argument against the mount, after safety: meaning. The oldest excuse in the trade, and for once it's literally true: the agent's build passed on its machine, with its toolchain, its ~/.m2 and its OS. Click through the three. A read-write mount hands you the files and none of that context, so "the tests pass" tells you about a machine you don't have. (The isx README's FAQ makes the same point: the agent's SNAPSHOTs and node_modules don't come through a mount.)
+And even reading the files isn't final: you open build.sh at 10:00 and it looks fine; the agent, still working, edits it at 10:01; at 10:02 you run the build, and it runs the version you never read, on your laptop, as you. Your IDE runs project configuration the moment you open the folder. (The race slide itself is at tag deck-v1-three-questions.)
 Echo the Wednesday line on purpose: a worktree isolates your checkout, not the machine it runs on; a mount shows the files, not the machine they ran on. The fix is two slides on: what comes back is a commit, and you re-run its tests on a fresh branch of the same template, so the environment is part of the evidence.
--->
-
----
-clicks: 3
----
-
-## Why not just mount the repo <span class="warn">into your IDE?</span>
-
-<div class="race mt-4">
-  <div class="race-row"><span class="t">10:00</span><span>You open <span class="kw">build.sh</span> and read it. Looks fine.</span></div>
-  <div v-click="1" class="race-row"><span class="t">10:01</span><span>The agent, still working, edits <span class="kw">build.sh</span>.</span></div>
-  <div v-click="2" class="race-row"><span class="t">10:02</span><span>You run the build. <span class="danger">It runs the version you never read, on your laptop, as you.</span></span></div>
-</div>
-
-<p v-click="3" class="lead mt-8">A live directory means your review is never final. And your IDE runs project configuration the moment you open the folder.</p>
-
-<!--
-From the isx README FAQ: a project directory is an implicit code execution channel (build plugins, Makefiles, gradlew, git hooks, IDE run configurations), and a live mount adds a race between review and execution. It's also misleading: the agent's SNAPSHOTs and node_modules don't come through the mount.
-The IDE still works: JetBrains Gateway / VS Code Remote run the backend inside the machine.
 -->
 
 ---
@@ -744,26 +659,16 @@ The three reasons come on the next slide, with the tick. Don't list them here to
 -->
 
 ---
-layout: center
 clicks: 4
 ---
 
-<Yardstick :done="3" :why="[
-  'What comes back is a commit, not a live directory',
-  'Tested in an environment anyone can rebuild',
-  'None of it ran on your laptop before you reviewed it',
-]" />
+## Friday's choices
 
----
-layout: center
-class: divider
----
+<Blueprint :stage="6" :from="3" reveal class="mt-2" />
 
-<div class="ghost">04</div>
-
-# Under <span class="accent">the hood</span>
-
-<p>How it's built</p>
+<!--
+The last three parts, then the reveal. Click: the machine has to log in, so the keys stay on your side and the proxy adds them on the way out. Click: everything it does would be in your name, so it gets an identity of its own. Click: getting the work back is a commit over git, not a mount; your repository has the machine as a remote. Click: "This is isx." Nothing on this picture arrived without a reason the room watched happen; that's the whole argument. The next two slides are the same picture exactly as built.
+-->
 
 ---
 clicks: 3
@@ -778,21 +683,6 @@ Click 1: the CLI and TUI talk to the Incus daemon's REST API over its unix socke
 Click 2: a machine's HTTPS to intercepted domains resolves to the bridge gateway (dnsmasq), is redirected to isx-proxy, which adds the real credentials and forwards upstream.
 Click 3: git reaches a machine through Incus exec over a WebSocket.
 -->
-
----
-
-## What <span class="kw">isx branch</span> does, in seconds
-
-<ol class="steps mt-4">
-  <li v-click>CoW-copies the template: a btrfs snapshot, no data copied</li>
-  <li v-click>Gives it a static IP, written into its network config before it boots</li>
-  <li v-click>Installs your SSH key: <span class="kw">ssh agent-1</span> just works</li>
-  <li v-click>Adds an <span class="kw">isx://agent-1/…</span> git remote to each matching checkout on your laptop</li>
-  <li v-click>Tells the proxy which accounts this machine uses</li>
-  <li v-click>Starts it, and drops you into a shell or starts the agent</li>
-</ol>
-
-<p v-click class="note pin"><span class="kw">isx destroy</span> undoes all of it: the machine, its disk delta, its SSH key and its git remotes.</p>
 
 ---
 clicks: 3
@@ -811,58 +701,7 @@ Sources: DESIGN.md (Incus Daemon Connection, macOS vsock robustness), appliance/
 -->
 
 ---
-clicks: 2
----
 
-## Under <span class="kw">git fetch agent-1</span>
-
-<GitHelper class="mt-2" />
-
-<!--
-The hops: git sees an isx:// URL and runs git-remote-isx; that hands over to the native isx helper, which checks the machine exists and only allows the git service; Incus exec opens git-upload-pack inside the machine, and the pack stream flows through the WebSocket untouched.
-If asked why there's a bash shim in front of the native helper: git's helper protocol starts with a few text lines, then switches to binary on the same pipe. Java's buffered stdin would read ahead into the binary stream; bash answers the text lines, then execs, so the native helper inherits a clean pipe. (DESIGN.md, "Git remote helper: bash + Java split".)
--->
-
----
-clicks: 3
----
-
-## To cache, <span class="warn">or not to cache?</span>
-
-<div class="cards three equal dilemma mt-4">
-  <div class="card warn"><h4>"Cache it, obviously."</h4><p class="voice">Every build downloads the same internet again, and keeps its own copy. Nothing shared, on the wire or on disk: slow builds, rate limits, and a flaky network deciding whether your tests pass.</p></div>
-  <div v-click="2" class="card you"><h4>You</h4><p class="voice">"I don't have fibre. I can't download 1,500 dependencies again for every reproducer. And I don't want cache problems either."</p></div>
-  <div v-click="1" class="card danger"><h4>"Never cache anything."</h4><p class="voice">Caches bite, in ways you can't predict. Remember Thursday afternoon: one shared <span class="kw">~/.m2</span>, and two days of evidence poisoned. A build you can't reproduce is one you can't trust.</p></div>
-</div>
-
-<h1 v-click="3" class="statement dilemma-q">Could we have <span class="accent">both</span>?</h1>
-
-<!--
-Play both colleagues straight: each is right. Left first, then right, then you, stuck in the middle. The first is the "Set up once" argument again: without a cache, every machine downloads its own copy and keeps it, so nothing is shared, not even on disk. The second is the one who lost Thursday afternoon. Then click: could we have both? The next slide is the answer.
-DO NOT PRESENT this slide without the next one, and that one waits for incus-spawn PR #792 to merge.
--->
-
----
-clicks: 6
----
-
-## Both: <span class="accent">cached, and never stale</span>
-
-<p class="lead">One rule: a cached file is served <span class="accent">only if a fresh download would return the same bytes</span>.</p>
-
-<CacheFlow class="mt-6" />
-
-<p class="note pin">Container layers and tool downloads are keyed by their SHA-256 digest. And the last resort is a command: <span class="kw">isx clean cache</span> throws the whole cache away; all you lose is a download.</p>
-
-<!--
-The answer to the dilemma, as a story of how the design got here. Start with what a cache must never touch (row 1: anything that can change, and anything private, since the cache is shared by every machine). Then the obvious half (row 2): download once, but keep the copy only if the bytes match the checksum upstream sent with them; with no checksum, serve but don't store. Then the part that makes it safe (row 3): a hit doesn't trust the disk, it asks Central "is this still what you'd send?" with one HEAD and compares checksums; only a match serves the stored copy. Row 4 is why that matters: a republished or withdrawn artifact is evicted on the spot and fetched fresh, whichever build tool asks. Row 5 is the honest edge: with Central unreachable, the copy is served unconfirmed, and only then, with a 30-second backoff so a dead network doesn't cost a timeout per request.
-The efficiency claim, stated carefully: what's saved is the download, not the round trip; a hit still costs one HEAD. For Maven 3.9+ that HEAD replaces the .sha1 request the client would have made anyway. Don't quote the old ~2.8 ms vs ~177 ms figures (docs/PERFORMANCE-NOTES.md, 2026-08-28): they predate the HEAD per hit and the bench notes say they're not comparable any more.
-Then the second group, one click: OCI registries work the other way round. A layer is requested by its sha256 digest, so the name is the checksum: the proxy verifies the bytes against it before storing (MitmProxy, BLOB_DIGEST_PATTERN / finalizeCacheFile) and a hit is served from disk with nothing to ask; manifests, tags and auth tokens are relayed, never cached, because a tag can move. That's the contrast to say out loud: Maven names a coordinate, OCI names the bytes; the rule is the same, the check follows the protocol. Gradle (Plugin Portal, distributions) is Maven-like but has no checksum header, so a hit re-fetches the .sha1/.sha256 sidecar instead of a HEAD.
-Source: incus-spawn PR #792 (fixes #555), its DESIGN.md section "Maven/Gradle cache integrity"; OCI: proxy/MitmProxy.java (shipped, unchanged by #792). STATUS 2026-09-26: the PR is open, not merged. Present this and the dilemma slide only once it has merged and is in the release you demo. Scope: Maven Central, the Gradle Plugin Portal and Gradle distributions; other domains are never cached. npm's tarball check is a follow-up (#787).
--->
-
-
----
 
 ## Every request passes <span class="accent">one point</span>
 
@@ -902,6 +741,7 @@ Branch (seconds, from a primed template) → no secrets inside, yet everything a
 
 ---
 
+
 ## Others are working on <span class="accent">the same problem</span>
 
 <div class="cards three equal mt-4">
@@ -938,6 +778,7 @@ The cost point, said plainly: no per-minute cloud meter and no subscription for 
 
 ---
 
+
 ## Get started
 
 <div class="cards mt-2">
@@ -957,6 +798,7 @@ Commands from the isx README (Installation). Debian/Ubuntu updates come with apt
 
 ---
 
+
 ## Then: <span class="accent">isx init</span>
 
 <p class="lead">One command, interactive: it installs Incus (on macOS, the Linux VM), creates the storage pool, asks for your credentials, and sets up the proxy.</p>
@@ -973,6 +815,7 @@ Per the isx README: on Linux, isx init installs Incus through your package manag
 -->
 
 ---
+
 
 ## Built on <span class="accent">great open source</span>
 
@@ -1020,6 +863,7 @@ class: divider
 
 ---
 
+
 ## Can't we just use <span class="muted">Docker?</span>
 
 <table class="mt-2">
@@ -1037,6 +881,7 @@ class: divider
 
 ---
 
+
 ## Or a <span class="muted">VM</span> per agent?
 
 <table class="mt-2">
@@ -1050,3 +895,74 @@ class: divider
 </table>
 
 <p class="note pin">The last row is the honest one. isx runs both, one flag apart: <span class="kw">--type vm</span> when you want it. The container is the default because it's cheap enough to branch per task.</p>
+
+---
+
+
+## Why <span class="accent">a system container</span>?
+
+<div class="cards three mt-4">
+  <div class="card warn"><h4>Docker / Podman</h4><p>Built to ship one app. No init by default, nested containers need <span class="kw">--privileged</span>, <span class="kw">perf</span> is blocked by the default seccomp profile. All of it configurable; none of it the default.</p></div>
+  <div class="card warn"><h4>A VM per agent</h4><p>The strongest boundary: its own kernel. Also a memory guess per agent, and a guest kernel's worth of cost each, so fewer fit on a laptop.</p></div>
+  <div class="card"><h4>An isx machine</h4><p>A full distribution with its own init, where nested containers and profilers just work. It shares the host kernel, so it's cheap enough to branch one per task.</p></div>
+</div>
+
+<p class="note pin">Containers share the host kernel. For code you believe is malicious, build the template as a VM: <span class="kw">isx build tpl-java --type vm</span>. Full comparison: backup slides.</p>
+
+<!--
+The two comparison tables are in the backup section at the end, for questions.
+Docker: ping and strace work by default (ping_group_range since 2020, ptrace allowed on kernel ≥ 4.8); only say what's true. Podman supports systemd in containers.
+VM memory: a guest reserves its RAM and its kernel fills it with page cache; containers get a ceiling (isx: 60% of host RAM), not a reservation, and one kernel shares cache, swap and priorities across all of them.
+-->
+
+---
+clicks: 3
+---
+
+## Network modes
+
+<table class="mt-2">
+  <thead><tr><th>Mode</th><th>Flag</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>Full internet</td><td class="muted">(default)</td><td>Unrestricted access; authentication via the proxy</td></tr>
+    <tr><td>Proxy only</td><td><span class="kw">--proxy-only</span></td><td>All outbound traffic dropped except the proxy and DNS</td></tr>
+    <tr><td>Airgapped</td><td><span class="kw">--airgap</span></td><td>Network device removed</td></tr>
+  </tbody>
+</table>
+
+<NetworkModes class="mt-6" />
+
+<!--
+One click per panel: the same machine and the same three requests each time. api.anthropic.com and github.com go through the proxy because isx intercepts them (github.com when the template has gh); evil.example stands for any other host.
+Airgapped runs no agent: the agent needs its model's API, and there's no network at all. It's for running code you don't trust, like Friday's reproducer: let the agent prepare a machine with network, then branch it with --airgap (isx branch run-1 --from repro-1 --airgap) and run only the tests. Dependencies have to be there already, from the template's prime step or the agent's earlier build. (An agent with a local model inside the machine could work offline, but isx doesn't set that up.)
+-->
+
+---
+
+
+## What <span class="kw">isx branch</span> does, in seconds
+
+<ol class="steps mt-4">
+  <li v-click>CoW-copies the template: a btrfs snapshot, no data copied</li>
+  <li v-click>Gives it a static IP, written into its network config before it boots</li>
+  <li v-click>Installs your SSH key: <span class="kw">ssh agent-1</span> just works</li>
+  <li v-click>Adds an <span class="kw">isx://agent-1/…</span> git remote to each matching checkout on your laptop</li>
+  <li v-click>Tells the proxy which accounts this machine uses</li>
+  <li v-click>Starts it, and drops you into a shell or starts the agent</li>
+</ol>
+
+<p v-click class="note pin"><span class="kw">isx destroy</span> undoes all of it: the machine, its disk delta, its SSH key and its git remotes.</p>
+
+---
+clicks: 2
+---
+
+## Under <span class="kw">git fetch agent-1</span>
+
+<GitHelper class="mt-2" />
+
+<!--
+The hops: git sees an isx:// URL and runs git-remote-isx; that hands over to the native isx helper, which checks the machine exists and only allows the git service; Incus exec opens git-upload-pack inside the machine, and the pack stream flows through the WebSocket untouched.
+If asked why there's a bash shim in front of the native helper: git's helper protocol starts with a few text lines, then switches to binary on the same pipe. Java's buffered stdin would read ahead into the binary stream; bash answers the text lines, then execs, so the native helper inherits a clean pipe. (DESIGN.md, "Git remote helper: bash + Java split".)
+-->
+

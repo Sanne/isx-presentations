@@ -14,6 +14,7 @@ spec per animation, in the order they pay off.
 | 4 | Branch a live machine | `LiveBranch.vue` | built; CONFIRM with one real branch |
 | 5 | Network modes | `NetworkModes.vue` | built |
 | 6 | Both: cached, and never stale | `CacheFlow.vue` | built against incus-spawn PR #792 (fixes #555); present only once it has merged |
+| 7 | The blueprint (Monday's / Wednesday's / Friday's choices) | `Blueprint.vue` | built; replaces the three-question yardstick (tag `deck-v1-three-questions`) |
 
 Where the build departed from the specs below, and why:
 
@@ -269,8 +270,8 @@ to cache?") sets up the dilemma this one answers.
   headers and the `x-api-key` line rewriting at the proxy; then a second run
   for `git push` with a GitHub token. Speaker notes on the slide already ask
   for this.
-- **`Yardstick.vue` on the dividers:** a tiny three-box progress motif in the
-  corner of each act divider, ticked as the acts complete.
+- **`Blueprint.vue` on the dividers:** a tiny version of the blueprint in the
+  corner of each day's divider, lit to the stage reached so far.
 - **`HomerFrames.vue` fallback:** if the frames aren't fetched, the Homer
   slide shows the original drawing; `HomerReturn.vue` shows the terminal
   text. Both are fine, but check them once with `public/memes/` moved away.
