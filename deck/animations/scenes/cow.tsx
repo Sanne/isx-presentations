@@ -1,4 +1,4 @@
-import {Line, makeScene2D, Node, Rect, Txt} from '@motion-canvas/2d';
+import {Circle, Line, makeScene2D, Node, Rect, Txt} from '@motion-canvas/2d';
 import {
   all,
   createRef,
@@ -86,15 +86,21 @@ export default makeScene2D(function* (view) {
     </Node>,
   );
 
-  // Totals along the bottom: real disk used, against what full copies would take.
-  view.add(
-    <Node y={400}>
-      <Txt x={-360} fill={C.accent} fontFamily={SANS} fontSize={44} fontWeight={600}
-           text={() => `on disk with isx  ${onDisk().toFixed(2)} GB`} />
-      <Txt x={400} fill={C.danger} fontFamily={SANS} fontSize={44} fontWeight={600}
-           text={() => `as full copies  ${fullCopies().toFixed(1)} GB`} />
-    </Node>,
+  // Totals along the bottom, as two disks filling: what CoW costs against
+  // what full copies would, on the same scale (the full-copy peak, 8 GB).
+  const MAX = 8;
+  const disk = (x: number, color: string, label: string, value: () => number) => (
+    <Node x={x} y={392}>
+      <Circle size={200} stroke={C.line} lineWidth={3} />
+      <Circle size={200} startAngle={-90} closed fill={color} opacity={0.9}
+              endAngle={() => -90 + 360 * Math.min(1, value() / MAX)} />
+      <Txt x={124} y={-30} offsetX={-1} fill={C.muted} fontFamily={SANS} fontSize={32} text={label} />
+      <Txt x={124} y={30} offsetX={-1} fill={color} fontFamily={SANS} fontSize={56} fontWeight={700}
+           text={() => `${value().toFixed(value() < 3 ? 2 : 1)} GB`} />
+    </Node>
   );
+  view.add(disk(-500, C.accent, 'on disk with isx', onDisk));
+  view.add(disk(120, C.danger, 'as full copies', fullCopies));
 
   // Build the template.
   caption().text('A template\'s disk: its blocks are stored once');
