@@ -595,6 +595,20 @@ Accurate to isx: with your personal PAT, isx generates the container's git ident
 <p class="lead mt-8">An agent is <span class="accent">a principal</span>, not a process: it gets an identity, and the identity gets exactly the access it needs.</p>
 
 ---
+layout: center
+---
+
+<p class="kicker">A fair question</p>
+
+<h1 class="statement">"Can I just mount the repo into my IDE?"</h1>
+
+<p class="lead mt-6">You want to watch the work happen, in your own editor. Of course you do.</p>
+
+<!--
+Ask it warmly, in the audience's voice: everyone asks this, and it's the natural thing to want. Don't answer it here. Pause, click, and let the man in the trench coat answer it for you. The realisation should be theirs, on the second slide, not yours on this one.
+-->
+
+---
 clicks: 3
 ---
 
