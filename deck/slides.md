@@ -666,7 +666,7 @@ Between click 0 and 1: the agent works inside agent-1 and commits. The remote ap
 layout: center
 ---
 
-<h1 class="statement">Trust it like a pull request <span class="accent">from a new colleague</span></h1>
+<h1 class="statement">Review it like <span class="accent">any other pull request</span>.</h1>
 
 <p class="lead mt-8">isx doesn't make its code correct.<br>It makes it reviewable, and keeps it contained until you have.</p>
 
@@ -856,7 +856,7 @@ class: glow-accent
 clicks: 3
 ---
 
-<h1 class="statement">Hand the agent a task, walk away,<br><span v-click="1">come back to <span class="accent">a commit</span>.</span></h1>
+<h1 class="statement">Hand the agent a task, walk away,<br><span v-click="1">come back to <span class="accent">a tested commit</span>.</span></h1>
 
 <p v-click="2" class="lead mt-10">Questions?</p>
 
@@ -867,7 +867,7 @@ clicks: 3
 </div>
 
 <!--
-The opening sentence again, with one word changed: that's the whole talk. "Hand the agent a task, walk away," pause, click: "come back to a commit." Not finished work in the abstract: a commit, from a machine of its own, under its own name, that you review like any PR. Click: questions, and the site. Click, as an afterthought: the command types itself. Say: and if you think of one later, ask isx itself.
+The opening sentence again, with one word changed: that's the whole talk. "Hand the agent a task, walk away," pause, click: "come back to a tested commit." The word that carries the talk is "tested": any agent on your laptop can hand you code changes; this one hands you a commit whose tests ran, in a machine of its own, under its own name, and which you review like any other pull request. Click: questions, and the site. Click, as an afterthought: the command types itself. Say: and if you think of one later, ask isx itself.
 isx ask answers questions about isx itself, from its own documentation, using the AI account you configured (it spends tokens). Also reachable as ? in the TUI.
 -->
 
