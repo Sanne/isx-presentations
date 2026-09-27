@@ -322,17 +322,6 @@ The worktrees diagram already listed what is shared; this is the one-line wish b
 -->
 
 ---
-layout: center
-class: glow-accent
----
-
-<div class="statement">
-  <div class="mono accent" style="font-size: 46px">isx</div>
-  <div style="font-size: 106px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.08" class="accent">branching</div>
-  <div style="font-size: 40px">for the entire machine</div>
-</div>
-
----
 clicks: 3
 ---
 
@@ -795,7 +784,7 @@ layout: center
 class: glow-accent
 ---
 
-<h1 class="statement">Local-first, <span class="accent">by conviction</span></h1>
+<h1 class="statement"><span class="accent">Local-first.</span></h1>
 
 <p class="lead mt-8 muted">Your hardware. Your network. Your repos.</p>
 
@@ -867,7 +856,7 @@ class: glow-accent
 clicks: 3
 ---
 
-<h1 class="statement"><span class="accent">Their machines.</span><br><span v-click="1">Your machine.</span></h1>
+<h1 class="statement">Hand the agent a task, walk away,<br><span v-click="1">come back to <span class="accent">a commit</span>.</span></h1>
 
 <p v-click="2" class="lead mt-10">Questions?</p>
 
@@ -878,7 +867,7 @@ clicks: 3
 </div>
 
 <!--
-Three beats. "Their machines." Pause. Click: "Your machine." Click: questions, and the site. Click, as an afterthought: the command types itself. Say: and if you think of one later, ask isx itself.
+The opening sentence again, with one word changed: that's the whole talk. "Hand the agent a task, walk away," pause, click: "come back to a commit." Not finished work in the abstract: a commit, from a machine of its own, under its own name, that you review like any PR. Click: questions, and the site. Click, as an afterthought: the command types itself. Say: and if you think of one later, ask isx itself.
 isx ask answers questions about isx itself, from its own documentation, using the AI account you configured (it spends tokens). Also reachable as ? in the TUI.
 -->
 

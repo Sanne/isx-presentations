@@ -21,11 +21,11 @@ const DWELL = 1.5 // minutes you spend on each prompt, switching included
 
 // Each agent's task, as the minutes of work between its prompts.
 const tasks = [
-  { name: 'fix a failing test', work: [4, 3, 3] },
-  { name: 'bump dependencies', work: [2, 4, 3, 5] },
-  { name: 'migrate the schema', work: [3, 2, 2, 4, 3] },
-  { name: 'hunt a flaky test', work: [1, 2, 1, 2, 1, 2, 2] },
-  { name: 'build the docs', work: [1, 1, 2, 1, 1, 1, 2, 2] },
+  { name: 'fix a failing test', cmd: 'mvn -q test', work: [4, 3, 3] },
+  { name: 'bump dependencies', cmd: 'mvn versions:use-latest-releases', work: [2, 4, 3, 5] },
+  { name: 'migrate the schema', cmd: 'flyway migrate', work: [3, 2, 2, 4, 3] },
+  { name: 'hunt a flaky test', cmd: 'mvn -q test -Dtest=OrderRaceTest', work: [1, 2, 1, 2, 1, 2, 2] },
+  { name: 'build the docs', cmd: 'npm run build:docs', work: [1, 1, 2, 1, 1, 1, 2, 2] },
 ]
 
 type Seg = { from: number; to: number; kind: 'work' | 'wait' }
@@ -130,6 +130,10 @@ const ROW = 58
     <div class="body">
       <div class="lanes">
         <!-- the attention cursor: you, in one lane at a time -->
+        <!-- the prompt you're answering, where the cursor is; boring commands only, the spicy ones are the game's -->
+        <div v-if="visit" class="ask" :class="{ flip: m > 19 }" :style="{ top: `${lastLane * ROW + 15}px`, left: `calc(210px + (100% - 210px) * ${(m / END).toFixed(3)})` }">
+          Allow this command? <code>{{ tasks[visit.lane].cmd }}</code>
+        </div>
         <div class="cursor" :class="{ busy: visit, fried: moodIdx >= 4 }" :style="{ top: `${lastLane * ROW}px` }">
           <span class="face">{{ mood.face }}</span>
         </div>
@@ -174,6 +178,11 @@ const ROW = 58
 .done { position: absolute; top: 50%; transform: translateY(-50%); padding-left: 8px; font-size: 14px; font-weight: 600; color: var(--accent); white-space: nowrap; opacity: 0; transition: opacity .4s; }
 .done.on { opacity: 1; }
 
+.ask { position: absolute; z-index: 2; padding: 4px 10px; border: 1px solid var(--warn); border-radius: 6px; background: var(--surface); box-shadow: 0 0 16px -6px var(--warn); font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--warn); white-space: nowrap; animation: pop .25s ease-out; }
+.ask code { display: inline; color: var(--text); background: none !important; border: none !important; padding: 0 0 0 8px !important; font-size: 13px; }
+.ask.flip { transform: translateX(calc(-100% - 12px)); }
+@keyframes pop { from { opacity: 0; transform: scale(.9); } }
+.ask.flip { animation: none; }
 .cursor { position: absolute; left: 0; height: 58px; display: flex; align-items: center; transition: top .45s cubic-bezier(.5, 0, .3, 1); }
 .cursor .face { font-size: 34px; line-height: 1; opacity: .55; transition: opacity .3s; }
 .cursor.busy .face { opacity: 1; filter: drop-shadow(0 0 8px rgba(245, 165, 36, .7)); }
