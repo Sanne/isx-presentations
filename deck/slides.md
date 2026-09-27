@@ -628,20 +628,21 @@ clicks: 4
 
 <h1 class="statement">"It works on my machine."</h1>
 
-<p class="lead mt-6" style="opacity: 1">It does. On <em class="accent">its</em> machine.</p>
+<p class="lead mt-6" style="opacity: 1">It does. On <em class="accent">its</em> machine. The trap: yours can say the same, <em>about something else</em>.</p>
 
 <ul class="works mt-8">
-  <li v-click="1"><b>Its tools</b>, at its versions: the JDK from the bug report, not yours.</li>
-  <li v-click="2"><b>Its SNAPSHOT dependencies</b>, with its patches inside them, not yours.</li>
-  <li v-click="3"><b>Its OS</b>: Fedora inside, whatever you run outside.</li>
+  <li v-click="1"><b>Same command, different program.</b> Your <span class="kw">mvn test</span> runs your Maven, your JDK, your plugins.</li>
+  <li v-click="2"><b>Same name, different bytes.</b> <span class="kw">lib-1.2-SNAPSHOT</span> in your <span class="kw">~/.m2</span> is not the one it patched and built.</li>
+  <li v-click="3"><b>Same OS?</b> Fedora inside. Whatever you run, outside.</li>
 </ul>
 
-<p v-click="4" class="lead mt-8" style="text-align: center">A mounted folder shows you the files. <span class="warn">Not the machine they ran on.</span></p>
+<p v-click="4" class="lead mt-8" style="text-align: center">The folder is half the picture. A green run in your IDE is <span class="warn">a different experiment with the same name.</span></p>
 
 <!--
-The second argument against the mount, after safety: meaning. The oldest excuse in the trade, and for once it's literally true: the agent's build passed on its machine, with its toolchain, its ~/.m2 and its OS. Click through the three. A read-write mount hands you the files and none of that context, so "the tests pass" tells you about a machine you don't have. (The isx README's FAQ makes the same point: the agent's SNAPSHOTs and node_modules don't come through a mount.)
+The second argument against the mount, and the subtler one: not danger from what it writes, but false confirmation of what it claims. The oldest excuse in the trade is literally true here: its build passed on its machine, with its toolchain, its ~/.m2, its OS. Now you open the mounted folder in your IDE and run the tests. Green. You feel you've verified it. You haven't: same command, but your Maven and your JDK; same dependency identifier, but a SNAPSHOT resolves to whatever your ~/.m2 holds, not the patched one it built (Wednesday's Thursday afternoon, in reverse); same OS, only by luck. Two green runs, two different experiments. A red run tells you even less: it may be failing for a reason the agent never saw.
+Say it plainly: the project folder is an incomplete view. Half of what ran lives outside it, and a mount only carries the half you can see. (The isx README's FAQ makes the same point: the agent's SNAPSHOTs and node_modules don't come through a mount.)
 And even reading the files isn't final: you open build.sh at 10:00 and it looks fine; the agent, still working, edits it at 10:01; at 10:02 you run the build, and it runs the version you never read, on your laptop, as you. Your IDE runs project configuration the moment you open the folder. (The race slide itself is at tag deck-v1-three-questions.)
-Echo the Wednesday line on purpose: a worktree isolates your checkout, not the machine it runs on; a mount shows the files, not the machine they ran on. The fix is two slides on: what comes back is a commit, and you re-run its tests on a fresh branch of the same template, so the environment is part of the evidence.
+The fix is two slides on: what comes back is a commit, and you re-run its tests on a fresh branch of the same template. Same experiment, this time; and one anyone can rebuild.
 -->
 
 ---
