@@ -339,3 +339,6 @@
 .ask .kw.typed { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; max-width: 0; }
 .ask .kw.typed:not(.slidev-vclick-hidden) { animation: type 1.6s steps(48, end) .2s forwards; }
 @keyframes type { to { max-width: 760px; } }
+
+/* A small label above a statement, saying what kind of sentence it is. */
+.slidev-layout .kicker { font-size: 15px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 18px; opacity: 1; }

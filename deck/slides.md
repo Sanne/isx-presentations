@@ -23,12 +23,16 @@ class: glow-accent
 layout: center
 ---
 
+<p class="kicker">The promise</p>
+
 <h1 class="statement">Hand the agent a task, <span class="accent">walk away</span>, come back to finished work.</h1>
 
 <p class="lead mt-8">Every part of isx answers a problem from your first week with an agent.<br>Let's have that week.</p>
 
 <!--
-The promise, and the shape of the talk: not a feature tour, a week. Monday, Wednesday, Friday; each day a problem you'll recognise, and the choice that answers it. By Friday the choices add up to a picture, and the picture is isx.
+Spoken intro: "Here's what we were promised." Read the line. "That's the job description of a coding agent. Not a faster autocomplete: you hand it a task, you leave, you come back to finished work. Hold on to that sentence: it's the bar I'll hold everything to today. Every part of isx exists because something got in the way of it. So let's have the week where that happens."
+It's the promise, not a wish and not isx's claim: the way agents are sold, and the thing you actually want. Monday is what happens when you take it at its word.
+The shape of the talk: not a feature tour, a week. Monday, Wednesday, Friday; each day a problem you'll recognise, and the choice that answers it. By Friday the choices add up to a picture, and the picture is isx.
 -->
 
 <!--
