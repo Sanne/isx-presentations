@@ -12,11 +12,13 @@
 //
 // The room's verdict: press Y or N for what the room shouted. It goes
 // through Slidev's shared state, so a key pressed in the presenter window
-// shows on the audience screen too. The bird still says yes.
+// shows on the audience screen too. The bird still says yes. With `score`
+// (the default), a yes to a command nobody should approve turns the chip red
+// and counts in the tally; `:score="false"` switches the scorekeeper off.
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { sharedState, useIsSlideActive, useSlideContext } from '@slidev/client'
 
-const props = withDefaults(defineProps<{ periodMs?: number; startAt?: number; stopAt?: number }>(), { periodMs: 3200, startAt: 1, stopAt: Infinity })
+const props = withDefaults(defineProps<{ periodMs?: number; startAt?: number; stopAt?: number; score?: boolean }>(), { periodMs: 3200, startAt: 1, stopAt: Infinity, score: true })
 const { $clicks, $renderContext } = useSlideContext()
 const active = useIsSlideActive()
 
@@ -64,6 +66,11 @@ type Vote = 'yes' | 'no'
 const votes = reactive<Record<number, Vote>>({})
 const vote = computed(() => votes[i.value])
 const roomNo = computed(() => Object.values(votes).filter(v => v === 'no').length)
+// The scorekeeper (prop `score`): commands nobody should approve, and how
+// many of them the room approved anyway. Which ones count is decided here,
+// by the command text, so the list above stays a plain list.
+const regrettable = (c: string) => /sudo sh|--force|id_ed25519|chmod -R 777|AWS_SECRET|npm publish|--author=|delete namespace|\*\.pem|firewalld|dQw4w9WgXcQ|DROP DATABASE|s3 rm|crontab|--admin|alias sudo|--privileged|openssl enc|history -c|rm -rf ~|if=\/dev\/zero|shutdown/.test(c)
+const regret = computed(() => Object.entries(votes).filter(([k, v]) => v === 'yes' && regrettable(commands[+k])).length)
 const shared = sharedState as unknown as { game?: { i: number; vote: Vote; t: number } }
 const onKey = (e: KeyboardEvent) => {
   if (!started.value || !active.value) return
@@ -104,12 +111,13 @@ onBeforeUnmount(stop)
         <span class="opt" :class="{ hit: stamped }">❯ 1. Yes</span>
         <span class="opt">2. Yes, and don't ask again</span>
         <span class="opt">3. No</span>
-        <span v-if="vote" :key="i" class="room" :class="vote">the room: {{ vote }}</span>
+        <span v-if="vote" :key="i" class="room" :class="[vote, { regret: vote === 'yes' && regrettable(commands[i]) }]">the room: {{ vote }}</span>
       </div>
       <div v-if="started" class="bar"><i :key="i" :style="{ animationDuration: `${periodMs}ms` }" /></div>
     </div>
     <div class="tally">
       <span class="count">the room said no: <b class="no">{{ roomNo }}</b></span>
+      <span v-if="score" class="count">waved through, to regret later: <b class="no">{{ regret }}</b></span>
       <span class="count">the drinking bird approved: <b>{{ approved }}</b> of {{ approved }}</span>
     </div>
   </div>
@@ -133,6 +141,7 @@ onBeforeUnmount(stop)
 .room { margin-left: auto; border-radius: 4px; padding: 0 12px; font-weight: 700; text-transform: uppercase; animation: stamp .3s ease-out; }
 .room.no { color: var(--bg); background: var(--danger); }
 .room.yes { color: var(--bg); background: var(--accent); }
+.room.yes.regret { background: var(--danger); }
 .waiting .opts .opt:first-child { color: var(--text); animation: blink 1.1s steps(2, start) infinite; }
 .bar { position: absolute; left: 36px; right: 36px; bottom: 10px; height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
 .bar i { display: block; height: 100%; background: var(--warn); animation: drain linear forwards; }
