@@ -183,15 +183,17 @@ Sources: anthropic.com/engineering/claude-code-auto-mode; code.claude.com/docs/e
 
 ---
 layout: center
-clicks: 1
+clicks: 2
 ---
 
 <h1 class="statement"><span class="warn">"Usually"?</span></h1>
 
 <p v-click="1" class="lead mt-8" style="font-size: 44px; color: var(--text)">My parachute usually opens.</p>
 
+<p v-click="2" class="lead mt-6" style="font-size: 32px">One time in six, when it matters, it doesn't. <span class="warn">Still jumping?</span></p>
+
 <!--
-Deadpan. Let "Usually?" sit for a second, click, and let the laugh happen. Then the plain version, spoken: for commands that run as you, on your laptop, "usually" isn't good enough.
+Deadpan. Let "Usually?" sit for a second, click, and let the laugh happen. Click again for the number, and get the wording right: Anthropic's 17% is a miss rate on real overeager actions, i.e. of the actions that genuinely should have been stopped, one in six got through. It is not "17% of the time it fails"; most actions are harmless and never needed stopping. So the parachute fails one time in six when it matters, which for a safety device is the only time that counts. Then ask the room. Then the plain version, spoken: for commands that run as you, on your laptop, "usually" isn't good enough.
 Alternative punchline if it suits the room better: "Usually, logging into my bank doesn't empty my savings."
 -->
 
