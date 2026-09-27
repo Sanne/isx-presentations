@@ -88,6 +88,21 @@ It can't finish without you, so you can't leave. This is the real cost, more tha
 -->
 
 ---
+clicks: 2
+---
+
+## And now run <span class="warn">five of them</span>
+
+<p class="lead">Five agents, five streams of prompts. One of you, switching between them.</p>
+
+<FiveAgents class="mt-6" />
+
+<!--
+Bridge from the coffee break: 29 minutes of waiting, and that was one agent. The obvious move, the one every demo shows, is to run five. Click 1 plays 30 minutes in about 25 seconds; let it run and narrate the face. Click 2: the verdict. This is still the world without isx: Monday's choice answers this scene too.
+Illustrative, not measured: the lanes are simulated with one rule, that you answer prompts in the order they arrive and each one costs you a minute and a half of reading and switching back. Nothing else is tuned; the queue does the rest.
+-->
+
+---
 clicks: 1
 ---
 
@@ -261,21 +276,10 @@ class: divider
 
 # Wednesday: <span class="accent">five agents at once</span>
 
-<p>Parallel work, without stepping on each other</p>
-
----
-clicks: 2
----
-
-## And now run <span class="warn">five of them</span>
-
-<p class="lead">Five agents, five streams of prompts. One of you, switching between them.</p>
-
-<FiveAgents class="mt-6" />
+<p>You got your afternoon back. So you started a second agent. Then a third.</p>
 
 <!--
-Click 1 plays 30 minutes in about 25 seconds; let it run and narrate the face. Click 2: the verdict.
-Illustrative, not measured: the lanes are simulated with one rule, that you answer prompts in the order they arrive and each one costs you a minute and a half of reading and switching back. Nothing else is tuned; the queue does the rest.
+Monday solved the prompts; nobody is waiting for you any more. So of course you run more than one. Wednesday's problem is a different one: they get in each other's way.
 -->
 
 ---
@@ -344,6 +348,7 @@ Click 3, the callback to worktrees: you keep the git workflow. Each machine is a
 ---
 
 
+
 ## Branching: <span class="accent">shared, not copied</span>
 
 <McPlayer src="/mc/cow.js" />
@@ -388,6 +393,7 @@ The demo's Postgres fork shows the same mechanism live.
 -->
 
 ---
+
 
 
 ## A template <span class="accent">declares the whole machine</span>
@@ -539,6 +545,7 @@ To extend: show the request as an HTTP message with headers, and the x-api-key l
 ---
 
 
+
 ## An old principle, <span class="accent">a new kind of <s class="struck">program</s> user</span>
 
 <div class="quote mt-2">"Every program and every user of the system should operate using the least set of privileges necessary to complete the job."<cite>Saltzer &amp; Schroeder, <em>The Protection of Information in Computer Systems</em>, 1975</cite></div>
@@ -573,6 +580,7 @@ Accurate to isx: with your personal PAT, isx generates the container's git ident
 -->
 
 ---
+
 
 
 ## The agent acts <span class="accent">as itself</span>
@@ -707,6 +715,7 @@ Sources: DESIGN.md (Incus Daemon Connection, macOS vsock robustness), appliance/
 ---
 
 
+
 ## Every request passes <span class="accent">one point</span>
 
 <p class="lead">Swap the account an agent uses, while it runs: <span class="tag shipped">shipped</span></p>
@@ -746,6 +755,7 @@ Branch (seconds, from a primed template) → no secrets inside, yet everything a
 ---
 
 
+
 ## Others are working on <span class="accent">the same problem</span>
 
 <div class="cards three equal mt-4">
@@ -783,6 +793,7 @@ The cost point, said plainly: no per-minute cloud meter and no subscription for 
 ---
 
 
+
 ## Get started
 
 <div class="cards mt-2">
@@ -803,6 +814,7 @@ Commands from the isx README (Installation). Debian/Ubuntu updates come with apt
 ---
 
 
+
 ## Then: <span class="accent">isx init</span>
 
 <p class="lead">One command, interactive: it installs Incus (on macOS, the Linux VM), creates the storage pool, asks for your credentials, and sets up the proxy.</p>
@@ -819,6 +831,7 @@ Per the isx README: on Linux, isx init installs Incus through your package manag
 -->
 
 ---
+
 
 
 ## Built on <span class="accent">great open source</span>
@@ -868,6 +881,7 @@ class: divider
 ---
 
 
+
 ## Can't we just use <span class="muted">Docker?</span>
 
 <table class="mt-2">
@@ -886,6 +900,7 @@ class: divider
 ---
 
 
+
 ## Or a <span class="muted">VM</span> per agent?
 
 <table class="mt-2">
@@ -901,6 +916,7 @@ class: divider
 <p class="note pin">The last row is the honest one. isx runs both, one flag apart: <span class="kw">--type vm</span> when you want it. The container is the default because it's cheap enough to branch per task.</p>
 
 ---
+
 
 
 ## Why <span class="accent">a system container</span>?
@@ -942,6 +958,7 @@ Airgapped runs no agent: the agent needs its model's API, and there's no network
 -->
 
 ---
+
 
 
 ## What <span class="kw">isx branch</span> does, in seconds
