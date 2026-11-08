@@ -143,7 +143,7 @@ clicks: 7
 
 <ul class="rules mt-2" :class="{ real: $clicks >= 6 }">
   <li class="head"><span>it asked</span><span class="why">you thought</span><span class="rule">it saved</span><span class="is">which allows</span></li>
-  <li v-click="1"><code>mvn -q test</code><span class="why">it needs to build</span><span class="rule"><code>Bash(mvn *)</code></span><span class="is">any code any plugin brings</span></li>
+  <li v-click="1"><code>mvn -q test</code><span class="why">it needs to build</span><span class="rule"><code>Bash(mvn *)</code></span><span class="is">any code it wrote, any instructions in dependencies and plugins</span></li>
   <li v-click="2"><code>git commit -am "wip"</code><span class="why">it needs to commit</span><span class="rule"><code>Bash(git commit *)</code></span><span class="is ok">reasonable</span></li>
   <li v-click="3"><code>curl -LO https://download.java.net/…</code><span class="why">it needs a boot JDK</span><span class="rule"><code>Bash(curl *)</code></span><span class="is">sending anything, anywhere</span></li>
   <li v-click="4"><code>docker run -d postgres:17</code><span class="why">Testcontainers</span><span class="rule"><code>Bash(docker run *)</code></span><span class="is">root on your laptop, via the socket</span></li>
