@@ -47,3 +47,19 @@ file, the slide falls back to an original drawing.
 - `node tools/audit.mjs <dir>`: screenshots every slide with all clicks
   revealed and flags overflow. `node tools/shot.mjs <dir> 12:3` screenshots
   one slide at one click (`12:3@8000` waits 8 s, for animations).
+
+## Dependencies
+
+`npm install` should report no vulnerabilities. Two of Slidev's transitive
+dependencies pin versions that `npm audit` flags, and neither pin can move on
+its own, so `package.json` carries `overrides` for them:
+
+- `dompurify` → `^3.4.17`: `monaco-editor` pins `3.4.15` exactly, which has an
+  XSS advisory. The deck never opens Monaco, but the pin is what audit sees.
+- `image-size` → `^2.1.0`: `pptxgenjs` asks for `^1.2.1`, which has a
+  denial-of-service advisory in its JXL/HEIF/ICNS parsers. Only `slidev export
+  --format pptx` would reach that code; this deck exports PDF.
+
+Keep `typescript` on 6.x. TypeScript 7 type-checks this project cleanly, but
+Slidev's twoslash code transformer calls `ts.sys`, which 7 no longer exposes,
+and `npm run build` dies before the first slide.
