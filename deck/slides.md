@@ -350,6 +350,22 @@ To extend: show the request as an HTTP message with headers, and the x-api-key l
 -->
 
 ---
+clicks: 4
+---
+
+## What comes back: <span class="accent">a commit</span>
+
+<div class="flow mt-6">
+  <div class="step">isx machine <b>agent-1</b><span>built and tested from <code>tpl-java</code></span></div>
+  <div v-click="1" class="step">commit <b>3f2a91c</b><span>immutable text</span></div>
+  <div v-click="2" class="step"><code>git fetch agent-1</code><span><code>git diff</code>: read it like any PR</span></div>
+  <div v-click="3" class="step">a fresh branch<span>re-run the tests from the same template</span></div>
+  <div v-click="4" class="step">cherry-pick<span>or throw it all away</span></div>
+</div>
+
+<p class="note pin">Want to watch it work? Your IDE connects <em>into</em> the machine (JetBrains Gateway, VS Code Remote), so nothing it writes runs on your laptop.</p>
+
+---
 clicks: 3
 ---
 
