@@ -413,6 +413,70 @@ For code you believe is actively malicious, the template can be built as a VM on
 -->
 
 ---
+clicks: 3
+---
+
+## One agent, <span class="accent">coordinating many</span>
+
+<div class="coord mt-4">
+  <div class="c-col">
+    <div class="c-box you-box"><h4>The coordinator</h4><p>Claude Code on your laptop, or in an isx machine of its own</p></div>
+  </div>
+  <div class="c-arrow">→</div>
+  <div class="c-col">
+    <div class="c-box mcp-box"><h4><span class="kw">isx mcp</span></h4>
+      <ul>
+        <li><b>create_instance</b> from a template, or fork a prepared one</li>
+        <li v-click="1"><b>delegate</b> a task · <b>send_message</b> to follow up</li>
+        <li v-click="2"><b>wait_any</b> · <b>task_result</b> · <b>get_diff</b></li>
+        <li v-click="3"><b>instance_activity</b>: working, or stuck?</li>
+      </ul>
+    </div>
+  </div>
+  <div class="c-arrow">→</div>
+  <div class="c-col workers">
+    <div class="c-box w"><h4>mcp-tpl-quarkus-870-impl</h4><p>Claude Code</p></div>
+    <div class="c-box w"><h4>mcp-tpl-quarkus-870-review</h4><p>Codex</p></div>
+    <div class="c-box w"><h4>mcp-tpl-quarkus-871-spike</h4><p>Pi</p></div>
+  </div>
+</div>
+
+<p class="note pin">Each worker runs with full access and no turn limit inside its machine: the machine is the boundary. A long log never fills the coordinator's context: <span class="kw">ask</span> "which tests fail?", and a model reads it inside the machine.</p>
+
+<!--
+The five agents from the start of the talk, without you switching between them: one agent coordinates, isx gives it the tools. Set up by isx init (off by default), or by hand: claude mcp add --scope user isx -- isx mcp. In Claude Code it also brings a prompt, /mcp__isx__coordinate.
+Click by click, from docs/MCP.md "The tools": create_instance (a fresh branch of an approved template; with from_instance, a fork of a stopped one: prepare once, fork many); click 1, delegate gives an instruction or an installed skill to Claude Code, Codex or Pi inside a machine, and send_message continues that conversation ("push and open a PR"); click 2, wait_any waits for whichever task finishes first, task_result reads the report, get_diff returns a patch, never touching your checkout; click 3, instance_activity reads what the proxy counted of the machine's model calls and traffic: the Activity card from the "one point" slide, put to work.
+The worker can be any of the three, whichever the coordinator is. Claude runs in bypassPermissions, Codex in danger-full-access, Pi with every tool: no prompts, because nothing of yours is inside.
+ask: a one-shot Claude Code on the summary model reads the output inside the instance and answers. It's a model's reading, so anything that gates a merge stays deterministic: get_diff with stat, CI, a reviewer.
+Names: mcp-<template>-<hint>-<suffix>; isx list shows an MCP column (held: #870 implement, orphaned, kept). isx shell <instance> --task joins a delegate's conversation where it left off.
+-->
+
+---
+
+
+
+## What a coordinator <span class="accent">can't do</span>
+
+<div class="cards three equal mt-4">
+  <div class="card"><h4>Pick its templates</h4><p>Only those you list in <span class="kw">mcp.yaml</span>, which no agent can write. A coordinator in a machine gets fewer still: what both <span class="kw">mcp.yaml</span> and its template's <span class="kw">control-over</span> name.</p></div>
+  <div class="card"><h4>Touch your host</h4><p>No commands on your laptop, except host tools you defined, whose command it can't change. Results come back as text; a diff is a patch, not an edit to your checkout.</p></div>
+  <div class="card"><h4>Change the rules</h4><p>Template defaults, no choices: the network mode, the accounts and the resources you set. Credentials stay in the proxy, as for every machine.</p></div>
+</div>
+
+<p class="lead mt-6">Every call is logged with credentials scrubbed. Limits on instances and tasks catch a runaway; instances a session leaves behind wait to be adopted, then go.</p>
+
+<p class="note pin">Not only MCP: <span class="kw">isx branch --owner</span>, <span class="kw">start</span>, <span class="kw">stop</span> with <span class="kw">--format=json</span> for any orchestrator, and herdr and Orca integrations.</p>
+
+<!--
+Source: docs/MCP.md, "Approving templates: mcp.yaml", "What an agent gets", "A coordinator in an instance", "Orphans and adoption".
+mcp.yaml is read on every call, and isx mcp has no way to write it; a missing or empty file approves nothing. A coordinator in an instance (isx branch coord --from tpl-dev --proxy-only --mcp-client) reaches the server at https://mcp.isx.internal/mcp through the proxy, acts with the instance's credentials (a bot's GitHub login) instead of yours, and controls only the intersection of mcp.yaml's templates and its own template's coordinator.control-over. So mcp.yaml stays your ceiling for every agent.
+Never a project-local (.incus-spawn/) template, never an unbuilt one: the agent is told to ask you to run isx build.
+Audit: ~/.local/state/incus-spawn/mcp.log. Limits: max-instances (8) and max-concurrent-tasks (8) per host user, "a safety net against runaway creation, not a budget". Orphans: an ended session's instances can be taken back with adopt_instance; unadopted ones are destroyed after orphan-grace-hours (24), never while you're in one or its delegate still works, never once kept.
+Text coming back from an instance is data produced inside the sandbox, and the tool descriptions tell the host agent to treat it that way.
+The footnote: the backup slide "Drive isx from other tools" has the detail.
+-->
+
+---
 layout: center
 class: divider
 ---
