@@ -31,7 +31,7 @@ const W = 320
          : 'One template with three isx branches, each a machine with its own checkout, ports, ~/.m2, tools and services.'">
     <!-- the source: one repository, or one template -->
     <rect class="src" x="460" y="10" width="240" height="64" rx="10" />
-    <text class="lbl" x="580" y="40">{{ wt ? 'one repository' : 'tpl-java' }}</text>
+    <text class="lbl" x="580" y="40">{{ wt ? 'one repository' : 'tpl-quarkus' }}</text>
     <text class="sub mid" x="580" y="62">{{ wt ? '.git' : 'template' }}</text>
 
     <!-- worktrees share one .git, so their work meets there -->

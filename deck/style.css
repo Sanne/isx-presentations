@@ -295,6 +295,7 @@
 /* Numbered steps */
 .steps { list-style: none; counter-reset: step; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
 .steps li { counter-increment: step; display: flex; gap: 18px; align-items: baseline; font-size: 24px; line-height: 1.4; }
+.steps li > .t { display: block; }
 .steps li::before {
   content: counter(step); flex: none;
   width: 34px; height: 34px; border-radius: 50%;
@@ -344,3 +345,63 @@
 
 /* A small label above a statement, saying what kind of sentence it is. */
 .slidev-layout .kicker { font-size: 15px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 18px; opacity: 1; }
+
+/* The modules slide: one row of the logos the old "Built on" slide carried */
+.built-on.logos { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px 44px; }
+.built-on.logos > img.word { height: 34px; width: auto; }
+.built-on.logos .tech { margin: 0; min-height: 0; }
+.built-on.logos .tech img.mark { height: 40px; }
+.built-on.logos .tech span { font-size: 22px; }
+.modules .card { display: flex; flex-direction: column; }
+.modules .tune { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); font-family: 'JetBrains Mono', monospace; font-size: 15px; line-height: 1.5; color: var(--accent); }
+.modules .tune b { color: var(--text-muted); font-weight: 600; }
+
+/* A command listing meant to be read from a livestream */
+.big-code .slidev-code { font-size: 22px !important; line-height: 1.6 !important; }
+
+/* A news item under a diagram: smaller than a statement quote */
+.quote.news { font-size: 20px; line-height: 1.45; max-width: 1080px; }
+.quote.news cite a { color: inherit; }
+
+/* Architecture diagrams that share the slide with a footer */
+.arch-fit { width: 88% !important; margin-left: auto; margin-right: auto; }
+
+/* One agent coordinating many: coordinator → isx mcp → workers */
+.coord { display: grid; grid-template-columns: 1fr auto 1.6fr auto 1.2fr; gap: 12px; align-items: center; }
+.coord .c-arrow { font-size: 30px; color: var(--accent); }
+.coord .c-box { background: var(--surface); border: 1px solid var(--line); border-top: 2px solid var(--accent); border-radius: 8px; padding: 14px 16px; }
+.coord .c-box h4 { margin: 0 0 6px; font-size: 22px; color: var(--accent); font-weight: 600; }
+.coord .c-box p { margin: 0; font-size: 17px; color: var(--text-muted); line-height: 1.4; }
+.coord .you-box { border-top-color: var(--text-muted); }
+.coord .you-box h4 { color: var(--text); }
+.coord .mcp-box ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.coord .mcp-box li { font-size: 17px; color: var(--text-muted); line-height: 1.35; padding: 0 !important; }
+.coord .mcp-box li::before { content: none !important; }
+.coord .mcp-box b { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); font-size: 16px; }
+.coord .workers { display: flex; flex-direction: column; gap: 10px; }
+.coord .w h4 { font-family: 'JetBrains Mono', monospace; font-size: 15px; }
+
+/* Setting up a coordinator: three steps, each with its snippet */
+.setup { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: stretch; }
+.setup .s-col { background: var(--surface); border: 1px solid var(--line); border-top: 2px solid var(--accent); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+.setup h4 { margin: 0 0 8px; font-size: 19px; font-weight: 600; color: var(--text); display: flex; gap: 10px; align-items: baseline; }
+.setup .n { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font-size: 14px; flex: none; }
+.setup p { margin: 8px 0 0; font-size: 16px; line-height: 1.4; color: var(--text-muted); }
+.setup .slidev-code { font-size: 14px !important; line-height: 1.5 !important; margin: 0 !important; white-space: pre-wrap; }
+
+/* Get started: tighter cards, so the next steps fit below */
+.install .card, .card.install { padding: 10px 18px 12px; }
+.install .card h4, .card.install h4 { font-size: 22px; margin-bottom: 4px; }
+
+/* The handover flow: who acts, then the command, then what it means */
+.flow.hand .step em { display: block; font-style: normal; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+.flow.hand .step > code, .flow.hand .step > b { display: inline-block; font-size: 15px; word-break: normal; overflow-wrap: normal; }
+.flow.hand .step span code { white-space: nowrap; }
+.flow.hand i.nb { font-style: normal; white-space: nowrap; }
+
+/* Get started: the homepage, in a browser frame */
+.site-shot { display: block; flex-shrink: 0; width: 56%; margin: 6px auto 0; border: 1px solid var(--line) !important; border-radius: 10px; overflow: hidden; background: var(--surface); text-decoration: none; box-shadow: 0 12px 40px -18px rgba(34, 211, 238, .45); }
+.site-shot .bar { display: flex; align-items: center; gap: 7px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.site-shot .bar span { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.site-shot .bar b { margin-left: 12px; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 15px; color: var(--accent); }
+.site-shot img { display: block; width: 100%; max-width: 100%; height: auto !important; max-height: none !important; object-fit: contain; }
