@@ -178,7 +178,6 @@ Be fair: auto mode is a real improvement for interactive work.
 - The classifier is a second model, Sonnet 5 by default, in a separate call that doesn't see tool outputs. When the session also runs Sonnet 5, it is literally another instance of the same model.
 - It costs tokens. Every shell command and network call goes to that second model first, with a portion of the transcript, and the answer comes back before the action runs. On the API, Enterprise, Bedrock, Vertex and Foundry accounts those calls count toward token usage. On Pro/Max the review happens server-side and isn't billed separately, but the round trip per action is still there.
 - It gives up: after 3 blocks in a row, or 20 in a session, it goes back to prompting you.
-- Since v2.1.302 the classifier model can be changed (CLAUDE_CODE_AUTO_MODE_MODEL); Sonnet 5 is still the default (checked 2026-11-08).
 Sources: anthropic.com/engineering/claude-code-auto-mode; code.claude.com/docs/en/permission-modes ("Cost and latency"; "Server-side classifier review"); code.claude.com/docs/en/sandbox-environments.
 -->
 
