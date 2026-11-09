@@ -382,7 +382,7 @@
 .coord .w h4 { font-family: 'JetBrains Mono', monospace; font-size: 15px; }
 
 /* Setting up a coordinator: three steps, each with its snippet */
-.setup { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: start; }
+.setup { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: stretch; }
 .setup .s-col { background: var(--surface); border: 1px solid var(--line); border-top: 2px solid var(--accent); border-radius: 8px; padding: 12px 14px; min-width: 0; }
 .setup h4 { margin: 0 0 8px; font-size: 19px; font-weight: 600; color: var(--text); display: flex; gap: 10px; align-items: baseline; }
 .setup .n { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font-size: 14px; flex: none; }

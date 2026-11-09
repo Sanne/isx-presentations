@@ -483,12 +483,15 @@ host-tools:
     <h4><span class="n">2</span> A coordinator template</h4>
 
 ```yaml
-# ~/.config/incus-spawn/images/coordinator.yaml
+# in ~/.config/incus-spawn/images/
 name: tpl-coordinator
 # it can read the code too
 parent: tpl-quarkus
 coordinator:
   control-over: [tpl-quarkus]
+repos:
+  - url: https://github.com/me/coord.git
+    path: ~/coordination
 ```
 
 <p>It controls only what both files name.</p>
@@ -499,8 +502,11 @@ coordinator:
 ```bash
 isx build tpl-coordinator
 isx branch coord --from tpl-coordinator
+# inside the machine
+cd ~/coordination && claude
 ```
 
+<p>Version its brief in that project's <span class="kw">CLAUDE.md</span>: what to work on, how to split it, what done looks like. Reviewed like code.</p>
 <p>Its Claude Code finds <span class="kw">isx</span> already registered, and acts as your bot, not as you.</p>
   </div>
 </div>
@@ -510,6 +516,7 @@ isx branch coord --from tpl-coordinator
 <!--
 Actionable on purpose: the setup the talk recommends, a coordinator in a machine of its own, in the order you'd do it. Nothing to register on your laptop for this one: every isx start registers the server in the instance's Claude Code or Pi (claude mcp list shows it as isx), and Claude Code also gets the prompt /mcp__isx__coordinate. Every branch of a template whose coordinator: block lists control-over is a coordinator (--no-mcp-client makes a plain one); add --proxy-only to the branch if it should reach nothing but the proxy, as the docs' example does. It reaches isx at https://mcp.isx.internal/mcp through the proxy.
 mcp.yaml applies to both setups: it's the ceiling for every agent. The footnote's alternative, a coordinator on your laptop (Claude Code registered with isx mcp, which isx init offers), acts with your laptop's identity; that's why the talk shows the other one.
+The brief (step 3) is a practice, not an isx feature: a small repository of your own, cloned by the coordinator template's repos:, whose CLAUDE.md Claude Code loads when started there. The claude tool already trusts every repository the template clones, so there's no trust prompt. Put in it what you'd tell a lead: the goal, how to split the work across templates, which agent for which kind of task, when to ask you, what done looks like. Versioned, so a change in how you coordinate is a reviewed commit, and the next coordinator starts from the same brief. Claude Code's /mcp__isx__coordinate prompt gives it isx's own coordination workflow on top.
 The log line: a diff arrives as a patch, so your checkout is never touched; the other ways to drive isx (--owner with --format=json, herdr, Orca) are in docs/INTEGRATIONS.md.
 What it still can't do, if asked: pick templates you didn't list; choose its own network mode, accounts or resources (template defaults, no choices); run anything on your host except host-tools, whose command string it can't influence.
 Source: docs/MCP.md, "Approving templates: mcp.yaml", "What an agent gets", "A coordinator in an instance", "Orphans and adoption".
