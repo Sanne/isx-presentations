@@ -449,9 +449,9 @@ clicks: 3
 ## To cache, <span class="warn">or not to cache?</span>
 
 <div class="cards three equal dilemma mt-4">
-  <div class="card warn"><h4>"Cache it, obviously."</h4><p class="voice"><span class="s">Every build downloads the same internet again, and keeps its own copy.</span><span class="s">Nothing shared, on the wire or on disk.</span><span class="s">Slow builds, rate limits, and a flaky network deciding whether your tests pass.</span></p></div>
+  <div class="card warn"><h4>"Cache it, obviously."</h4><p class="voice"><span class="s">Every build downloads the same internet again, and keeps its own copy.</span><span class="s">Builds share nothing, on the wire or on disk.</span><span class="s">Tests are affected by slow builds, rate limits and flaky networks.</span></p></div>
   <div v-click="2" class="card you"><h4>Me</h4><p class="voice">"I don't have fibre. I can't download 1,500 dependencies again for every reproducer. And I don't want cache problems either."</p></div>
-  <div v-click="1" class="card danger"><h4>"Never cache anything."</h4><p class="voice"><span class="s">Caches bite, in ways you can't predict.</span><span class="s">Remember Thursday afternoon: one shared <span class="kw">~/.m2</span>, and two days of evidence poisoned.</span><span class="s">A build you can't reproduce is one you can't trust.</span></p></div>
+  <div v-click="1" class="card danger"><h4>"Never cache anything."</h4><p class="voice"><span class="s">Caches bite, in ways you can't predict.</span><span class="s">Remember Thursday afternoon: one shared <span class="kw">~/.m2</span> poisoned two days of evidence.</span><span class="s">You can't trust a build you can't reproduce.</span></p></div>
 </div>
 
 <h1 v-click="3" class="statement dilemma-q">Could we have <span class="accent">both</span>?</h1>
