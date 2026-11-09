@@ -4,11 +4,12 @@
 // what he comes back to. `show` picks which; the third is usually kept for
 // HomerReturn, after the audience has played the drinking bird themselves. The frames aren't in the repository (see
 // tools/fetch-memes.sh); if any is missing, the slide falls back to an
-// original drawing of the drinking bird. Slide: clicks: show.length - 1
+// original drawing of the drinking bird. Slide: clicks: show.length - 1 + startAt.
+// startAt: the click that shows the first frame (0: on entry; 1: the title alone first).
 import { computed, ref } from 'vue'
 import { useSlideContext } from '@slidev/client'
 
-const props = withDefaults(defineProps<{ show?: number[] }>(), { show: () => [0, 1, 2] })
+const props = withDefaults(defineProps<{ show?: number[]; startAt?: number }>(), { show: () => [0, 1, 2], startAt: 0 })
 const { $clicks } = useSlideContext()
 const base = import.meta.env.BASE_URL
 const all = [
@@ -22,12 +23,12 @@ const missing = ref(false)
 
 <template>
   <div v-if="!missing" class="homer" :style="{ gridTemplateColumns: `repeat(${frames.length}, 1fr)` }">
-    <figure v-for="(f, i) in frames" :key="f.t" :class="{ on: $clicks >= i }">
+    <figure v-for="(f, i) in frames" :key="f.t" :class="{ on: $clicks >= i + startAt }">
       <img :src="`${base}memes/homer-${f.t}.jpg`" :alt="f.caption" @error="missing = true">
       <figcaption :class="{ bad: f.bad }">{{ show[i] + 1 }}. {{ f.caption }}</figcaption>
     </figure>
   </div>
-  <DrinkingBird v-else />
+  <DrinkingBird v-else-if="$clicks >= startAt" />
 </template>
 
 <style scoped>

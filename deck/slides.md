@@ -76,17 +76,17 @@ Source: anthropic.com/engineering/claude-code-auto-mode. At 93%, the prompt has 
 -->
 
 ---
-clicks: 1
+clicks: 2
 ---
 
 ## Homer solved this <span class="muted">in 1995</span>
 
-<HomerFrames :show="[0, 1]" class="mt-2" />
+<HomerFrames :show="[0, 1]" :start-at="1" class="mt-2" />
 
-<p class="note pin"><em>The Simpsons</em>, "King-Size Homer" (1995). Homer's job: answering the safety prompts at the nuclear plant.</p>
+<p v-click="1" class="note pin"><em>The Simpsons</em>, "King-Size Homer" (1995). Homer's job: answering the safety prompts at the nuclear plant.</p>
 
 <!--
-Two frames here: he replaces his finger with a stick, then automates it with a drinking bird and goes to the cinema. What he comes back to is held for the end of the game on the next slide.
+Title alone first: let the room guess which Homer (the poet? Homer Simpson? 1995 says it). Click 1: the first frame and the caption. Click 2: the second. Two frames here: he replaces his finger with a stick, then automates it with a drinking bird and goes to the cinema. What he comes back to is held for the end of the game on the next slide.
 The frames are fetched by tools/fetch-memes.sh and not committed (the repo is public); without them the slide shows an original drawing.
 -->
 
