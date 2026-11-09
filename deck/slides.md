@@ -388,7 +388,7 @@ Between click 0 and 1: the agent works inside agent-1 and commits. The remote ap
 <div class="big-code">
 
 ```bash
-isx branch pr-4812 --from tpl-quarkus --proxy-only --shell
+isx branch pr-4812 --from tpl-quarkus
 # inside the machine: no keys, nothing of yours
 cd ~/quarkus && gh pr checkout 4812 && mvn verify
 # back on your laptop, when you're done
@@ -399,11 +399,9 @@ isx destroy pr-4812
 
 <p class="lead mt-4">Same for bug reproducers: <span class="accent">a fresh machine per report</span>, thrown away after.</p>
 
-<p class="note pin"><span class="kw">--proxy-only</span>: the build still reaches GitHub and Maven Central through the proxy, and nothing else.</p>
-
 <!--
 The message for this audience: isx isn't only for people running agents. Every maintainer who reviews outside contributions runs strangers' build code: Maven plugins, test code, annotation processors, dependencies that run at build time. Today that runs on your laptop, with your keys.
-Accurate to isx: --shell opens a plain shell instead of the template's default action (which may start the agent). gh inside the machine authenticates through the proxy, as the template's GitHub account (the bot account, if you set one up); the clone at ~/quarkus comes from the template's repos: entry (path: ~/quarkus). With --proxy-only, the instance's egress reaches only the proxy, its health check and DNS, enforced on the host; github.com and Maven Central are intercepted domains, so gh and mvn still work, and the cache serves what's already been downloaded.
+Accurate to isx: isx branch opens a shell in the new machine (if the template's default action starts an agent instead, --shell gives a plain shell). gh inside the machine authenticates through the proxy, as the template's GitHub account (the bot account, if you set one up); the clone at ~/quarkus comes from the template's repos: entry (path: ~/quarkus). If asked about locking it down further: branch with --proxy-only, and the instance's egress reaches only the proxy, its health check and DNS, enforced on the host; github.com and Maven Central are intercepted domains, so gh and mvn still work, and the cache serves what's already been downloaded.
 If asked about going further: --airgap removes the network device entirely. Prepare the machine with network first (checkout, mvn dependency:go-offline), then branch it with --airgap (isx branch run-1 --from pr-4812 --airgap) and run only the tests. The dependencies have to be there already.
 For code you believe is actively malicious, the template can be built as a VM on Linux (--type vm): its own kernel.
 -->
