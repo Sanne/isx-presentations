@@ -239,7 +239,7 @@ Click by click: the repository; three checkouts, and the thing everyone likes ab
 clicks: 5
 ---
 
-## Thursday afternoon
+## Two agents, <span class="warn">one ~/.m2</span>
 
 <SnapshotStory class="mt-2" />
 
@@ -508,7 +508,6 @@ mcp.yaml is read on every call, and isx mcp has no way to write it; a missing or
 Never a project-local (.incus-spawn/) template, never an unbuilt one: the agent is told to ask you to run isx build.
 Audit: ~/.local/state/incus-spawn/mcp.log. Limits: max-instances (8) and max-concurrent-tasks (8) per host user, "a safety net against runaway creation, not a budget". Orphans: an ended session's instances can be taken back with adopt_instance; unadopted ones are destroyed after orphan-grace-hours (24), never while you're in one or its delegate still works, never once kept.
 Text coming back from an instance is data produced inside the sandbox, and the tool descriptions tell the host agent to treat it that way.
-The footnote: the backup slide "Drive isx from other tools" has the detail.
 -->
 
 ---
@@ -625,13 +624,13 @@ clicks: 3
 <div class="cards three equal dilemma mt-4">
   <div class="card warn"><h4>"Cache it, obviously."</h4><p class="voice"><span class="s">Every build downloads the same internet again, and keeps its own copy.</span><span class="s">Builds share nothing, on the wire or on disk.</span><span class="s">Tests are affected by slow builds, rate limits and flaky networks.</span></p></div>
   <div v-click="2" class="card you"><h4>Me</h4><p class="voice"><span class="s">"I don't have fibre.</span><span class="s">I can't download 1,500 dependencies again for every reproducer.</span><span class="s">And I don't want cache problems either.</span><span class="s">No agent should be able to poison another agent's Maven repository."</span></p></div>
-  <div v-click="1" class="card danger"><h4>"Never cache anything."</h4><p class="voice"><span class="s">Caches bite, in ways you can't predict.</span><span class="s">Remember Thursday afternoon: one shared <span class="kw">~/.m2</span> poisoned two days of evidence.</span><span class="s">You can't trust a build you can't reproduce.</span></p></div>
+  <div v-click="1" class="card danger"><h4>"Never cache anything."</h4><p class="voice"><span class="s">Caches bite, in ways you can't predict.</span><span class="s">Remember the shared <span class="kw">~/.m2</span>: it poisoned two days of evidence.</span><span class="s">You can't trust a build you can't reproduce.</span></p></div>
 </div>
 
 <h1 v-click="3" class="statement dilemma-q">Could we have <span class="accent">both</span>?</h1>
 
 <!--
-Play both colleagues straight: each is right. Left first, then right, then me, stuck in the middle. The first is the "Set up once" argument again: without a cache, every machine downloads its own copy and keeps it, so nothing is shared, not even on disk. The second is the one who lost Thursday afternoon. The middle card's last line is the requirement that ties them together: a cache shared by every machine must never let one agent poison another's dependencies (Thursday afternoon, but across machines). The next slide's first row answers it: the cache never touches anything that can change (SNAPSHOTs, metadata), and stores nothing upstream wouldn't send again. Then click: could we have both? The next slide is the answer.
+Play both colleagues straight: each is right. Left first, then right, then me, stuck in the middle. The first is the "Set up once" argument again: without a cache, every machine downloads its own copy and keeps it, so nothing is shared, not even on disk. The second is the one who lost two days to the shared ~/.m2. The middle card's last line is the requirement that ties them together: a cache shared by every machine must never let one agent poison another's dependencies (the shared ~/.m2 story, but across machines). The next slide's first row answers it: the cache never touches anything that can change (SNAPSHOTs, metadata), and stores nothing upstream wouldn't send again. Then click: could we have both? The next slide is the answer.
 -->
 
 ---
@@ -940,24 +939,4 @@ clicks: 2
 <!--
 The hops: git sees an isx:// URL and runs git-remote-isx; that hands over to the native isx helper, which checks the machine exists and only allows the git service; Incus exec opens git-upload-pack inside the machine, and the pack stream flows through the WebSocket untouched.
 If asked why there's a bash shim in front of the native helper: git's helper protocol starts with a few text lines, then switches to binary on the same pipe. Java's buffered stdin would read ahead into the binary stream; bash answers the text lines, then execs, so the native helper inherits a clean pipe. (DESIGN.md, "Git remote helper: bash + Java split".)
--->
-
----
-
-
-
-## Drive isx <span class="accent">from other tools</span>
-
-<p class="lead">Who does all this branching? Not you, switching between five agents: <span class="accent">another program can.</span></p>
-
-<div class="cards three equal mt-4">
-  <div class="card"><h4>An agent delegates</h4><p><span class="kw">isx mcp</span>: an agent on your host branches machines from templates you approved, and hands whole tasks to Claude Code, Codex or Pi inside them.</p></div>
-  <div class="card"><h4>An orchestrator drives</h4><p><span class="kw">isx branch --owner</span>, <span class="kw">isx start</span>, <span class="kw">isx stop</span>, with <span class="kw">--format=json</span>: the SSH target and project root, for any tool.</p></div>
-  <div class="card"><h4>Your agent manager</h4><p>Add <span class="kw">herdr</span> or <span class="kw">orca</span> to a template: each instance registers itself on first start, and leaves on destroy.</p></div>
-</div>
-
-<p class="note pin">A tool may destroy only the instances it owns, and only if your <span class="kw">config.yaml</span> lets it. Off by default: <span class="kw">isx init</span> offers to set it up.</p>
-
-<!--
-Where it sits: right after the live branch. Fix A and fix B from one state is exactly the kind of fan-out you'd rather a program ran; then back to how a template is written. New in v0.5.0 (isx.run/docs/integrations; docs/MCP.md, docs/INTEGRATIONS.md). isx mcp is no longer experimental. A coordinator's reach is limited to templates both its own template and mcp.yaml approve; a coordinator can also run inside an instance (isx branch --mcp-client). isx shell <instance> --task opens the conversation of a delegated task. herdr: a stopped instance starts again when herdr reconnects to it. If asked whether the coordinator sees credentials: no, the same proxy rule applies to it as to any machine.
 -->
