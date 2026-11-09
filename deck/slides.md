@@ -219,7 +219,46 @@ class: divider
 <p>Whole machines, branched in seconds. No keys inside.</p>
 
 <!--
-The "what" in three moves: a branch is a whole machine, a template declares it, and nothing secret is inside. Then how the work comes back.
+The "what": start from what everyone already uses for parallel agents, git worktrees, and where they stop. Then a branch is a whole machine, a template declares it, and nothing secret is inside. Then how the work comes back.
+-->
+
+---
+clicks: 3
+---
+
+## You know <span class="muted">git worktrees</span>
+
+<Machines mode="worktrees" class="mt-2" />
+
+<!--
+For those who haven't used them: one repository, several branches checked out side by side in separate directories, all sharing one .git. It's how most people run parallel agents today.
+Click by click: the repository; three checkouts, and the thing everyone likes about worktrees: they share one .git, so a commit in any checkout can be merged from any other; they all sit on one machine; the collisions.
+-->
+
+---
+clicks: 5
+---
+
+## Thursday afternoon
+
+<SnapshotStory class="mt-2" />
+
+<p v-click="5" class="lead mt-3">Nobody touched B's code. The lost afternoon isn't the real cost: <span class="danger">B's evidence is poisoned, and it committed a fix for a bug it never understood.</span></p>
+
+<!--
+Tell it as a story, row by row, without explaining. Let the audience wonder why B's numbers move. Only on the last click does the ~/.m2 column light up: A's mvn install overwrote the SNAPSHOT that B's build was using. Dwell on B: it did everything right, collected evidence for two days, and the evidence itself was corrupted. It's now confidently wrong, and so are you if you trust its write-up.
+-->
+
+---
+layout: center
+---
+
+<h1 class="statement">A worktree isolates your checkout.<br><span class="warn">Not the machine it runs on.</span></h1>
+
+<p class="lead mt-8 muted">Ports, services, tools, caches, and yesterday's leftovers: all still shared.</p>
+
+<!--
+The worktrees diagram already listed what is shared; this is the one-line wish before the answer. "Yesterday's leftovers" matters: they teach the agent solutions that only work on your laptop.
 -->
 
 ---
@@ -231,8 +270,8 @@ clicks: 3
 <Machines mode="isx" class="mt-2" />
 
 <!--
-What would be one shared laptop for every agent is now inside each box. Each branch has its own ports, ~/.m2, tools, services and IP, starts from the same clean template, and is destroyed rather than cleaned up.
-Click 3: you keep the git workflow. Each machine is a git remote of your repository (isx://agent-1/~/shop), so git fetch, git push and git pull work as they do between any two repositories; isx adds and removes the remote for you when host-paths is configured. The details come on "Getting it back is just git".
+Same picture as the worktrees slide, on purpose: what was one shared machine at the bottom is now inside each box. Each branch has its own ports, ~/.m2, tools, services and IP, starts from the same clean template, and is destroyed rather than cleaned up.
+Click 3, the callback to worktrees: you keep the git workflow. Each machine is a git remote of your repository (isx://agent-1/~/shop), so git fetch, git push and git pull work as they do between any two repositories; isx adds and removes the remote for you when host-paths is configured. The details come on "Getting it back is just git".
 -->
 
 ---
@@ -403,7 +442,25 @@ Click 3: git reaches a machine through Incus exec over a WebSocket.
 <!--
 Sources: design/proxy.md ("How it works"; "Certificates are chosen per SNI name, at any depth (#783)"; the WebSocket handshake section) and the Quarkus 4 port commit (b7330b7c).
 Details if asked: a name outside every intercepted domain, a client sending no SNI, or a name past MAX_SERVED_NAMES is refused, never answered with an unrelated certificate; the cap exists because Vert.x caches an SslContext per answered name and never evicts (reported upstream as V-T5). Vert.x 5 holds an undecided handshake open until the idle timeout, so every path must call accept() or reject().
-Bridge: the next slide is the proxy's second job, the cache.
+Bridge: the next two slides are the proxy's second job, the cache: first the dilemma, then the answer.
+-->
+
+---
+clicks: 3
+---
+
+## To cache, <span class="warn">or not to cache?</span>
+
+<div class="cards three equal dilemma mt-4">
+  <div class="card warn"><h4>"Cache it, obviously."</h4><p class="voice"><span class="s">Every build downloads the same internet again, and keeps its own copy.</span><span class="s">Builds share nothing, on the wire or on disk.</span><span class="s">Tests are affected by slow builds, rate limits and flaky networks.</span></p></div>
+  <div v-click="2" class="card you"><h4>Me</h4><p class="voice"><span class="s">"I don't have fibre.</span><span class="s">I can't download 1,500 dependencies again for every reproducer.</span><span class="s">And I don't want cache problems either.</span><span class="s">No agent should be able to poison another agent's Maven repository."</span></p></div>
+  <div v-click="1" class="card danger"><h4>"Never cache anything."</h4><p class="voice"><span class="s">Caches bite, in ways you can't predict.</span><span class="s">Remember Thursday afternoon: one shared <span class="kw">~/.m2</span> poisoned two days of evidence.</span><span class="s">You can't trust a build you can't reproduce.</span></p></div>
+</div>
+
+<h1 v-click="3" class="statement dilemma-q">Could we have <span class="accent">both</span>?</h1>
+
+<!--
+Play both colleagues straight: each is right. Left first, then right, then me, stuck in the middle. The first is the "Set up once" argument again: without a cache, every machine downloads its own copy and keeps it, so nothing is shared, not even on disk. The second is the one who lost Thursday afternoon. The middle card's last line is the requirement that ties them together: a cache shared by every machine must never let one agent poison another's dependencies (Thursday afternoon, but across machines). The next slide's first row answers it: the cache never touches anything that can change (SNAPSHOTs, metadata), and stores nothing upstream wouldn't send again. Then click: could we have both? The next slide is the answer.
 -->
 
 ---
@@ -419,7 +476,7 @@ clicks: 6
 <p class="note pin">Container layers and tool downloads are keyed by their SHA-256 digest. And the last resort is a command: <span class="kw">isx clean cache</span> throws the whole cache away; all you lose is a download.</p>
 
 <!--
-Here as the proxy's second job: every machine's Maven Central traffic passes it anyway, so it's the natural place for one shared cache. The catch everyone fears: a shared cache lets one agent poison another's dependencies. The story of how the design got here. Start with what a cache must never touch (row 1: anything that can change, and anything private, since the cache is shared by every machine). Then the obvious half (row 2): download once, but keep the copy only if the bytes match the checksum upstream sent with them; with no checksum, serve but don't store. Then the part that makes it safe (row 3): a hit doesn't trust the disk, it asks Central "is this still what you'd send?" with one HEAD and compares checksums; only a match serves the stored copy. Row 4 is why that matters: a republished or withdrawn artifact is evicted on the spot and fetched fresh, whichever build tool asks. Row 5 is the honest edge: with Central unreachable, the copy is served unconfirmed, and only then, with a 30-second backoff so a dead network doesn't cost a timeout per request.
+The answer to the dilemma, as a story of how the design got here. Start with what a cache must never touch (row 1: anything that can change, and anything private, since the cache is shared by every machine). Then the obvious half (row 2): download once, but keep the copy only if the bytes match the checksum upstream sent with them; with no checksum, serve but don't store. Then the part that makes it safe (row 3): a hit doesn't trust the disk, it asks Central "is this still what you'd send?" with one HEAD and compares checksums; only a match serves the stored copy. Row 4 is why that matters: a republished or withdrawn artifact is evicted on the spot and fetched fresh, whichever build tool asks. Row 5 is the honest edge: with Central unreachable, the copy is served unconfirmed, and only then, with a 30-second backoff so a dead network doesn't cost a timeout per request.
 The efficiency claim, stated carefully: what's saved is the download, not the round trip; a hit still costs one HEAD. For Maven 3.9+ that HEAD replaces the .sha1 request the client would have made anyway. Don't quote the old ~2.8 ms vs ~177 ms figures (docs/PERFORMANCE-NOTES.md, 2026-08-28): they predate the HEAD per hit and the bench notes say they're not comparable any more.
 Then the second group, one click: OCI registries work the other way round. A layer is requested by its sha256 digest, so the name is the checksum: the proxy verifies the bytes against it before storing (MitmProxy, BLOB_DIGEST_PATTERN / finalizeCacheFile) and a hit is served from disk with nothing to ask; manifests, tags and auth tokens are relayed, never cached, because a tag can move. That's the contrast to say out loud: Maven names a coordinate, OCI names the bytes; the rule is the same, the check follows the protocol. Gradle (Plugin Portal, distributions) is Maven-like but has no checksum header, so a hit re-fetches the .sha1/.sha256 sidecar instead of a HEAD.
 Source: incus-spawn PR #792 (fixes #555, merged 2026-09-26, in v0.5.0), its DESIGN.md section "Maven/Gradle cache integrity"; OCI: proxy/MitmProxy.java (unchanged by #792). Scope: Maven Central, the Gradle Plugin Portal and Gradle distributions, and npm; other domains are never cached. npm tarballs follow the same rule (#787, in v0.5.0): a tarball is checked against the registry's dist.integrity (SHA-512) on store, and a version withdrawn upstream stops being served.
