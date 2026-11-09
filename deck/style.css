@@ -398,3 +398,10 @@
 .flow.hand .step > code, .flow.hand .step > b { display: inline-block; font-size: 15px; word-break: normal; overflow-wrap: normal; }
 .flow.hand .step span code { white-space: nowrap; }
 .flow.hand i.nb { font-style: normal; white-space: nowrap; }
+
+/* Get started: the homepage, in a browser frame */
+.site-shot { display: block; flex-shrink: 0; width: 56%; margin: 6px auto 0; border: 1px solid var(--line) !important; border-radius: 10px; overflow: hidden; background: var(--surface); text-decoration: none; box-shadow: 0 12px 40px -18px rgba(34, 211, 238, .45); }
+.site-shot .bar { display: flex; align-items: center; gap: 7px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.site-shot .bar span { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.site-shot .bar b { margin-left: 12px; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 15px; color: var(--accent); }
+.site-shot img { display: block; width: 100%; max-width: 100%; height: auto !important; max-height: none !important; object-fit: contain; }

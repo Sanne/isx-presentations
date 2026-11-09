@@ -799,21 +799,25 @@ The point for this audience: the Quarkus 4 port, the PGO pipeline and the jjq mi
 
 
 
-## Get started
+## Get started: <span class="accent">isx.run</span>
 
-<div class="cards mt-2 install">
-  <div class="card"><h4>Fedora / RHEL</h4><div class="cmd small">sudo dnf install -y 'dnf5-command(copr)'<br>sudo dnf copr enable sanne/incus-spawn<br>sudo dnf install incus-spawn</div></div>
-  <div class="card"><h4>macOS <span class="muted">(Apple Silicon)</span></h4><div class="cmd small">brew install Sanne/tap/incus-spawn</div></div>
-  <div class="card"><h4>Any Linux</h4><div class="cmd small">curl -fsSL https://isx.run | sh</div></div>
-  <div class="card"><h4>Already have a JVM?</h4><div class="cmd small">jbang app install isx@Sanne/incus-spawn<br>jbang app install isx-proxy@Sanne/incus-spawn</div></div>
-</div>
+<a class="site-shot" href="https://isx.run" target="_blank">
+  <div class="bar"><span></span><span></span><span></span><b>isx.run</b></div>
+  <img src="/isx-run.jpg" alt="The isx.run homepage: give your AI coding agents their own machines, not your credentials, with install commands for Linux, macOS and JBang.">
+</a>
 
-<div class="card mt-2 install"><h4>Ubuntu / Debian</h4><div class="cmd small">curl -fsSL https://sanne.github.io/isx-apt-releases/public.gpg \<br>&nbsp;&nbsp;| sudo gpg --yes --dearmor -o /usr/share/keyrings/incus-spawn.gpg<br>echo "deb [signed-by=/usr/share/keyrings/incus-spawn.gpg] https://sanne.github.io/isx-apt-releases stable main" \<br>&nbsp;&nbsp;| sudo tee /etc/apt/sources.list.d/incus-spawn.list<br>sudo apt update && sudo apt install incus-spawn</div></div>
-
-<p class="note mt-2">Then <span class="kw">isx init</span>, add <a class="kw" href="https://github.com/Sanne/incus-spawn-templates">incus-spawn-templates</a> to <span class="kw">searchPaths</span>, <span class="kw">isx build tpl-quarkus</span>, <span class="kw">isx branch my-feature --from tpl-quarkus</span>.</p>
+<p class="lead mt-4" style="text-align: center">Install from the homepage, then <span class="kw">isx init</span> and your first <span class="kw">tpl-quarkus</span>.</p>
 
 <!--
-tpl-quarkus is the community template in github.com/Sanne/incus-spawn-templates (images/quarkus.yaml): parent tpl-mydev, podman, graalvm, mvnd and Claude Code, cloning quarkus and quarkus-quickstarts, primed with a breadth-first mvnd install. To use it: add that checkout under searchPaths: in ~/.config/incus-spawn/config.yaml. The built-in tpl-dev and tpl-java are deprecated in v0.5.0 (#1195); the same definitions live in that repository.
+The commands, in case someone asks on air (from the isx README, v0.5.0); the homepage has them, with a copy button:
+- Fedora / RHEL: sudo dnf install -y 'dnf5-command(copr)' (RHEL 9: 'dnf-command(copr)'); sudo dnf copr enable sanne/incus-spawn; sudo dnf install incus-spawn
+- macOS, Apple Silicon: brew install Sanne/tap/incus-spawn
+- Ubuntu / Debian: the apt repository at sanne.github.io/isx-apt-releases (key, sources line, apt install incus-spawn)
+- Any Linux: curl -fsSL https://isx.run | sh
+- JBang: jbang app install isx@Sanne/incus-spawn and jbang app install isx-proxy@Sanne/incus-spawn
+Then isx init; add github.com/Sanne/incus-spawn-templates to searchPaths in ~/.config/incus-spawn/config.yaml; isx build tpl-quarkus; isx branch my-feature --from tpl-quarkus. Plain isx opens the TUI.
+The screenshot is public/isx-run.jpg, taken from the live site on 2026-11-09; retake it if the homepage changes before the show.
+Earlier notes: tpl-quarkus is the community template in github.com/Sanne/incus-spawn-templates (images/quarkus.yaml): parent tpl-mydev, podman, graalvm, mvnd and Claude Code, cloning quarkus and quarkus-quickstarts, primed with a breadth-first mvnd install. To use it: add that checkout under searchPaths: in ~/.config/incus-spawn/config.yaml. The built-in tpl-dev and tpl-java are deprecated in v0.5.0 (#1195); the same definitions live in that repository.
 Commands from the isx README (Quick Start), v0.5.0. On RHEL 9 the copr plugin is 'dnf-command(copr)'. JBang needs both apps, and jbang must stay on the PATH. Intel Macs: v0.4.2 was the last release built for them. Debian/Ubuntu updates come with apt upgrade; Fedora with dnf. Plain isx, with no arguments, opens the TUI. On macOS, isx runs its own small Linux VM: no Docker Desktop. Full instructions at isx.run.
 isx init: Per the isx README: on Linux, isx init installs Incus through your package manager and creates a btrfs pool if needed; on macOS it provisions the vfkit VM. It prompts for the credentials the proxy will inject, and can install the proxy as a systemd user service (launchd on macOS). The real keys stay in ~/.config/incus-spawn/ on the host.
 -->
