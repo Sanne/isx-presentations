@@ -267,9 +267,12 @@ clicks: 3
 
 ## Every branch is <span class="accent">a whole machine</span>
 
+<p class="lead">A whole <span class="kw">tpl-quarkus</span> machine, branched in <span class="accent">about 400 ms</span>.</p>
+
 <Machines mode="isx" class="mt-2" />
 
 <!--
+The 400 ms is a ballpark, not a benchmark on this template: a copy-on-write branch costs about the same whatever the template holds (docs/dev/PERFORMANCE-NOTES.md has isx branch to a usable prompt at 372 ms on a Mac; branch alone 58-75 ms there, 350 ms in a Linux sample). Say "about", and "seconds at most" if pressed.
 Same picture as the worktrees slide, on purpose: what was one shared machine at the bottom is now inside each box. Each branch has its own ports, ~/.m2, tools, services and IP, starts from the same clean template, and is destroyed rather than cleaned up.
 Click 3, the callback to worktrees: you keep the git workflow. Each machine is a git remote of your repository (isx://agent-1/~/quarkus), so git fetch, git push and git pull work as they do between any two repositories; isx adds and removes the remote for you when host-paths is configured. The details come on "How to take it: plain git".
 -->
@@ -777,14 +780,15 @@ layout: center
 <h1 class="statement">isx is built <span class="accent">by agents, inside isx</span>.</h1>
 
 <div class="stats" style="margin-top: 44px">
-  <div class="stat"><b class="accent">2,239</b><span>of 2,636 commits on main, by an AI assistant, since March</span></div>
+  <div class="stat"><b class="accent">1,104</b><span>of 1,224 merged pull requests, opened by agents, since March</span></div>
+  <div class="stat"><b class="accent">268</b><span>merged pull requests in v0.5.0 alone: 19 days</span></div>
   <div class="stat"><b class="accent">110k</b><span>lines of Java, and 124k more of tests</span></div>
 </div>
 
 <p class="lead mt-8">Reviewed like any other pull request. And because its machines are wiped, everything it learns goes in the repository: <span class="kw">CLAUDE.md</span>, <span class="kw">design/</span>, <span class="kw">.claude/rules/</span>.</p>
 
 <!--
-Figures from incus-spawn main on 2026-11-09: git log authors ("Sanne's AI assistant" 2,239; Sanne 212; Yoann Rodière 110; Peter Palaga's AI agent 6), first commit 2026-03-31; line counts of src/main and src/test Java. Re-count before presenting.
+Figures from GitHub and incus-spawn main on 2026-11-09. Merged pull requests by author: Sanne-ai-bot 1,060, yrodiere-agent 43, ppalaga-agent 1 (the agents: 1,104), Sanne 86, yrodiere 9, and 12 more people with 1 to 4 each; 1,224 in all, the first commit on 2026-03-31. v0.5.0 (tagged 2026-11-08) has 268 merged since v0.4.1 (tagged 2026-10-20): 592 commits, 571 of them by the AI assistant. Every one reviewed and merged by a human.
 The point for this audience: the Quarkus 4 port, the PGO pipeline and the jjq migration on the last slides were all done this way, by agents in isx machines, with a human reviewing.
 -->
 
@@ -818,21 +822,21 @@ isx init: Per the isx README: on Linux, isx init installs Incus through your pac
 ---
 layout: center
 class: glow-accent
-clicks: 2
+clicks: 1
 ---
 
-<h1 class="statement">Hand the agent a task, walk away,<br><span v-click="1">come back to <span class="accent">a tested commit</span>.</span></h1>
+<h1 class="statement">Hand the agent a task, walk away,<br>come back to <span class="accent">a tested, green PR</span>.</h1>
 
-<p v-click="2" class="lead mt-10">Questions?</p>
+<p v-click="1" class="lead mt-10">Questions?</p>
 
 <div class="ask mt-4">
-  <a v-click="2" class="site" href="https://isx.run" target="_blank">isx.run</a>
-  <span v-click="2" class="or">or, later</span>
-  <span v-click="2" class="kw typed">isx ask "how do I set up a template for my repo?"</span>
+  <a v-click="1" class="site" href="https://isx.run" target="_blank">isx.run</a>
+  <span v-click="1" class="or">or, later</span>
+  <span v-click="1" class="kw typed">isx ask "how do I set up a template for my repo?"</span>
 </div>
 
 <!--
-The opening sentence again, with one word changed: that's the whole talk. "Hand the agent a task, walk away," pause, click: "come back to a tested commit." The word that carries the talk is "tested": any agent on your laptop can hand you code changes; this one hands you a commit whose tests ran, in a machine of its own, under its own name, and which you review like any other pull request. Click: questions, the site, and, as an afterthought, the command typing itself. Say: and if you think of one later, ask isx itself.
+The opening sentence again, with the ending changed: that's the whole talk. All of it at once; let it sit. "Tested" and "green" carry the talk: any agent on your laptop can hand you code changes; this one hands you a pull request whose tests ran, in a machine of its own, under its own name, and which you review like any other. Click: questions, the site, and, as an afterthought, the command typing itself. Say: and if you think of one later, ask isx itself.
 isx ask answers questions about isx itself, from its own documentation (it spends tokens). It needs an Anthropic API key, Vertex AI or an OpenAI key: a Claude Pro/Max subscription only serves Claude Code. isx init offers to add a key beside a subscription, and Max and Team plans include monthly API credits that pay for one. Also reachable as ? in the TUI.
 -->
 
