@@ -355,3 +355,6 @@
 .modules .card { display: flex; flex-direction: column; }
 .modules .tune { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); font-family: 'JetBrains Mono', monospace; font-size: 15px; line-height: 1.5; color: var(--accent); }
 .modules .tune b { color: var(--text-muted); font-weight: 600; }
+
+/* A command listing meant to be read from a livestream */
+.big-code .slidev-code { font-size: 22px !important; line-height: 1.6 !important; }
