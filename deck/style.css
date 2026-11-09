@@ -362,3 +362,6 @@
 /* A news item under a diagram: smaller than a statement quote */
 .quote.news { font-size: 20px; line-height: 1.45; max-width: 1080px; }
 .quote.news cite a { color: inherit; }
+
+/* Architecture diagrams that share the slide with a footer */
+.arch-fit { width: 88% !important; margin-left: auto; margin-right: auto; }

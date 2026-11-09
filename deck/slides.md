@@ -467,12 +467,15 @@ clicks: 3
 
 ## The architecture, <span class="accent">on Linux</span>
 
-<Arch platform="linux" class="mt-1" />
+<Arch platform="linux" class="mt-1 arch-fit" />
+
+<p class="note pin">Our own Fedora 45 images: a container rootfs, and for <span class="kw">--type vm</span> an image built around <span class="accent">isx's own kernel</span>, started by the firmware directly. No boot loader, no initrd: 2.4 s to boot, against 6.0 s from the stock image.</p>
 
 <!--
 Click 1: the CLI and TUI talk to the Incus daemon's REST API over its unix socket; Incus CoW-copies templates into branches on a btrfs pool.
 Click 2: a machine's HTTPS to intercepted domains resolves to the bridge gateway (dnsmasq), is redirected to isx-proxy, which adds the real credentials and forwards upstream.
 Click 3: git reaches a machine through Incus exec over a WebSocket.
+The images (footer): github.com/Sanne/incus-spawn-images builds them, Fedora 45, both architectures, with checksums verified against the signed release. The container image is a Fedora rootfs bootstrapped with dnf --installroot, agentuser and the network setup baked in, no kernel (containers share the host's). The VM image is built from scratch: a GPT with two partitions, the ESP holding one file, the kernel as EFI/BOOT/BOOTX64.EFI with its command line built in; root found by partition label, so no initrd and no udev at boot; 2.4 s to basic.target against 6.0 s for the old image built from the stock Incus one. dnf in it refuses kernel packages: the kernel only changes when isx bumps its pin. VMs are Linux-only.
 -->
 
 ---
@@ -481,10 +484,12 @@ clicks: 3
 
 ## The architecture, <span class="accent">on macOS</span>
 
-<Arch platform="macos" class="mt-1" />
+<Arch platform="macos" class="mt-1 arch-fit" />
+
+<p class="note pin">Our own appliance: Alpine, a kernel built from kernel.org with every driver built in and no initrd, and an <span class="kw">incusd</span> rebuilt with an upstream fix. The same kernel version as the Linux VMs: 7.3.3.</p>
 
 <!--
-isx provisions a small Linux appliance: Alpine, a custom kernel with every driver built in, no initrd, no SSH, started by vfkit on Apple's Virtualization framework.
+isx provisions a small Linux appliance: Alpine, a custom kernel with every driver built in, no initrd, no SSH, started by vfkit on Apple's Virtualization framework. The footer, if asked: the kernel is built from vanilla kernel.org source (appliance/kernel/build-kernel.sh), about 5 MB gzipped to download; incusd is rebuilt from Alpine's own Incus release plus one upstream commit (lxc/incus@2cb2549: a client that sent fewer than 8 bytes could stall every API request behind it, #1313). Appliance and VM kernel both at 7.3.3 in v0.5.0.
 Click 1: the CLI reaches Incus through a vsock tunnel (vm.incus.sock → virtio-vsock → socat → Incus). Why vsock: corporate VPN clients (e.g. Cisco AnyConnect) install socket filters that block unsigned binaries from TCP to the VM subnet; AF_VSOCK isn't TCP.
 Click 2: the proxy runs on the Mac (launchd); the VM DNATs port 443 from the bridge to the Mac's :18443.
 Click 3: a second vsock channel reaches isx-agent, a tiny shell agent that only accepts a fixed list of verbs (ping, version, socat-count, sshd-status, forwarder-restart, shutdown, btrfs-usage, btrfs-status, btrfs-rescan, btrfs-orphan-delete), never arbitrary commands. Three users: the automatic recovery in VmManager.recoverReachability() and isx doctor both compare host-side fds with the in-VM socat count to find a wedged forwarder and restart it, even when the Incus channel is stuck; and because the btrfs pool lives inside the VM, the TUI's pool-usage figures come through its btrfs-usage verb (on Linux the same read is a scoped sudoers rule instead).
