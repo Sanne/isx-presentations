@@ -203,7 +203,7 @@ clicks: 4
 <IsxBox class="mt-2" />
 
 <!--
-Click by click: your laptop and your things; an isx machine appears beside them; inside, agentuser has passwordless sudo over its own machine, so it never needs to ask; it can't reach your home or your credentials (not mounted, never inside), only HTTPS through the proxy; and if it breaks its machine, you destroy it and branch another.
+Click by click: your laptop and your things; an isx machine appears beside them, inside its container boundary (unprivileged: root inside maps to an unused uid on the host); inside, agentuser has passwordless sudo over its own machine, so it never needs to ask; then the network boundary the host enforces around it: your home and your credentials don't cross (not mounted, never inside), and HTTPS to an intercepted domain carries only a proof, which the proxy checks before adding the real key and sending it on. Be accurate if asked: in the default mode other hosts are reachable directly, there's just nothing inside worth sending; --proxy-only makes the proxy the only way out. Last click: if it breaks its machine, you destroy it and branch another.
 Honest limit, for the VM slide: a container shares the host kernel.
 -->
 
