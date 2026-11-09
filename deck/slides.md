@@ -390,6 +390,26 @@ The demo's Postgres fork shows the same mechanism live.
 
 
 
+## Drive isx <span class="accent">from other tools</span>
+
+<p class="lead">Who does all this branching? Not you, switching between five agents: <span class="accent">another program can.</span></p>
+
+<div class="cards three equal mt-4">
+  <div class="card"><h4>An agent delegates</h4><p><span class="kw">isx mcp</span>: an agent on your host branches machines from templates you approved, and hands whole tasks to Claude Code, Codex or Pi inside them.</p></div>
+  <div class="card"><h4>An orchestrator drives</h4><p><span class="kw">isx branch --owner</span>, <span class="kw">isx start</span>, <span class="kw">isx stop</span>, with <span class="kw">--format=json</span>: the SSH target and project root, for any tool.</p></div>
+  <div class="card"><h4>Your agent manager</h4><p>Add <span class="kw">herdr</span> or <span class="kw">orca</span> to a template: each instance registers itself on first start, and leaves on destroy.</p></div>
+</div>
+
+<p class="note pin">A tool may destroy only the instances it owns, and only if your <span class="kw">config.yaml</span> lets it. Off by default: <span class="kw">isx init</span> offers to set it up.</p>
+
+<!--
+Where it sits: right after the live branch. Fix A and fix B from one state is exactly the kind of fan-out you'd rather a program ran; then back to how a template is written. New in v0.5.0 (isx.run/docs/integrations; docs/MCP.md, docs/INTEGRATIONS.md). isx mcp is no longer experimental. A coordinator's reach is limited to templates both its own template and mcp.yaml approve; a coordinator can also run inside an instance (isx branch --mcp-client). isx shell <instance> --task opens the conversation of a delegated task. herdr: a stopped instance starts again when herdr reconnects to it. If asked whether the coordinator sees credentials: no, the same proxy rule applies to it as to any machine.
+-->
+
+---
+
+
+
 ## A template <span class="accent">declares the whole machine</span>
 
 <div class="dense">
@@ -998,24 +1018,4 @@ clicks: 2
 <!--
 The hops: git sees an isx:// URL and runs git-remote-isx; that hands over to the native isx helper, which checks the machine exists and only allows the git service; Incus exec opens git-upload-pack inside the machine, and the pack stream flows through the WebSocket untouched.
 If asked why there's a bash shim in front of the native helper: git's helper protocol starts with a few text lines, then switches to binary on the same pipe. Java's buffered stdin would read ahead into the binary stream; bash answers the text lines, then execs, so the native helper inherits a clean pipe. (DESIGN.md, "Git remote helper: bash + Java split".)
--->
-
----
-
-
-
-## Drive isx <span class="accent">from other tools</span>
-
-<p class="lead">The five agents of Wednesday don't need you switching between them: <span class="accent">another program can.</span></p>
-
-<div class="cards three equal mt-4">
-  <div class="card"><h4>An agent delegates</h4><p><span class="kw">isx mcp</span>: an agent on your host branches machines from templates you approved, and hands whole tasks to Claude Code, Codex or Pi inside them.</p></div>
-  <div class="card"><h4>An orchestrator drives</h4><p><span class="kw">isx branch --owner</span>, <span class="kw">isx start</span>, <span class="kw">isx stop</span>, with <span class="kw">--format=json</span>: the SSH target and project root, for any tool.</p></div>
-  <div class="card"><h4>Your agent manager</h4><p>Add <span class="kw">herdr</span> or <span class="kw">orca</span> to a template: each instance registers itself on first start, and leaves on destroy.</p></div>
-</div>
-
-<p class="note pin">A tool may destroy only the instances it owns, and only if your <span class="kw">config.yaml</span> lets it. Off by default: <span class="kw">isx init</span> offers to set it up.</p>
-
-<!--
-New in v0.5.0 (isx.run/docs/integrations; docs/MCP.md, docs/INTEGRATIONS.md). isx mcp is no longer experimental. A coordinator's reach is limited to templates both its own template and mcp.yaml approve; a coordinator can also run inside an instance (isx branch --mcp-client). isx shell <instance> --task opens the conversation of a delegated task. herdr: a stopped instance starts again when herdr reconnects to it. If asked whether the coordinator sees credentials: no, the same proxy rule applies to it as to any machine.
 -->
