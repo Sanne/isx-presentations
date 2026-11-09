@@ -515,25 +515,23 @@ Shipped in v0.5.0: isx proxy activity shows, per instance, requests and bytes, w
 
 
 
-## Quarkus 4.0.0.Beta3, <span class="accent">in production</span>
+## Porting to Quarkus 4: <span class="accent">what we learned</span>
 
-<div class="quote mt-2">"We are Quarkus maintainers, and we use this project to validate Quarkus 4 on a real application before it ships. So we treat the beta as a final release."<cite>docs/dev/QUARKUS-4.md, in the isx repository</cite></div>
+<p class="lead">Quarkus 3.40 → 4.0.0.Beta3, which means Vert.x 4.5 → 5.2 and Netty 4.1 → 4.2. We tried it on isx before it ships.</p>
 
-<table class="mt-4">
-  <thead><tr><th></th><th>Quarkus 3.40.1.1</th><th>Quarkus 4.0.0.Beta3</th></tr></thead>
-  <tbody>
-    <tr><td>Vert.x</td><td>4.5.35</td><td class="accent">5.2.3</td></tr>
-    <tr><td>Netty</td><td>4.1.139</td><td class="accent">4.2.20</td></tr>
-    <tr><td>GraalVM minimum</td><td>25.0</td><td class="warn">25.0.4: no more Intel Mac builds</td></tr>
-  </tbody>
-</table>
+<div class="cards three equal mt-4">
+  <div class="card"><h4>What changed</h4><p>Only the proxy: 31 files. The CLI and common compiled as they were. WebSocket upgrades move to a handshake handler that must <span class="kw">accept()</span> or <span class="kw">reject()</span>; <span class="kw">getHost()</span> becomes <span class="kw">authority()</span>.</p></div>
+  <div class="card"><h4>What it fixed</h4><p>The handshake is decided before a credential is added (#972). A frame pipelined with the upgrade request is no longer dropped and leaked (fixed in Vert.x 5.2.3).</p></div>
+  <div class="card"><h4>What goes back upstream</h4><p>8 notes for Quarkus, 13 for Vert.x. Two examples: the async DNS resolver is back in native images (+2.2 MiB); a server's SNI certificate lookup runs on the event loop by default.</p></div>
+</div>
 
-<p class="lead mt-4">Only the proxy needed changes; the CLI and common compiled as they were. What came back: <span class="accent">8 notes for Quarkus, 13 for Vert.x</span>, each with its upstream issue.</p>
+<p class="note pin">Written down as we went, with the upstream issue where one is filed: <span class="kw">docs/dev/QUARKUS-4.md</span> in the isx repository. GraalVM 25.0.4 is now the minimum, so there are no Intel Mac builds any more.</p>
 
 <!--
-The port: commit b7330b7c (2026-11-04), 31 files. The WebSocket upgrade moves to webSocketHandshakeHandler; HttpClientRequest.getHost()/getPort() become authority(); sendHead() becomes writeHead(); the test doubles move to the Vert.x 5 WebSocket client.
-Feedback examples, from docs/dev/QUARKUS-4.md: Q-1, the async DNS resolver is back in native images, 2.2 MiB in the proxy (quarkusio/quarkus#58063, open); Q-3, Jackson 3 core always reachable in Vert.x native images, 0.87 MiB with no JSON in use; Q-12, GraalVM 25.0.4 minimum, and Oracle ships no macOS x64 build after 25.0.1. Vert.x: V-T1, a server's SNI key-manager lookup runs on the event loop by default (a regression; isx sets useWorkerThread); V-W1, Vert.x 5.2.2 dropped a frame pipelined with the upgrade request (eclipse-vertx/vert.x#6475, fixed in 5.2.3).
-This is the slide to hand to the hosts: what would they like to hear more about?
+Framing: an early port of a real application, not a claim about the beta. The record says why: the beta is treated as a final release so every open problem is written down and goes upstream; an item is removed once a release fixes it.
+The port: commit b7330b7c (2026-11-04), 31 files. HttpClientRequest.getHost()/getPort() become authority(), the request's own Host; sendHead() becomes writeHead(); the test doubles move to the Vert.x 5 WebSocket client. Vert.x 5 holds an undecided handshake open until the idle timeout, so every path must decide.
+Feedback examples, from docs/dev/QUARKUS-4.md: Q-1, Netty's resolver and DNS codec are linked although Quarkus forces the property off in native, 2.2 MiB in the proxy (quarkusio/quarkus#58063, open); Q-3, Jackson 3 core always reachable in Vert.x native images, 0.87 MiB with no JSON in use; Q-12, GraalVM 25.0.4 minimum, and Oracle ships no macOS x64 build after 25.0.1. Vert.x: V-T1, a regression: a server's SNI key-manager lookup runs on the event loop by default (isx sets useWorkerThread on the SSL engine); V-W1, Vert.x 5.2.2 dropped a frame pipelined with the upgrade request and leaked its buffer (eclipse-vertx/vert.x#6475, fixed in 5.2.3 by #6490).
+A good slide to hand to the hosts: what would they like to hear more about?
 -->
 
 ---
