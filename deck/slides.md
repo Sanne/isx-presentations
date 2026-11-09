@@ -455,19 +455,54 @@ Names: mcp-<template>-<hint>-<suffix>; isx list shows an MCP column (held: #870 
 
 
 
-## What a coordinator <span class="accent">can't do</span>
+## Set it up: <span class="accent">two files, your rules</span>
 
-<div class="cards three equal mt-4">
-  <div class="card"><h4>Pick its templates</h4><p>Only those you list in <span class="kw">mcp.yaml</span>, which no agent can write. A coordinator in a machine gets fewer still: what both <span class="kw">mcp.yaml</span> and its template's <span class="kw">control-over</span> name.</p></div>
-  <div class="card"><h4>Touch your host</h4><p>No commands on your laptop, except host tools you defined, whose command it can't change. Results come back as text; a diff is a patch, not an edit to your checkout.</p></div>
-  <div class="card"><h4>Change the rules</h4><p>Template defaults, no choices: the network mode, the accounts and the resources you set. Credentials stay in the proxy, as for every machine.</p></div>
+<div class="setup mt-2">
+  <div class="s-col">
+    <h4><span class="n">1</span> Register it, on your laptop</h4>
+
+```bash
+claude mcp add --scope user isx -- isx mcp
+```
+
+<p><span class="kw">isx init</span> offers to do this for you. Off by default.</p>
+  </div>
+  <div class="s-col">
+    <h4><span class="n">2</span> Approve templates</h4>
+
+```yaml
+# ~/.config/incus-spawn/mcp.yaml
+templates: [tpl-quarkus]
+max-instances: 8
+host-tools:
+  ci-status:
+    command: ~/bin/ci-status.sh
+    description: CI status of my PRs
+```
+
+<p>No agent can write this file. Nothing listed, nothing allowed; the only host commands are the ones you name here.</p>
+  </div>
+  <div class="s-col">
+    <h4><span class="n">3</span> Optional: a coordinator in a machine</h4>
+
+```yaml
+# a template of yours
+name: tpl-coordinator
+# it can read the code too
+parent: tpl-quarkus
+coordinator:
+  control-over: [tpl-quarkus]
+```
+
+<p>It controls only what both files name, and acts as your bot, not as you.</p>
+  </div>
 </div>
 
-<p class="lead mt-6">Every call is logged with credentials scrubbed. Limits on instances and tasks catch a runaway; instances a session leaves behind wait to be adopted, then go.</p>
-
-<p class="note pin">Not only MCP: <span class="kw">isx branch --owner</span>, <span class="kw">start</span>, <span class="kw">stop</span> with <span class="kw">--format=json</span> for any orchestrator, and herdr and Orca integrations.</p>
+<p class="note pin">Every call is logged, credentials scrubbed, to <span class="kw">~/.local/state/incus-spawn/mcp.log</span>. A diff comes back as a patch: your checkout is never touched. Not only MCP: <span class="kw">isx branch --owner</span> with <span class="kw">--format=json</span>, herdr and Orca.</p>
 
 <!--
+Actionable on purpose: the three things to do, in the order you'd do them. Step 3's branch: isx branch coord --from tpl-coordinator --proxy-only (every branch of a template with control-over is a coordinator; --no-mcp-client makes a plain one). Inside it, Claude Code finds the server registered as isx, and the prompt /mcp__isx__coordinate.
+What it still can't do, if asked: pick templates you didn't list; choose its own network mode, accounts or resources (template defaults, no choices); run anything on your host except host-tools, whose command string it can't influence.
 Source: docs/MCP.md, "Approving templates: mcp.yaml", "What an agent gets", "A coordinator in an instance", "Orphans and adoption".
 mcp.yaml is read on every call, and isx mcp has no way to write it; a missing or empty file approves nothing. A coordinator in an instance (isx branch coord --from tpl-dev --proxy-only --mcp-client) reaches the server at https://mcp.isx.internal/mcp through the proxy, acts with the instance's credentials (a bot's GitHub login) instead of yours, and controls only the intersection of mcp.yaml's templates and its own template's coordinator.control-over. So mcp.yaml stays your ceiling for every agent.
 Never a project-local (.incus-spawn/) template, never an unbuilt one: the agent is told to ask you to run isx build.
@@ -749,19 +784,20 @@ The point for this audience: the Quarkus 4 port, the PGO pipeline and the jjq mi
 
 ## Get started
 
-<div class="cards mt-2">
+<div class="cards mt-2 install">
   <div class="card"><h4>Fedora / RHEL</h4><div class="cmd small">sudo dnf install -y 'dnf5-command(copr)'<br>sudo dnf copr enable sanne/incus-spawn<br>sudo dnf install incus-spawn</div></div>
   <div class="card"><h4>macOS <span class="muted">(Apple Silicon)</span></h4><div class="cmd small">brew install Sanne/tap/incus-spawn</div></div>
   <div class="card"><h4>Any Linux</h4><div class="cmd small">curl -fsSL https://isx.run | sh</div></div>
   <div class="card"><h4>Already have a JVM?</h4><div class="cmd small">jbang app install isx@Sanne/incus-spawn<br>jbang app install isx-proxy@Sanne/incus-spawn</div></div>
 </div>
 
-<div class="card mt-2"><h4>Ubuntu / Debian</h4><div class="cmd small">curl -fsSL https://sanne.github.io/isx-apt-releases/public.gpg \<br>&nbsp;&nbsp;| sudo gpg --yes --dearmor -o /usr/share/keyrings/incus-spawn.gpg<br>echo "deb [signed-by=/usr/share/keyrings/incus-spawn.gpg] https://sanne.github.io/isx-apt-releases stable main" \<br>&nbsp;&nbsp;| sudo tee /etc/apt/sources.list.d/incus-spawn.list<br>sudo apt update && sudo apt install incus-spawn</div></div>
+<div class="card mt-2 install"><h4>Ubuntu / Debian</h4><div class="cmd small">curl -fsSL https://sanne.github.io/isx-apt-releases/public.gpg \<br>&nbsp;&nbsp;| sudo gpg --yes --dearmor -o /usr/share/keyrings/incus-spawn.gpg<br>echo "deb [signed-by=/usr/share/keyrings/incus-spawn.gpg] https://sanne.github.io/isx-apt-releases stable main" \<br>&nbsp;&nbsp;| sudo tee /etc/apt/sources.list.d/incus-spawn.list<br>sudo apt update && sudo apt install incus-spawn</div></div>
 
-<p class="note mt-2">Then <span class="kw">isx init</span>, <span class="kw">isx build tpl-java</span>, <span class="kw">isx branch my-feature --from tpl-java</span>, or just <span class="kw">isx</span> for the TUI.</p>
+<p class="note mt-2">Then <span class="kw">isx init</span>, add <a class="kw" href="https://github.com/Sanne/incus-spawn-templates">incus-spawn-templates</a> to <span class="kw">searchPaths</span>, <span class="kw">isx build tpl-quarkus</span>, <span class="kw">isx branch my-feature --from tpl-quarkus</span>.</p>
 
 <!--
-Commands from the isx README (Quick Start), v0.5.0. On RHEL 9 the copr plugin is 'dnf-command(copr)'. JBang needs both apps, and jbang must stay on the PATH. Intel Macs: v0.4.2 was the last release built for them. Debian/Ubuntu updates come with apt upgrade; Fedora with dnf. On macOS, isx runs its own small Linux VM: no Docker Desktop. Full instructions at isx.run.
+tpl-quarkus is the community template in github.com/Sanne/incus-spawn-templates (images/quarkus.yaml): parent tpl-mydev, podman, graalvm, mvnd and Claude Code, cloning quarkus and quarkus-quickstarts, primed with a breadth-first mvnd install. To use it: add that checkout under searchPaths: in ~/.config/incus-spawn/config.yaml. The built-in tpl-dev and tpl-java are deprecated in v0.5.0 (#1195); the same definitions live in that repository.
+Commands from the isx README (Quick Start), v0.5.0. On RHEL 9 the copr plugin is 'dnf-command(copr)'. JBang needs both apps, and jbang must stay on the PATH. Intel Macs: v0.4.2 was the last release built for them. Debian/Ubuntu updates come with apt upgrade; Fedora with dnf. Plain isx, with no arguments, opens the TUI. On macOS, isx runs its own small Linux VM: no Docker Desktop. Full instructions at isx.run.
 isx init: Per the isx README: on Linux, isx init installs Incus through your package manager and creates a btrfs pool if needed; on macOS it provisions the vfkit VM. It prompts for the credentials the proxy will inject, and can install the proxy as a systemd user service (launchd on macOS). The real keys stay in ~/.config/incus-spawn/ on the host.
 -->
 

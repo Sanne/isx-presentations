@@ -380,3 +380,15 @@
 .coord .mcp-box b { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); font-size: 16px; }
 .coord .workers { display: flex; flex-direction: column; gap: 10px; }
 .coord .w h4 { font-family: 'JetBrains Mono', monospace; font-size: 15px; }
+
+/* Setting up a coordinator: three steps, each with its snippet */
+.setup { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: start; }
+.setup .s-col { background: var(--surface); border: 1px solid var(--line); border-top: 2px solid var(--accent); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+.setup h4 { margin: 0 0 8px; font-size: 19px; font-weight: 600; color: var(--text); display: flex; gap: 10px; align-items: baseline; }
+.setup .n { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--accent); color: var(--accent); font-size: 14px; flex: none; }
+.setup p { margin: 8px 0 0; font-size: 16px; line-height: 1.4; color: var(--text-muted); }
+.setup .slidev-code { font-size: 14px !important; line-height: 1.5 !important; margin: 0 !important; white-space: pre-wrap; }
+
+/* Get started: tighter cards, so the next steps fit below */
+.install .card, .card.install { padding: 10px 18px 12px; }
+.install .card h4, .card.install h4 { font-size: 22px; margin-bottom: 4px; }
