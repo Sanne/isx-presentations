@@ -465,16 +465,7 @@ Names: mcp-<template>-<hint>-<suffix>; isx list shows an MCP column (held: #870 
 
 <div class="setup mt-2">
   <div class="s-col">
-    <h4><span class="n">1</span> Register it, on your laptop</h4>
-
-```bash
-claude mcp add --scope user isx -- isx mcp
-```
-
-<p><span class="kw">isx init</span> offers to do this for you. Off by default.</p>
-  </div>
-  <div class="s-col">
-    <h4><span class="n">2</span> Approve templates</h4>
+    <h4><span class="n">1</span> Approve templates, on your laptop</h4>
 
 ```yaml
 # ~/.config/incus-spawn/mcp.yaml
@@ -489,10 +480,10 @@ host-tools:
 <p>No agent can write this file. Nothing listed, nothing allowed; the only host commands are the ones you name here.</p>
   </div>
   <div class="s-col">
-    <h4><span class="n">3</span> Optional: a coordinator in a machine</h4>
+    <h4><span class="n">2</span> A coordinator template</h4>
 
 ```yaml
-# a template of yours
+# ~/.config/incus-spawn/images/coordinator.yaml
 name: tpl-coordinator
 # it can read the code too
 parent: tpl-quarkus
@@ -500,14 +491,26 @@ coordinator:
   control-over: [tpl-quarkus]
 ```
 
-<p>It controls only what both files name, and acts as your bot, not as you.</p>
+<p>It controls only what both files name.</p>
+  </div>
+  <div class="s-col">
+    <h4><span class="n">3</span> Branch it, and talk to it</h4>
+
+```bash
+isx build tpl-coordinator
+isx branch coord --from tpl-coordinator
+```
+
+<p>Its Claude Code finds <span class="kw">isx</span> already registered, and acts as your bot, not as you.</p>
   </div>
 </div>
 
-<p class="note pin">Every call is logged, credentials scrubbed, to <span class="kw">~/.local/state/incus-spawn/mcp.log</span>. A diff comes back as a patch: your checkout is never touched. Not only MCP: <span class="kw">isx branch --owner</span> with <span class="kw">--format=json</span>, herdr and Orca.</p>
+<p class="note pin">Rather coordinate from your laptop? <span class="kw">claude mcp add --scope user isx -- isx mcp</span>, or let <span class="kw">isx init</span> do it: step 1 still applies. Every call is logged, credentials scrubbed, to <span class="kw">~/.local/state/incus-spawn/mcp.log</span>.</p>
 
 <!--
-Actionable on purpose: the three things to do, in the order you'd do them. Step 3's branch: isx branch coord --from tpl-coordinator --proxy-only (every branch of a template with control-over is a coordinator; --no-mcp-client makes a plain one). Inside it, Claude Code finds the server registered as isx, and the prompt /mcp__isx__coordinate.
+Actionable on purpose: the setup the talk recommends, a coordinator in a machine of its own, in the order you'd do it. Nothing to register on your laptop for this one: every isx start registers the server in the instance's Claude Code or Pi (claude mcp list shows it as isx), and Claude Code also gets the prompt /mcp__isx__coordinate. Every branch of a template whose coordinator: block lists control-over is a coordinator (--no-mcp-client makes a plain one); add --proxy-only to the branch if it should reach nothing but the proxy, as the docs' example does. It reaches isx at https://mcp.isx.internal/mcp through the proxy.
+mcp.yaml applies to both setups: it's the ceiling for every agent. The footnote's alternative, a coordinator on your laptop (Claude Code registered with isx mcp, which isx init offers), acts with your laptop's identity; that's why the talk shows the other one.
+The log line: a diff arrives as a patch, so your checkout is never touched; the other ways to drive isx (--owner with --format=json, herdr, Orca) are in docs/INTEGRATIONS.md.
 What it still can't do, if asked: pick templates you didn't list; choose its own network mode, accounts or resources (template defaults, no choices); run anything on your host except host-tools, whose command string it can't influence.
 Source: docs/MCP.md, "Approving templates: mcp.yaml", "What an agent gets", "A coordinator in an instance", "Orphans and adoption".
 mcp.yaml is read on every call, and isx mcp has no way to write it; a missing or empty file approves nothing. A coordinator in an instance (isx branch coord --from tpl-dev --proxy-only --mcp-client) reaches the server at https://mcp.isx.internal/mcp through the proxy, acts with the instance's credentials (a bot's GitHub login) instead of yours, and controls only the intersection of mcp.yaml's templates and its own template's coordinator.control-over. So mcp.yaml stays your ceiling for every agent.
