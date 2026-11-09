@@ -72,7 +72,7 @@ export default makeScene2D(function* (view) {
   view.add(
     <Node y={TPL_Y}>
       <Node ref={tplLabel} opacity={0}>
-        <Txt text="tpl-java" x={LABEL_X} y={-18} offsetX={-1} fill={C.accent}
+        <Txt text="tpl-quarkus" x={LABEL_X} y={-18} offsetX={-1} fill={C.accent}
              fontFamily={MONO} fontSize={40} fontWeight={700} />
         <Txt text="template's disk" x={LABEL_X} y={26} offsetX={-1} fill={C.muted}
              fontFamily={MONO} fontSize={26} />
