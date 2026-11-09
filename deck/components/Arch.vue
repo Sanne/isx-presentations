@@ -87,7 +87,7 @@ const paths = computed(() => mac.value ? [
     <rect class="pool" :x="pool.x" :y="pool.y" :width="pool.w" :height="pool.h" rx="10" />
     <text class="sub" :x="pool.x + 16" :y="pool.y + 26">{{ pool.label }}</text>
     <rect class="tpl" :x="tpl.x" :y="tpl.y" :width="tpl.w" :height="tpl.h" rx="8" />
-    <text class="lbl sm" :x="tpl.x + tpl.w / 2" :y="tpl.y + 30">tpl-java · template</text>
+    <text class="lbl sm" :x="tpl.x + tpl.w / 2" :y="tpl.y + 30">tpl-quarkus · template</text>
     <g v-for="m in machines" :key="m.name">
       <rect class="machine" :x="m.x" :y="m.y" :width="m.w" :height="m.h" rx="8" />
       <text class="lbl sm" :x="m.x + m.w / 2" :y="m.y + 34">{{ m.name }}</text>

@@ -476,6 +476,22 @@ Click 3: git reaches a machine through Incus exec over a WebSocket.
 -->
 
 ---
+clicks: 3
+---
+
+## The architecture, <span class="accent">on macOS</span>
+
+<Arch platform="macos" class="mt-1" />
+
+<!--
+isx provisions a small Linux appliance: Alpine, a custom kernel with every driver built in, no initrd, no SSH, started by vfkit on Apple's Virtualization framework.
+Click 1: the CLI reaches Incus through a vsock tunnel (vm.incus.sock → virtio-vsock → socat → Incus). Why vsock: corporate VPN clients (e.g. Cisco AnyConnect) install socket filters that block unsigned binaries from TCP to the VM subnet; AF_VSOCK isn't TCP.
+Click 2: the proxy runs on the Mac (launchd); the VM DNATs port 443 from the bridge to the Mac's :18443.
+Click 3: a second vsock channel reaches isx-agent, a tiny shell agent that only accepts a fixed list of verbs (ping, version, socat-count, sshd-status, forwarder-restart, shutdown, btrfs-usage, btrfs-status, btrfs-rescan, btrfs-orphan-delete), never arbitrary commands. Three users: the automatic recovery in VmManager.recoverReachability() and isx doctor both compare host-side fds with the in-VM socat count to find a wedged forwarder and restart it, even when the Incus channel is stuck; and because the btrfs pool lives inside the VM, the TUI's pool-usage figures come through its btrfs-usage verb (on Linux the same read is a scoped sudoers rule instead).
+Sources: DESIGN.md (Incus Daemon Connection, macOS vsock robustness), appliance/DESIGN.md (Boot Backends, First-Boot Initialization, Control agent).
+-->
+
+---
 
 
 
