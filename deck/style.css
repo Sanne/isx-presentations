@@ -358,3 +358,7 @@
 
 /* A command listing meant to be read from a livestream */
 .big-code .slidev-code { font-size: 22px !important; line-height: 1.6 !important; }
+
+/* A news item under a diagram: smaller than a statement quote */
+.quote.news { font-size: 20px; line-height: 1.45; max-width: 1080px; }
+.quote.news cite a { color: inherit; }

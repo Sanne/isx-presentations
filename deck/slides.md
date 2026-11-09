@@ -336,14 +336,20 @@ Mirrors the demo script's beat 2: GH_TOKEN is a proof token (gho_isx_…), not a
 -->
 
 ---
-clicks: 5
+clicks: 6
 ---
 
 ## Credentials <span class="accent">never enter</span>
 
 <ProxyFlow class="mt-10" />
 
+<div v-click="6" class="quote news mt-6">Last week: <span class="danger">2,539 secrets in 1,994 public GitHub repositories</span>, written down by "Yes, and don't ask again" in <span class="kw">.claude/settings.local.json</span>, and in committed agent transcripts. On isx there's nothing real to write down: a leaked proof is worthless outside its machine.<cite><a href="https://apiiro.com/blog/coding-agents-leaking-secrets-github-dont-ask-again" target="_blank">Apiiro</a>, 5 November 2026</cite></div>
+
 <!--
+Click 6, the news (Apiiro, "coding agents leaking secrets on GitHub", 5 Nov 2026; covered by iTWire, The Hacker News, GBHackers; HN discussion item 50407882): approving a Bash command with "Yes, and don't ask again" saves the whole command as an allow rule in .claude/settings.local.json, credentials included. Apiiro scanned 104,185 public copies (1-3 Nov) and found 1,122 with secrets, 1,379 distinct values; counting git history, the shared settings.json and committed agent transcripts, 2,539 distinct secrets across 1,994 repositories (379 database passwords, 43 SSH logins, 42 GitHub/GitLab/npm tokens, 23 AWS keys). Claude co-authored the commits that changed the file in 539 of 1,105 traced repositories, which doesn't prove it pushed every secret.
+Be fair, as with auto mode: Boris Cherny (Claude Code) answered on Hacker News that "historically Claude Code has not done secret scrubbing", that the file is gitignored when Claude creates it (so these copies were checked in by hand; but that ignore goes in your global git excludes, which don't travel with the repository), and that they're prototyping secret scanning.
+The isx point: it doesn't depend on scrubbing. Whatever the agent writes down (an allow rule, a transcript, a commit) can only hold the proof token, which the proxy accepts from this machine alone. Honest limit: a secret you paste into the agent yourself is still a secret; isx keeps the credentials it manages out.
+Links for the chat: apiiro.com/blog/coding-agents-leaking-secrets-github-dont-ask-again and news.ycombinator.com/item?id=50407882.
 If asked what else the one point gives you: --proxy-only drops every outbound packet except to the proxy and DNS (an Incus network ACL enforced on the host, so root inside the machine can't lift it), and --airgap removes the network device; the network-modes slide is in backup.
 The token in the chip is a proof, not a placeholder: unique to this machine and credential, worthless anywhere else, and the proxy adds the real key only to a request that carries it (docs/CREDENTIAL-PROOFS.md, v0.5.0). A static placeholder never authorizes anything.
 To extend: show the request as an HTTP message with headers, and the x-api-key line rewriting at the proxy; a second pass for git push with a GitHub token.
