@@ -519,7 +519,7 @@ clicks: 3
 <Term scene="secretsIsx" class="mt-2" />
 
 <!--
-Mirrors the demo script's beat 2: GH_TOKEN is a proof token (gho_isx_…), not a credential: it's worthless outside this machine, and the proxy only adds the real token for a request carrying this machine's proof. gh still authenticates, as the agent's own bot account. (Since v0.5.0; earlier releases showed a static gho_placeholder.)
+Mirrors the demo script's beat 2: GH_TOKEN is a proof token (gho_isx_…), not a credential: it's worthless outside this machine, and the proxy only adds the real token for a request carrying this machine's proof. gh still authenticates, as the agent's own bot account. (Since v0.5.0; earlier releases showed a static gho_placeholder.) If asked what "from this machine" means: on Linux the proxy checks the proof and the machine's address together; on macOS every container reaches the proxy from the VM's address, so there the proof alone identifies the machine. Either way it's useless to anyone outside isx, and isx account reset-proofs revokes it.
 -->
 
 ---
