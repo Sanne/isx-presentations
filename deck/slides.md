@@ -312,7 +312,7 @@ agent_note: |                # added to every agent's briefing
   it takes the same goals and flags.
 repos:
   - url: https://github.com/quarkusio/quarkus.git
-    prime: mvnd -b singlethreaded -Dquickly
+    prime: mvnd -Dquickly
 ```
 
 </div>
