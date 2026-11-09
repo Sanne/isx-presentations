@@ -104,12 +104,12 @@ export const scenes: Record<string, Scene> = {
   // Act 3: getting the work back is plain git. Run on the host.
   // isx's own output lines are paraphrased, not verbatim.
   gitLoop: {
-    title: 'you — ~/src/shop (your laptop)',
+    title: 'you — ~/src/quarkus (your laptop)',
     steps: [
-      [run('isx branch agent-1 --from tpl-java'), out("agent-1 is ready · git remote 'agent-1' added to ~/src/shop")],
-      [run('git remote -v | grep agent-1'), out('agent-1   isx://agent-1/~/shop (fetch)')],
-      [run('git fetch agent-1'), out(' * [new branch]      main       -> agent-1/main'), run('git diff --stat main agent-1/main'), out(' src/main/java/demo/PriceCalculator.java | 2 +-')],
-      [run('git cherry-pick agent-1/main'), run('isx destroy agent-1'), out("agent-1 destroyed · git remote 'agent-1' removed from ~/src/shop")],
+      [run('isx branch agent-1 --from tpl-quarkus'), out("agent-1 is ready · git remote 'agent-1' added to ~/src/quarkus")],
+      [run('git remote -v | grep agent-1'), out('agent-1   isx://agent-1/~/quarkus (fetch)')],
+      [run('git fetch agent-1'), out(' * [new branch]      main       -> agent-1/main'), run('git diff --stat main agent-1/main'), out(' core/runtime/src/main/java/io/quarkus/runtime/ApplicationLifecycleManager.java | 2 +-')],
+      [run('git cherry-pick agent-1/main'), run('isx destroy agent-1'), out("agent-1 destroyed · git remote 'agent-1' removed from ~/src/quarkus")],
     ],
   },
 

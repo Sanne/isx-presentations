@@ -271,7 +271,7 @@ clicks: 3
 
 <!--
 Same picture as the worktrees slide, on purpose: what was one shared machine at the bottom is now inside each box. Each branch has its own ports, ~/.m2, tools, services and IP, starts from the same clean template, and is destroyed rather than cleaned up.
-Click 3, the callback to worktrees: you keep the git workflow. Each machine is a git remote of your repository (isx://agent-1/~/shop), so git fetch, git push and git pull work as they do between any two repositories; isx adds and removes the remote for you when host-paths is configured. The details come on "Getting it back is just git".
+Click 3, the callback to worktrees: you keep the git workflow. Each machine is a git remote of your repository (isx://agent-1/~/quarkus), so git fetch, git push and git pull work as they do between any two repositories; isx adds and removes the remote for you when host-paths is configured. The details come on "How to take it: plain git".
 -->
 
 ---
@@ -359,23 +359,29 @@ To extend: show the request as an HTTP message with headers, and the x-api-key l
 clicks: 4
 ---
 
-## What comes back: <span class="accent">a commit</span>
+## What you get: <span class="accent">a commit, not a mount</span>
 
-<div class="flow mt-6">
-  <div class="step">isx machine <b>agent-1</b><span>built and tested from <code>tpl-java</code></span></div>
-  <div v-click="1" class="step">commit <b>3f2a91c</b><span>immutable text</span></div>
-  <div v-click="2" class="step"><code>git fetch agent-1</code><span><code>git diff</code>: read it like any PR</span></div>
-  <div v-click="3" class="step">a fresh branch<span>re-run the tests from the same template</span></div>
-  <div v-click="4" class="step">cherry-pick<span>or throw it all away</span></div>
+<div class="flow mt-6 hand">
+  <div class="step"><em>in the machine</em><b>the agent commits</b><span>built and tested on <code><i class="nb">tpl-quarkus</i></code></span></div>
+  <div v-click="1" class="step"><em>on your laptop</em><code>git fetch <i class="nb">agent-1</i></code><span>the machine is a git remote of your checkout</span></div>
+  <div v-click="2" class="step"><em>review</em><code>git diff main <i class="nb">agent-1/main</i></code><span>read it like any pull request</span></div>
+  <div v-click="3" class="step"><em>verify</em><code>git push <i class="nb">check-1</i> <i class="nb">agent-1/main:verify</i></code><span>into a fresh branch of the same template; run its tests there</span></div>
+  <div v-click="4" class="step"><em>keep it, or not</em><code>git <i class="nb">cherry-pick</i> <i class="nb">agent-1/main</i></code><span>or <code>isx destroy <i class="nb">agent-1</i></code>, and it's gone</span></div>
 </div>
 
 <p class="note pin">Want to watch it work? Your IDE connects <em>into</em> the machine (JetBrains Gateway, VS Code Remote), so nothing it writes runs on your laptop.</p>
+
+<!--
+What's offered, step by step. The agent commits inside its machine, on the template it was built and tested on. On your laptop the machine is already a git remote of your checkout (isx adds it on isx branch when host-paths in config.yaml finds the repository, and removes it on isx destroy), so git fetch agent-1 brings the commit over, and git diff shows it: a specific commit, which can't change between your review and your cherry-pick.
+Verify: isx branch check-1 --from tpl-quarkus gives a fresh machine of the same template, which becomes a remote too; git push check-1 agent-1/main:verify puts the agent's commit into it on a new branch, and you run the tests there. Same experiment as the agent's, on a machine nobody has touched. (A push to the branch that's checked out there is refused, as in any git repository, hence the new branch name.)
+Then cherry-pick it, or isx destroy agent-1: the machine, its disk delta and its remote go.
+-->
 
 ---
 clicks: 3
 ---
 
-## Getting it back is <span class="accent">just git</span>
+## How to take it: <span class="accent">plain git</span>
 
 <Term scene="gitLoop" class="mt-2" />
 

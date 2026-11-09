@@ -392,3 +392,9 @@
 /* Get started: tighter cards, so the next steps fit below */
 .install .card, .card.install { padding: 10px 18px 12px; }
 .install .card h4, .card.install h4 { font-size: 22px; margin-bottom: 4px; }
+
+/* The handover flow: who acts, then the command, then what it means */
+.flow.hand .step em { display: block; font-style: normal; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+.flow.hand .step > code, .flow.hand .step > b { display: inline-block; font-size: 15px; word-break: normal; overflow-wrap: normal; }
+.flow.hand .step span code { white-space: nowrap; }
+.flow.hand i.nb { font-style: normal; white-space: nowrap; }
