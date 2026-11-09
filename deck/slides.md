@@ -451,7 +451,7 @@ clicks: 3
 
 <!--
 The five agents from the start of the talk, without you switching between them: one agent coordinates, isx gives it the tools. Set up by isx init (off by default), or by hand: claude mcp add --scope user isx -- isx mcp. In Claude Code it also brings a prompt, /mcp__isx__coordinate.
-Click by click, from docs/MCP.md "The tools": create_instance (a fresh branch of an approved template; with from_instance, a fork of a stopped one: prepare once, fork many); click 1, delegate gives an instruction or an installed skill to Claude Code, Codex or Pi inside a machine, and send_message continues that conversation ("push and open a PR"); click 2, wait_any waits for whichever task finishes first, task_result reads the report, get_diff returns a patch, never touching your checkout; click 3, instance_activity reads what the proxy counted of the machine's model calls and traffic: the Activity card from the "one point" slide, put to work.
+Click by click, from docs/MCP.md "The tools": create_instance (a fresh branch of an approved template; with from_instance, a fork of a stopped one: prepare once, fork many); click 1, delegate gives an instruction or an installed skill to Claude Code, Codex or Pi inside a machine, and send_message continues that conversation ("push and open a PR"); click 2, wait_any waits for whichever task finishes first, task_result reads the report, get_diff returns a patch, never touching your checkout; click 3, instance_activity reads what the proxy counted of the machine's model calls and traffic (isx proxy activity shows the same to you).
 The worker can be any of the three, whichever the coordinator is. Claude runs in bypassPermissions, Codex in danger-full-access, Pi with every tool: no prompts, because nothing of yours is inside.
 ask: a one-shot Claude Code on the summary model reads the output inside the instance and answers. It's a model's reading, so anything that gates a merge stays deterministic: get_diff with stat, CI, a reviewer.
 Names: mcp-<template>-<hint>-<suffix>; isx list shows an MCP column (held: #870 implement, orphaned, kept). isx shell <instance> --task joins a delegate's conversation where it left off.
@@ -676,7 +676,7 @@ Source: incus-spawn PR #792 (fixes #555, merged 2026-09-26, in v0.5.0), its DESI
 
 ## Every request passes <span class="accent">one point</span>
 
-<p class="lead">Swap the account an agent uses, while it runs: <span class="tag shipped">shipped</span></p>
+<p class="lead">Swap the account an agent uses, while it runs:</p>
 
 ```bash
 isx account set agent-1 claude=personal
@@ -686,17 +686,10 @@ isx account set agent-1 claude=personal
 
 <p class="note" style="margin-top: 4px">(Switching between Claude auth modes is the exception: that's fixed at template build.)</p>
 
-<p class="lead mt-6">And because every API call passes there, without touching the machine: <span class="kw">isx proxy activity</span></p>
-
-<div class="cards mt-3">
-  <div class="card"><h4>Activity <span class="tag shipped">shipped</span></h4><p>Working, or stuck? Requests in flight, last model call.</p></div>
-  <div class="card"><h4>Spend <span class="tag shipped">shipped</span></h4><p>Model calls and tokens, per agent.</p></div>
-  <div class="card"><h4>Audit <span class="tag shipped">partly</span></h4><p>Traffic per domain, per agent. Every call: next.</p></div>
-  <div class="card warn"><h4>Routing <span class="tag roadmap">roadmap</span></h4><p>Model calls re-routed on the fly.</p></div>
-</div>
 
 <!--
-Shipped in v0.5.0: isx proxy activity shows, per instance, requests and bytes, what's in flight, the last model request and response, and input/output/cache tokens; --by-domain gives one row per domain, --format=json serves scripts (#898, #935). It's also what isx mcp's instance_activity reads, so a coordinating agent can tell a working instance from a stuck one. Audit is "partly": counts per domain, not a log of every call. Routing is still direction, not a feature: incus-spawn #322.
+One point: the proxy holds the credentials, so changing which account a machine uses is a host-side change, applied on the machine's next request. Nothing inside restarts, and nothing inside could tell: the machine only ever had a proof. Use it to move an agent from your personal subscription to the team's, or from one GitHub bot to another, mid-task. Pins: isx account set; isx account unset follows the default again; isx account show says where each choice comes from.
+The exception on the slide: switching between Claude auth modes (Pro/Max, API key, Vertex) needs a template built for that mode (#866).
 -->
 
 ---
