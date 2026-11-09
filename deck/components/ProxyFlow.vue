@@ -19,7 +19,7 @@ const real = computed(() => step.value >= 3)
 
 <template>
   <svg class="flow" viewBox="0 0 1160 330" role="img"
-       aria-label="A request leaves the container with a placeholder token; DNS and a redirect send it to the host proxy, which terminates TLS, swaps in the real key and re-encrypts to the upstream API.">
+       aria-label="A request leaves the container with a proof token that is worthless anywhere else; DNS and a redirect send it to the host proxy, which terminates TLS, checks the proof, adds the real key and re-encrypts to the upstream API.">
     <!-- container -->
     <rect class="bx" :class="real ? 'edge-accent' : 'edge-danger'" x="1" y="100" width="230" height="100" />
     <text class="lbl" x="116" y="142">Container</text>
@@ -36,7 +36,7 @@ const real = computed(() => step.value >= 3)
     <rect class="bx edge-accent" :class="{ lit: step >= 2 && step < 4 }" x="445" y="30" width="270" height="250" />
     <text class="lbl" x="580" y="64">Host-side proxy</text>
     <text class="step" :class="{ on: step >= 2 }" x="470" y="184"><tspan class="num">1</tspan>  terminates TLS</text>
-    <text class="step" :class="{ on: step >= 3 }" x="470" y="216"><tspan class="num">2</tspan>  swaps in the real key</text>
+    <text class="step" :class="{ on: step >= 3 }" x="470" y="216"><tspan class="num">2</tspan>  checks proof, adds key</text>
     <text class="step" :class="{ on: step >= 4 }" x="470" y="248"><tspan class="num">3</tspan>  re-encrypts upstream</text>
 
     <!-- wire 2 -->
@@ -50,7 +50,7 @@ const real = computed(() => step.value >= 3)
     <!-- the token, in transit -->
     <g class="chip" :style="{ transform: `translate(${chipAt.x}px, ${chipAt.y}px)` }">
       <rect :class="real ? 'edge-accent' : 'edge-danger'" x="-92" y="-17" width="184" height="34" rx="6" />
-      <text class="tok fake" :class="{ gone: real }" y="6">sk-ant-placeholder</text>
+      <text class="tok fake" :class="{ gone: real }" y="6">sk-ant-isx_7c1e…</text>
       <text class="tok real" :class="{ gone: !real }" y="6">sk-ant-api03-R7f…</text>
     </g>
 

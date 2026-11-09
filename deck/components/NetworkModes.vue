@@ -4,8 +4,9 @@
 // api.anthropic.com and github.com are among the hosts the proxy intercepts
 // (github.com when the template has the gh tool), so they reach the internet
 // through it; evil.example stands for any other host, which a machine reaches
-// directly. --proxy-only is iptables inside the machine: drop all output
-// except to the proxy and DNS (InstanceLifecycle.applyProxyOnlyFirewall).
+// directly. --proxy-only is an Incus network ACL on the machine's NIC, enforced
+// on the host (since v0.5.0; design/network.md): drop all egress except to the
+// proxy and DNS, and root inside the machine can't lift it.
 // --airgap removes the network device, so no agent runs there: it couldn't
 // reach its model. The third panel's machine runs only the tests.
 import { useSlideContext } from '@slidev/client'
@@ -14,7 +15,7 @@ const { $clicks } = useSlideContext()
 
 const panels = [
   { title: 'Full internet', flag: '(default)', mode: 'full', caption: 'credentials added at the proxy' },
-  { title: 'Proxy only', flag: '--proxy-only', mode: 'proxy', caption: 'iptables: only the proxy and DNS' },
+  { title: 'Proxy only', flag: '--proxy-only', mode: 'proxy', caption: 'host ACL: only the proxy and DNS' },
   { title: 'Airgapped', flag: '--airgap', mode: 'air', caption: 'no network: no agent, just the tests' },
 ]
 const hosts = [
