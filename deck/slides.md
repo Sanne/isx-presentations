@@ -142,7 +142,7 @@ clicks: 2
 <p class="lead" style="margin-top: 28px">It's usually right.</p>
 
 <div class="stats autostat" style="margin-top: 44px">
-  <div class="stat"><b class="warn">17%</b><span>of real overeager actions get through, per Anthropic</span></div>
+  <div class="stat"><b class="warn">17%</b><span>of real overeager actions get through, per <a href="https://www.anthropic.com/engineering/claude-code-auto-mode" target="_blank">Anthropic</a></span></div>
 </div>
 
 <p v-click="1" class="lead" style="margin-top: 36px; font-size: 36px; color: var(--text)">My parachute usually opens.</p>
