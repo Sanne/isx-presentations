@@ -450,14 +450,14 @@ clicks: 3
 
 <div class="cards three equal dilemma mt-4">
   <div class="card warn"><h4>"Cache it, obviously."</h4><p class="voice"><span class="s">Every build downloads the same internet again, and keeps its own copy.</span><span class="s">Builds share nothing, on the wire or on disk.</span><span class="s">Tests are affected by slow builds, rate limits and flaky networks.</span></p></div>
-  <div v-click="2" class="card you"><h4>Me</h4><p class="voice">"I don't have fibre. I can't download 1,500 dependencies again for every reproducer. And I don't want cache problems either."</p></div>
+  <div v-click="2" class="card you"><h4>Me</h4><p class="voice"><span class="s">"I don't have fibre.</span><span class="s">I can't download 1,500 dependencies again for every reproducer.</span><span class="s">And I don't want cache problems either.</span><span class="s">No agent should be able to poison another agent's Maven repository."</span></p></div>
   <div v-click="1" class="card danger"><h4>"Never cache anything."</h4><p class="voice"><span class="s">Caches bite, in ways you can't predict.</span><span class="s">Remember Thursday afternoon: one shared <span class="kw">~/.m2</span> poisoned two days of evidence.</span><span class="s">You can't trust a build you can't reproduce.</span></p></div>
 </div>
 
 <h1 v-click="3" class="statement dilemma-q">Could we have <span class="accent">both</span>?</h1>
 
 <!--
-Play both colleagues straight: each is right. Left first, then right, then me, stuck in the middle. The first is the "Set up once" argument again: without a cache, every machine downloads its own copy and keeps it, so nothing is shared, not even on disk. The second is the one who lost Thursday afternoon. Then click: could we have both? The next slide is the answer.
+Play both colleagues straight: each is right. Left first, then right, then me, stuck in the middle. The first is the "Set up once" argument again: without a cache, every machine downloads its own copy and keeps it, so nothing is shared, not even on disk. The second is the one who lost Thursday afternoon. The middle card's last line is the requirement that ties them together: a cache shared by every machine must never let one agent poison another's dependencies (Thursday afternoon, but across machines). The next slide's first row answers it: the cache never touches anything that can change (SNAPSHOTs, metadata), and stores nothing upstream wouldn't send again. Then click: could we have both? The next slide is the answer.
 -->
 
 ---
