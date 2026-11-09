@@ -128,7 +128,7 @@ export const scenes: Record<string, Scene> = {
     title: 'agent — isx machine agent-1',
     steps: [
       [run('env | grep -E "TOKEN|KEY"')],
-      [out('GH_TOKEN=gho_placeholder')],
+      [out('GH_TOKEN=gho_isx_3b9f…')],
       [agent('Yet everything authenticates:'), run('gh api user --jq .login'), out('shop-ai-bot')],
       [note('No real credential inside. And it acts as its own account, not as you.')],
     ],

@@ -13,7 +13,7 @@ spec per animation, in the order they pay off.
 | 3 | Set up once | `TemplateRace.vue` | built; MEASURE before quoting numbers |
 | 4 | Branch a live machine | `LiveBranch.vue` | built; CONFIRM with one real branch |
 | 5 | Network modes | `NetworkModes.vue` | built |
-| 6 | Both: cached, and never stale | `CacheFlow.vue` | built against incus-spawn PR #792 (fixes #555); present only once it has merged |
+| 6 | Both: cached, and never stale | `CacheFlow.vue` | built against incus-spawn PR #792 (fixes #555); merged, in v0.5.0 |
 | 7 | The blueprint (Monday's / Wednesday's / Friday's choices) | `Blueprint.vue` | built; replaces the three-question yardstick (tag `deck-v1-three-questions`) |
 
 Where the build departed from the specs below, and why:
@@ -238,8 +238,7 @@ light the panels one at a time.
 
 ## 6. Caching without surprises (Under the hood, slide "Caching…")
 
-**Built from incus-spawn PR #792 (2026-09-26, open at the time).** Present
-it only once the PR has merged and is in the release being demoed. The
+**Built from incus-spawn PR #792 (merged 2026-09-26, shipped in v0.5.0).** The
 design it draws: a cached artifact is served only when a fresh download
 would return the same bytes; every hit is confirmed with upstream (a `HEAD`
 on Maven Central, the checksum sidecar elsewhere); a changed or withdrawn

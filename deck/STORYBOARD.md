@@ -62,7 +62,7 @@ The acts are the days of one week with coding agents:
 
 `slides.md` is the source of truth for the exact order; the sections below keep the reasoning,
 the planned animations and the claims register. **`ANIMATIONS.md` specifies the animations**;
-all are built; the cache flow follows incus-spawn PR #792 and is presented only once it has merged.
+all are built; the cache flow follows incus-spawn PR #792 (merged, in v0.5.0).
 
 ## Act 0 — The goal (2–3 slides)
 

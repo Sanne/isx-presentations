@@ -178,6 +178,7 @@ Be fair: auto mode is a real improvement for interactive work.
 - The classifier is a second model, Sonnet 5 by default, in a separate call that doesn't see tool outputs. When the session also runs Sonnet 5, it is literally another instance of the same model.
 - It costs tokens. Every shell command and network call goes to that second model first, with a portion of the transcript, and the answer comes back before the action runs. On the API, Enterprise, Bedrock, Vertex and Foundry accounts those calls count toward token usage. On Pro/Max the review happens server-side and isn't billed separately, but the round trip per action is still there.
 - It gives up: after 3 blocks in a row, or 20 in a session, it goes back to prompting you.
+- Since v2.1.302 the classifier model can be changed (CLAUDE_CODE_AUTO_MODE_MODEL); Sonnet 5 is still the default (checked 2026-11-08).
 Sources: anthropic.com/engineering/claude-code-auto-mode; code.claude.com/docs/en/permission-modes ("Cost and latency"; "Server-side classifier review"); code.claude.com/docs/en/sandbox-environments.
 -->
 
@@ -400,12 +401,12 @@ parent: tpl-mydev
 tools:
   - podman
   - mvnd
-  - claude: {model: claude-sonnet-5}
+  - claude: {model: claude-sonnet-5-5}
 skills:                      # baked into the template
   repo: myorg/claude-skills
   list:
     - code-review
-agent_note: |                # added to the agent's CLAUDE.md
+agent_note: |                # added to every agent's briefing
   Prefer mvnd over mvn for repeated builds:
   it takes the same goals and flags.
 repos:
@@ -437,7 +438,6 @@ clicks: 3
 
 <!--
 Play both colleagues straight: each is right. Left first, then right, then you, stuck in the middle. The first is the "Set up once" argument again: without a cache, every machine downloads its own copy and keeps it, so nothing is shared, not even on disk. The second is the one who lost Thursday afternoon. Then click: could we have both? The next slide is the answer.
-DO NOT PRESENT this slide without the next one, and that one waits for incus-spawn PR #792 to merge.
 -->
 
 ---
@@ -456,7 +456,7 @@ clicks: 6
 The answer to the dilemma, as a story of how the design got here. Start with what a cache must never touch (row 1: anything that can change, and anything private, since the cache is shared by every machine). Then the obvious half (row 2): download once, but keep the copy only if the bytes match the checksum upstream sent with them; with no checksum, serve but don't store. Then the part that makes it safe (row 3): a hit doesn't trust the disk, it asks Central "is this still what you'd send?" with one HEAD and compares checksums; only a match serves the stored copy. Row 4 is why that matters: a republished or withdrawn artifact is evicted on the spot and fetched fresh, whichever build tool asks. Row 5 is the honest edge: with Central unreachable, the copy is served unconfirmed, and only then, with a 30-second backoff so a dead network doesn't cost a timeout per request.
 The efficiency claim, stated carefully: what's saved is the download, not the round trip; a hit still costs one HEAD. For Maven 3.9+ that HEAD replaces the .sha1 request the client would have made anyway. Don't quote the old ~2.8 ms vs ~177 ms figures (docs/PERFORMANCE-NOTES.md, 2026-08-28): they predate the HEAD per hit and the bench notes say they're not comparable any more.
 Then the second group, one click: OCI registries work the other way round. A layer is requested by its sha256 digest, so the name is the checksum: the proxy verifies the bytes against it before storing (MitmProxy, BLOB_DIGEST_PATTERN / finalizeCacheFile) and a hit is served from disk with nothing to ask; manifests, tags and auth tokens are relayed, never cached, because a tag can move. That's the contrast to say out loud: Maven names a coordinate, OCI names the bytes; the rule is the same, the check follows the protocol. Gradle (Plugin Portal, distributions) is Maven-like but has no checksum header, so a hit re-fetches the .sha1/.sha256 sidecar instead of a HEAD.
-Source: incus-spawn PR #792 (fixes #555), its DESIGN.md section "Maven/Gradle cache integrity"; OCI: proxy/MitmProxy.java (shipped, unchanged by #792). STATUS 2026-09-26: the PR is open, not merged. Present this and the dilemma slide only once it has merged and is in the release you demo. Scope: Maven Central, the Gradle Plugin Portal and Gradle distributions; other domains are never cached. npm's tarball check is a follow-up (#787).
+Source: incus-spawn PR #792 (fixes #555, merged 2026-09-26, in v0.5.0), its DESIGN.md section "Maven/Gradle cache integrity"; OCI: proxy/MitmProxy.java (unchanged by #792). Scope: Maven Central, the Gradle Plugin Portal and Gradle distributions, and npm; other domains are never cached. npm tarballs follow the same rule (#787, in v0.5.0): a tarball is checked against the registry's dist.integrity (SHA-512) on store, and a version withdrawn upstream stops being served.
 -->
 
 ---
@@ -496,7 +496,7 @@ clicks: 3
 
 <p v-click="3" class="lead mt-6">You approved <span class="kw">mvn verify</span>. <span class="danger">Everything it runs, runs as you.</span></p>
 
-<p class="note pin">A sandbox doesn't help when you approved the run. On isx it runs on a throwaway branch; for code you believe is actively malicious, use <span class="kw">--type vm</span>.</p>
+<p class="note pin">A sandbox doesn't help when you approved the run. On isx it runs on a throwaway branch; for code you believe is actively malicious, use <span class="kw">--type vm</span> (Linux).</p>
 
 ---
 clicks: 2
@@ -519,7 +519,7 @@ clicks: 3
 <Term scene="secretsIsx" class="mt-2" />
 
 <!--
-Mirrors the demo script's beat 2: GH_TOKEN is a placeholder, and gh still authenticates, as the agent's own bot account.
+Mirrors the demo script's beat 2: GH_TOKEN is a proof token (gho_isx_…), not a credential: it's worthless outside this machine, and the proxy only adds the real token for a request carrying this machine's proof. gh still authenticates, as the agent's own bot account. (Since v0.5.0; earlier releases showed a static gho_placeholder.)
 -->
 
 ---
@@ -531,7 +531,8 @@ clicks: 5
 <ProxyFlow class="mt-10" />
 
 <!--
-If asked what else the one point gives you: --proxy-only drops every outbound packet except to the proxy and DNS (iptables inside the machine), and --airgap removes the network device; the network-modes slide is in backup.
+If asked what else the one point gives you: --proxy-only drops every outbound packet except to the proxy and DNS (an Incus network ACL enforced on the host, so root inside the machine can't lift it), and --airgap removes the network device; the network-modes slide is in backup.
+The token in the chip is a proof, not a placeholder: unique to this machine and credential, worthless anywhere else, and the proxy adds the real key only to a request that carries it (docs/CREDENTIAL-PROOFS.md, v0.5.0). A static placeholder never authorizes anything.
 To extend: show the request as an HTTP message with headers, and the x-api-key line rewriting at the proxy; a second pass for git push with a GitHub token.
 -->
 
@@ -716,7 +717,7 @@ clicks: 3
 isx provisions a small Linux appliance: Alpine, a custom kernel with every driver built in, no initrd, no SSH, started by vfkit on Apple's Virtualization framework.
 Click 1: the CLI reaches Incus through a vsock tunnel (vm.incus.sock → virtio-vsock → socat → Incus). Why vsock: corporate VPN clients (e.g. Cisco AnyConnect) install socket filters that block unsigned binaries from TCP to the VM subnet; AF_VSOCK isn't TCP.
 Click 2: the proxy runs on the Mac (launchd); the VM DNATs port 443 from the bridge to the Mac's :18443.
-Click 3: a second vsock channel reaches isx-agent, a tiny shell agent that only accepts a fixed list of verbs (ping, version, socat-count, sshd-status, forwarder-restart, btrfs-usage, btrfs-status, btrfs-rescan), never arbitrary commands. Three users: the automatic recovery in VmManager.ensureRunning() and isx doctor both compare host-side fds with the in-VM socat count to find a wedged forwarder and restart it, even when the Incus channel is stuck; and because the btrfs pool lives inside the VM, the TUI's pool-usage figures come through its btrfs-usage verb (on Linux the same read is a scoped sudoers rule instead).
+Click 3: a second vsock channel reaches isx-agent, a tiny shell agent that only accepts a fixed list of verbs (ping, version, socat-count, sshd-status, forwarder-restart, shutdown, btrfs-usage, btrfs-status, btrfs-rescan, btrfs-orphan-delete), never arbitrary commands. Three users: the automatic recovery in VmManager.recoverReachability() and isx doctor both compare host-side fds with the in-VM socat count to find a wedged forwarder and restart it, even when the Incus channel is stuck; and because the btrfs pool lives inside the VM, the TUI's pool-usage figures come through its btrfs-usage verb (on Linux the same read is a scoped sudoers rule instead).
 Sources: DESIGN.md (Incus Daemon Connection, macOS vsock robustness), appliance/DESIGN.md (Boot Backends, First-Boot Initialization, Control agent).
 -->
 
@@ -736,17 +737,17 @@ isx account set agent-1 claude=personal
 
 <p class="note" style="margin-top: 4px">(Switching between Claude auth modes is the exception: that's fixed at template build.)</p>
 
-<p class="lead mt-6">And because every API call passes there, without touching the machine: <span class="tag roadmap">roadmap</span></p>
+<p class="lead mt-6">And because every API call passes there, without touching the machine: <span class="kw">isx proxy activity</span></p>
 
 <div class="cards mt-3">
-  <div class="card warn"><h4>Activity</h4><p>Working, waiting for you, or stuck?</p></div>
-  <div class="card warn"><h4>Spend</h4><p>Live token usage per agent.</p></div>
-  <div class="card warn"><h4>Audit</h4><p>Every call observable, fully transparently.</p></div>
-  <div class="card warn"><h4>Routing</h4><p>Model calls re-routed on the fly.</p></div>
+  <div class="card"><h4>Activity <span class="tag shipped">shipped</span></h4><p>Working, or stuck? Requests in flight, last model call.</p></div>
+  <div class="card"><h4>Spend <span class="tag shipped">shipped</span></h4><p>Model calls and tokens, per agent.</p></div>
+  <div class="card"><h4>Audit <span class="tag shipped">partly</span></h4><p>Traffic per domain, per agent. Every call: next.</p></div>
+  <div class="card warn"><h4>Routing <span class="tag roadmap">roadmap</span></h4><p>Model calls re-routed on the fly.</p></div>
 </div>
 
 <!--
-The roadmap half is direction, not a feature: incus-spawn #322.
+Shipped in v0.5.0: isx proxy activity shows, per instance, requests and bytes, what's in flight, the last model request and response, and input/output/cache tokens; --by-domain gives one row per domain, --format=json serves scripts (#898, #935). It's also what isx mcp's instance_activity reads, so a coordinating agent can tell a working instance from a stuck one. Audit is "partly": counts per domain, not a log of every call. Routing is still direction, not a feature: incus-spawn #322.
 -->
 
 ---
@@ -772,7 +773,7 @@ Branch (seconds, from a primed template) → no secrets inside, yet everything a
   <div class="card warn"><h4>Cloud sandboxes</h4><p>Anthropic's cloud sessions, E2B, Daytona. A machine per agent, on someone else's compute and account.</p></div>
 </div>
 
-<p class="lead mt-6">Where isx differs: a whole Linux machine, <span class="accent">branched in seconds</span> from a template you wrote, handing back <span class="accent">a commit</span> rather than editing a mount. On your hardware, for any agent.</p>
+<p class="lead mt-6">Where isx differs: a whole Linux machine, <span class="accent">branched in seconds</span> from a template you wrote, handing back <span class="accent">a commit</span> rather than editing a mount. On your hardware, for any agent: Claude Code, Codex, Pi, Gemini CLI, Copilot, Bob.</p>
 
 <!--
 On Docker Sandboxes, point at "read-write by default" and let the room remember the USB stick; no need to say more. (Docker also offers a clone mode and a mountless mode; say so if asked.)
@@ -805,10 +806,10 @@ The cost point, said plainly: no per-minute cloud meter and no subscription for 
 ## Get started
 
 <div class="cards mt-2">
-  <div class="card"><h4>Fedora / RHEL</h4><div class="cmd small">sudo dnf copr enable sanne/incus-spawn<br>sudo dnf install incus-spawn</div></div>
-  <div class="card"><h4>macOS</h4><div class="cmd small">brew install Sanne/tap/incus-spawn</div></div>
+  <div class="card"><h4>Fedora / RHEL</h4><div class="cmd small">sudo dnf install -y 'dnf5-command(copr)'<br>sudo dnf copr enable sanne/incus-spawn<br>sudo dnf install incus-spawn</div></div>
+  <div class="card"><h4>macOS <span class="muted">(Apple Silicon)</span></h4><div class="cmd small">brew install Sanne/tap/incus-spawn</div></div>
   <div class="card"><h4>Any Linux</h4><div class="cmd small">curl -fsSL https://isx.run | sh</div></div>
-  <div class="card"><h4>Already have a JVM?</h4><div class="cmd small">jbang app install isx@Sanne/incus-spawn</div></div>
+  <div class="card"><h4>Already have a JVM?</h4><div class="cmd small">jbang app install isx@Sanne/incus-spawn<br>jbang app install isx-proxy@Sanne/incus-spawn</div></div>
 </div>
 
 <div class="card mt-2"><h4>Ubuntu / Debian</h4><div class="cmd small">curl -fsSL https://sanne.github.io/isx-apt-releases/public.gpg \<br>&nbsp;&nbsp;| sudo gpg --yes --dearmor -o /usr/share/keyrings/incus-spawn.gpg<br>echo "deb [signed-by=/usr/share/keyrings/incus-spawn.gpg] https://sanne.github.io/isx-apt-releases stable main" \<br>&nbsp;&nbsp;| sudo tee /etc/apt/sources.list.d/incus-spawn.list<br>sudo apt update && sudo apt install incus-spawn</div></div>
@@ -816,7 +817,7 @@ The cost point, said plainly: no per-minute cloud meter and no subscription for 
 <p class="note pin">On macOS, isx runs its own small Linux VM: no Docker Desktop. Full instructions at <a class="kw" href="https://isx.run">isx.run</a>.</p>
 
 <!--
-Commands from the isx README (Installation). Debian/Ubuntu updates come with apt upgrade; Fedora with dnf.
+Commands from the isx README (Quick Start), v0.5.0. On RHEL 9 the copr plugin is 'dnf-command(copr)'. JBang needs both apps, and jbang must stay on the PATH. Intel Macs: v0.4.2 was the last release built for them. Debian/Ubuntu updates come with apt upgrade; Fedora with dnf.
 -->
 
 ---
@@ -846,13 +847,17 @@ Per the isx README: on Linux, isx init installs Incus through your package manag
 
 <div class="cards three mt-4 built-on">
   <div class="card"><div class="tech"><a href="https://linuxcontainers.org/incus/"><img src="/logos/incus.png" alt="Incus" class="mark"></a><span><a href="https://linuxcontainers.org/incus/">Incus</a></span></div><p>System containers and VMs: the machines themselves</p></div>
-  <div class="card"><div class="tech"><a href="https://quarkus.io/"><img src="/logos/quarkus.svg" alt="Quarkus" class="word"></a></div><p>The framework isx is written with</p></div>
-  <div class="card"><div class="tech"><a href="https://www.graalvm.org/"><img src="/logos/graalvm.png" alt="GraalVM" class="word"></a></div><p>Native binaries: instant startup, no JVM to install</p></div>
+  <div class="card"><div class="tech"><a href="https://quarkus.io/"><img src="/logos/quarkus.svg" alt="Quarkus" class="word"></a></div><p>The framework isx is written with, now on Quarkus 4</p></div>
+  <div class="card"><div class="tech"><a href="https://www.graalvm.org/"><img src="/logos/graalvm.png" alt="GraalVM" class="word"></a></div><p>Native binaries, profile-guided: instant startup, no JVM to install</p></div>
   <div class="card"><div class="tech"><img src="/logos/java.svg" alt="Java" class="mark"><span>Java 25</span></div><p>The language, on the current LTS</p></div>
   <div class="card"><div class="tech"><img src="/logos/tamboui.svg" alt="Tamboui" class="mark"><span><a href="https://tamboui.dev/">Tamboui</a> &amp; <a href="https://github.com/aeshell/aesh">Aesh</a></span></div><p>The terminal UI and the command engine</p></div>
 </div>
 
 <p class="note pin">Thank you to these communities: isx exists because they built the hard parts.</p>
+
+<!--
+v0.5.0 numbers, if asked (release notes, measured against the previous release flags): GraalVM PGO made the proxy binary 58% smaller (99 MB → 42 MB), idle RSS 39% lower, throughput up 19% to 83% depending on the path; CLI startup 17 to 20% faster. Quarkus 4 brought the proxy onto Vert.x 5 and Netty 4.2, and the toolchain onto GraalVM 25.
+-->
 
 ---
 layout: center
@@ -872,7 +877,7 @@ clicks: 3
 
 <!--
 The opening sentence again, with one word changed: that's the whole talk. "Hand the agent a task, walk away," pause, click: "come back to a tested commit." The word that carries the talk is "tested": any agent on your laptop can hand you code changes; this one hands you a commit whose tests ran, in a machine of its own, under its own name, and which you review like any other pull request. Click: questions, and the site. Click, as an afterthought: the command types itself. Say: and if you think of one later, ask isx itself.
-isx ask answers questions about isx itself, from its own documentation, using the AI account you configured (it spends tokens). Also reachable as ? in the TUI.
+isx ask answers questions about isx itself, from its own documentation (it spends tokens). It needs an Anthropic API key, Vertex AI or an OpenAI key: a Claude Pro/Max subscription only serves Claude Code. isx init offers to add a key beside a subscription, and Max and Team plans include monthly API credits that pay for one. Also reachable as ? in the TUI.
 -->
 
 ---
@@ -921,7 +926,7 @@ class: divider
   </tbody>
 </table>
 
-<p class="note pin">The last row is the honest one. isx runs both, one flag apart: <span class="kw">--type vm</span> when you want it. The container is the default because it's cheap enough to branch per task.</p>
+<p class="note pin">The last row is the honest one. On Linux isx runs both, one flag apart: <span class="kw">--type vm</span> when you want it; on macOS, containers only. The container is the default because it's cheap enough to branch per task.</p>
 
 ---
 
@@ -935,7 +940,7 @@ class: divider
   <div class="card"><h4>An isx machine</h4><p>A full distribution with its own init, where nested containers and profilers just work. It shares the host kernel, so it's cheap enough to branch one per task.</p></div>
 </div>
 
-<p class="note pin">Containers share the host kernel. For code you believe is malicious, build the template as a VM: <span class="kw">isx build tpl-java --type vm</span>. Full comparison: backup slides.</p>
+<p class="note pin">Containers share the host kernel. For code you believe is malicious, build the template as a VM on Linux: <span class="kw">isx build tpl-java --type vm</span>. Full comparison: backup slides.</p>
 
 <!--
 The two comparison tables are in the backup section at the end, for questions.
@@ -953,7 +958,7 @@ clicks: 3
   <thead><tr><th>Mode</th><th>Flag</th><th>What it does</th></tr></thead>
   <tbody>
     <tr><td>Full internet</td><td class="muted">(default)</td><td>Unrestricted access; authentication via the proxy</td></tr>
-    <tr><td>Proxy only</td><td><span class="kw">--proxy-only</span></td><td>All outbound traffic dropped except the proxy and DNS</td></tr>
+    <tr><td>Proxy only</td><td><span class="kw">--proxy-only</span></td><td>All outbound traffic dropped except the proxy and DNS, enforced on the host</td></tr>
     <tr><td>Airgapped</td><td><span class="kw">--airgap</span></td><td>Network device removed</td></tr>
   </tbody>
 </table>
@@ -995,3 +1000,22 @@ The hops: git sees an isx:// URL and runs git-remote-isx; that hands over to the
 If asked why there's a bash shim in front of the native helper: git's helper protocol starts with a few text lines, then switches to binary on the same pipe. Java's buffered stdin would read ahead into the binary stream; bash answers the text lines, then execs, so the native helper inherits a clean pipe. (DESIGN.md, "Git remote helper: bash + Java split".)
 -->
 
+---
+
+
+
+## Drive isx <span class="accent">from other tools</span>
+
+<p class="lead">The five agents of Wednesday don't need you switching between them: <span class="accent">another program can.</span></p>
+
+<div class="cards three equal mt-4">
+  <div class="card"><h4>An agent delegates</h4><p><span class="kw">isx mcp</span>: an agent on your host branches machines from templates you approved, and hands whole tasks to Claude Code, Codex or Pi inside them.</p></div>
+  <div class="card"><h4>An orchestrator drives</h4><p><span class="kw">isx branch --owner</span>, <span class="kw">isx start</span>, <span class="kw">isx stop</span>, with <span class="kw">--format=json</span>: the SSH target and project root, for any tool.</p></div>
+  <div class="card"><h4>Your agent manager</h4><p>Add <span class="kw">herdr</span> or <span class="kw">orca</span> to a template: each instance registers itself on first start, and leaves on destroy.</p></div>
+</div>
+
+<p class="note pin">A tool may destroy only the instances it owns, and only if your <span class="kw">config.yaml</span> lets it. Off by default: <span class="kw">isx init</span> offers to set it up.</p>
+
+<!--
+New in v0.5.0 (isx.run/docs/integrations; docs/MCP.md, docs/INTEGRATIONS.md). isx mcp is no longer experimental. A coordinator's reach is limited to templates both its own template and mcp.yaml approve; a coordinator can also run inside an instance (isx branch --mcp-client). isx shell <instance> --task opens the conversation of a delegated task. herdr: a stopped instance starts again when herdr reconnects to it. If asked whether the coordinator sees credentials: no, the same proxy rule applies to it as to any machine.
+-->
