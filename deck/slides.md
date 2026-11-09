@@ -352,20 +352,22 @@ The whole picture at once, as the bridge from what to how: each part answers a p
 ## Two native binaries, <span class="accent">three modules</span>
 
 <div class="cards three equal mt-4 modules">
-  <div class="card"><h4><span class="kw">isx</span> · cli</h4><p>Quarkus, with <a href="https://github.com/aeshell/aesh">Aesh</a> for the commands and <a href="https://tamboui.dev/">Tamboui</a> for the TUI, on Panama. The Incus REST client, the git remote helper, <span class="kw">isx mcp</span>.</p></div>
-  <div class="card"><h4>common</h4><p>Not a Quarkus app: a Jandex index, so both apps discover its CDI beans. Templates, tools, accounts, configuration, all read with jjq.</p></div>
-  <div class="card"><h4><span class="kw">isx-proxy</span></h4><p>Quarkus and Vert.x 5 on Netty 4.2: the MITM TLS proxy, the credential proofs, the caches. A service: systemd on Linux, launchd on macOS.</p></div>
+  <div class="card"><h4><span class="kw">isx</span> · cli</h4><p>Quarkus, with <a href="https://github.com/aeshell/aesh">Aesh</a> for the commands and <a href="https://tamboui.dev/">Tamboui</a> for the TUI, on Panama. The Incus REST client, the git remote helper, <span class="kw">isx mcp</span>.</p><div class="tune"><b>short-lived:</b> serial GC · MaxRAM 512m · 2 CPUs · -O3 + PGO</div></div>
+  <div class="card"><h4>common</h4><p>Not a Quarkus app: a Jandex index, so both apps discover its CDI beans. Templates, tools, accounts, configuration, all read with jjq.</p><div class="tune"><b>no binary:</b> compiled into both, tuned by each</div></div>
+  <div class="card"><h4><span class="kw">isx-proxy</span></h4><p>Quarkus and Vert.x 5 on Netty 4.2: the MITM TLS proxy, the credential proofs, the caches. A service: systemd on Linux, launchd on macOS.</p><div class="tune"><b>long-running:</b> G1 on Linux, serial on macOS · MaxRAM 256m · 4 CPUs · -O3 + PGO</div></div>
 </div>
 
 <div class="built-on logos mt-6">
   <img src="/logos/quarkus.svg" alt="Quarkus" class="word"><img src="/logos/graalvm.png" alt="GraalVM" class="word"><span class="tech"><img src="/logos/java.svg" alt="Java" class="mark"><span>Java 25</span></span><span class="tech"><img src="/logos/incus.png" alt="Incus" class="mark"><span>Incus</span></span><span class="tech"><img src="/logos/tamboui.svg" alt="Tamboui" class="mark"><span>Tamboui</span></span>
 </div>
 
-<p class="note pin">Quarkus 4.0.0.Beta3, GraalVM 25, Java 25. Splitting the proxy out took Vert.x out of the CLI: each binary carries only what it runs.</p>
+<p class="note pin">Both are built for <span class="kw">-march=haswell</span> or <span class="kw">armv8.1-a+aes</span>: GraalVM's default targets leave out AES, and TLS through the proxy ran <span class="accent">up to 13× slower</span>. Splitting the proxy out took Vert.x out of the CLI: each binary carries only what it runs.</p>
 
 <!--
 Replaces the old "Built on" slide: the same thanks, now attached to what each part does. Sources: the three poms (cli: quarkus-arc, aesh, tamboui-panama-backend; proxy: quarkus-arc, quarkus-vertx; common: quarkus-core, Jandex plugin) and design/native-image.md "Module Structure".
-Native settings, if asked: the CLI uses the serial GC; the proxy G1 on Linux and serial on macOS (G1 measured on Apple Silicon and bought nothing, #1140). Both -O3 with PGO in release builds (later slide).
+The tuning follows the workload: the CLI lives for milliseconds, so serial GC and a small heap; the proxy runs for days under load, so G1 on Linux. On macOS the proxy stays on serial: G1 was measured on Apple Silicon and bought nothing (118 req/s either way on the Maven load) while costing 9 MB of binary and 5.4 MB of idle RSS (#1140); it also needs Oracle GraalVM, which Homebrew's GraalVM CE lacks. Both -O3 with PGO in release builds (later slide). MaxRAM and ActiveProcessorCount are fixed at build time (-R:), from each module's application.properties.
+The -march story (design/native-image.md, "Native image CPU baseline"): GraalVM's x86-64-v3 default has no AES-NI or CLMUL, so AES-GCM ran in software: a cached Maven artifact served at 73 MB/s with the default, 960 MB/s with haswell (x86-64-v4 is a trap: AVX-512, still no AES). On Apple Silicon, armv8.1-a+aes took the proxy from 118 to about 1,000 req/s (#1144). -H:RuntimeCheckedCPUFeatures doesn't cover the crypto intrinsics, and aarch64 has no runtime dispatch at all: it's -march or nothing.
+Quarkus 4.0.0.Beta3, GraalVM 25, Java 25.
 Say thank you here: isx exists because the Incus, Quarkus, GraalVM, Tamboui and Aesh communities built the hard parts.
 -->
 
