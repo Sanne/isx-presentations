@@ -825,7 +825,7 @@ isx init: Per the isx README: on Linux, isx init installs Incus through your pac
 ---
 layout: center
 class: glow-accent
-clicks: 3
+clicks: 2
 ---
 
 <h1 class="statement">Hand the agent a task, walk away,<br><span v-click="1">come back to <span class="accent">a tested commit</span>.</span></h1>
@@ -834,12 +834,12 @@ clicks: 3
 
 <div class="ask mt-4">
   <a v-click="2" class="site" href="https://isx.run" target="_blank">isx.run</a>
-  <span v-click="3" class="or">or, later</span>
-  <span v-click="3" class="kw typed">isx ask "how do I set up a template for my repo?"</span>
+  <span v-click="2" class="or">or, later</span>
+  <span v-click="2" class="kw typed">isx ask "how do I set up a template for my repo?"</span>
 </div>
 
 <!--
-The opening sentence again, with one word changed: that's the whole talk. "Hand the agent a task, walk away," pause, click: "come back to a tested commit." The word that carries the talk is "tested": any agent on your laptop can hand you code changes; this one hands you a commit whose tests ran, in a machine of its own, under its own name, and which you review like any other pull request. Click: questions, and the site. Click, as an afterthought: the command types itself. Say: and if you think of one later, ask isx itself.
+The opening sentence again, with one word changed: that's the whole talk. "Hand the agent a task, walk away," pause, click: "come back to a tested commit." The word that carries the talk is "tested": any agent on your laptop can hand you code changes; this one hands you a commit whose tests ran, in a machine of its own, under its own name, and which you review like any other pull request. Click: questions, the site, and, as an afterthought, the command typing itself. Say: and if you think of one later, ask isx itself.
 isx ask answers questions about isx itself, from its own documentation (it spends tokens). It needs an Anthropic API key, Vertex AI or an OpenAI key: a Claude Pro/Max subscription only serves Claude Code. isx init offers to add a key beside a subscription, and Max and Team plans include monthly API credits that pay for one. Also reachable as ? in the TUI.
 -->
 
