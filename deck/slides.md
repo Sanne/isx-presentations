@@ -32,7 +32,7 @@ layout: center
 <!--
 Spoken intro: "Here's what we were promised." Read the line. "That's the job description of a coding agent. Not a faster autocomplete: you hand it a task, you leave, you come back to finished work. Hold on to that sentence: it's the bar I'll hold everything to today. Every part of isx exists because something got in the way of it. So let's have the week where that happens."
 It's the promise, not a wish and not isx's claim: the way agents are sold, and the thing you actually want. Monday is what happens when you take it at its word.
-The shape of the talk: not a feature tour, a week. Monday, Wednesday, Friday; each day a problem you'll recognise, and the choice that answers it. By Friday the choices add up to a picture, and the picture is isx.
+The shape of the talk: why (the week everyone has with an agent), what (a machine of its own), and how it's built: the part for this audience, Quarkus all the way down.
 -->
 
 <!--
@@ -46,7 +46,7 @@ class: divider
 
 <div class="ghost">01</div>
 
-# Monday: <span class="accent">one agent, on my laptop</span>
+# Why: <span class="accent">one agent, on my laptop</span>
 
 <p>A failing test. How hard can it be?</p>
 
@@ -73,33 +73,6 @@ layout: center
 
 <!--
 Source: anthropic.com/engineering/claude-code-auto-mode. At 93%, the prompt has stopped being a decision.
--->
-
----
-clicks: 2
----
-
-## So you try to walk away
-
-<Term scene="coffee" class="mt-2" />
-
-<!--
-It can't finish without you, so you can't leave. This is the real cost, more than the annoyance.
--->
-
----
-clicks: 2
----
-
-## And now run <span class="warn">five of them</span>
-
-<p class="lead">Five agents, five streams of prompts. One of you, switching between them.</p>
-
-<FiveAgents class="mt-6" />
-
-<!--
-Bridge from the coffee break: 29 minutes of waiting, and that was one agent. The obvious move, the one every demo shows, is to run five. Click 1 plays 30 minutes in about 25 seconds; let it run and narrate the face. Click 2: the verdict. This is still the world without isx: Monday's choice answers this scene too.
-Illustrative, not measured: the lanes are simulated with one rule, that you answer prompts in the order they arrive and each one costs you a minute and a half of reading and switching back. Nothing else is tuned; the queue does the rest.
 -->
 
 ---
@@ -161,6 +134,7 @@ If asked: docker run * still covers docker run --privileged -v /:/host, hence "r
 
 ---
 layout: center
+clicks: 2
 ---
 
 <h1 class="statement">Or you turn on "auto mode", and<br><span class="warn">a second model</span> decides what's safe.</h1>
@@ -171,30 +145,18 @@ layout: center
   <div class="stat"><b class="warn">17%</b><span>of real overeager actions get through, per Anthropic</span></div>
 </div>
 
-<div class="quote" style="margin: 26px auto 0; max-width: 720px; text-align: left">"A per-action control, not an isolation boundary."<cite>Anthropic, on what auto mode is</cite></div>
+<p v-click="1" class="lead" style="margin-top: 36px; font-size: 36px; color: var(--text)">My parachute usually opens.</p>
+
+<p v-click="2" class="lead mt-3" style="font-size: 28px">One time in six, when it matters, it doesn't. <span class="warn">Still jumping?</span></p>
 
 <!--
-Be fair: auto mode is a real improvement for interactive work.
+Be fair: auto mode is a real improvement for interactive work. Anthropic itself calls it "a per-action control, not an isolation boundary".
+The parachute, on clicks 1 and 2: Deadpan. Get the wording right: Anthropic's 17% is a miss rate on real overeager actions, i.e. of the actions that genuinely should have been stopped, one in six got through. It is not "17% of the time it fails"; most actions are harmless and never needed stopping. So the parachute fails one time in six when it matters, which for a safety device is the only time that counts. Then ask the room. Then the plain version, spoken: for commands that run as you, on your laptop, "usually" isn't good enough.
+Alternative punchline if it suits the room better: "Usually, logging into my bank doesn't empty my savings."
 - The classifier is a second model, Sonnet 5 by default, in a separate call that doesn't see tool outputs. When the session also runs Sonnet 5, it is literally another instance of the same model.
 - It costs tokens. Every shell command and network call goes to that second model first, with a portion of the transcript, and the answer comes back before the action runs. On the API, Enterprise, Bedrock, Vertex and Foundry accounts those calls count toward token usage. On Pro/Max the review happens server-side and isn't billed separately, but the round trip per action is still there.
 - It gives up: after 3 blocks in a row, or 20 in a session, it goes back to prompting you.
 Sources: anthropic.com/engineering/claude-code-auto-mode; code.claude.com/docs/en/permission-modes ("Cost and latency"; "Server-side classifier review"); code.claude.com/docs/en/sandbox-environments.
--->
-
----
-layout: center
-clicks: 2
----
-
-<h1 class="statement"><span class="warn">"Usually"?</span></h1>
-
-<p v-click="1" class="lead mt-8" style="font-size: 44px; color: var(--text)">My parachute usually opens.</p>
-
-<p v-click="2" class="lead mt-6" style="font-size: 32px">One time in six, when it matters, it doesn't. <span class="warn">Still jumping?</span></p>
-
-<!--
-Deadpan. Let "Usually?" sit for a second, click, and let the laugh happen. Click again for the number, and get the wording right: Anthropic's 17% is a miss rate on real overeager actions, i.e. of the actions that genuinely should have been stopped, one in six got through. It is not "17% of the time it fails"; most actions are harmless and never needed stopping. So the parachute fails one time in six when it matters, which for a safety device is the only time that counts. Then ask the room. Then the plain version, spoken: for commands that run as you, on your laptop, "usually" isn't good enough.
-Alternative punchline if it suits the room better: "Usually, logging into my bank doesn't empty my savings."
 -->
 
 ---
@@ -246,83 +208,18 @@ Honest limit, for the VM slide: a container shares the host kernel.
 -->
 
 ---
-clicks: 2
----
-
-## Where did <span class="accent">your</span> 36 minutes go?
-
-<ThirtyMinutes class="mt-2" />
-
-
-<!--
-Click 1 plays "With prompts": narrate it as your morning. The agent stops, you don't notice because you're in the PR; you notice, answer, and try to get back into the PR; the answers get sloppier; at 10:14 you give up and just watch it, clicking yes. Point at the face. Click 2 plays "On isx". Then: the build took about as long; what changed is who had to be there.
-make images is measured (~15 min); the rest is estimated. The gap between the two runs is exactly the waiting: 11½ minutes.
--->
-
----
-clicks: 1
----
-
-## Monday's choice
-
-<Blueprint :stage="1" class="mt-2" />
-
-<!--
-The first part of the picture. Not a checklist: a problem, and the choice that answers it. You were the approve button; the choice is to stop judging commands one at a time and give the agent a machine of its own, where "yes" is safe because nothing of yours is inside. Everything else in the talk builds on this picture.
--->
-
----
 layout: center
 class: divider
 ---
 
 <div class="ghost">02</div>
 
-# Wednesday: <span class="accent">five agents at once</span>
+# What: <span class="accent">a machine of its own</span>
 
-<p>You got your afternoon back. So you started a second agent. Then a third.</p>
-
-<!--
-Monday solved the prompts; nobody is waiting for you any more. So of course you run more than one. Wednesday's problem is a different one: they get in each other's way.
--->
-
----
-clicks: 3
----
-
-## You know <span class="muted">git worktrees</span>
-
-<Machines mode="worktrees" class="mt-2" />
+<p>Whole machines, branched in seconds. No keys inside.</p>
 
 <!--
-For those who haven't used them: one repository, several branches checked out side by side in separate directories, all sharing one .git. It's how most people run parallel agents today.
-Click by click: the repository; three checkouts, and the thing everyone likes about worktrees: they share one .git, so a commit in any checkout can be merged from any other; they all sit on one machine; the collisions.
--->
-
----
-clicks: 5
----
-
-## Thursday afternoon
-
-<SnapshotStory class="mt-2" />
-
-<p v-click="5" class="lead mt-3">Nobody touched B's code. The lost afternoon isn't the real cost: <span class="danger">B's evidence is poisoned, and it committed a fix for a bug it never understood.</span></p>
-
-<!--
-Tell it as a story, row by row, without explaining. Let the audience wonder why B's numbers move. Only on the last click does the ~/.m2 column light up: A's mvn install overwrote the SNAPSHOT that B's build was using. Dwell on B: it did everything right, collected evidence for two days, and the evidence itself was corrupted. It's now confidently wrong, and so are you if you trust its write-up.
--->
-
----
-layout: center
----
-
-<h1 class="statement">A worktree isolates your checkout.<br><span class="warn">Not the machine it runs on.</span></h1>
-
-<p class="lead mt-8 muted">Ports, services, tools, caches, and yesterday's leftovers: all still shared.</p>
-
-<!--
-The worktrees diagram already listed what is shared; this is the one-line wish before the answer. "Yesterday's leftovers" matters: they teach the agent solutions that only work on your laptop.
+The "what" in three moves: a branch is a whole machine, a template declares it, and nothing secret is inside. Then how the work comes back.
 -->
 
 ---
@@ -334,8 +231,8 @@ clicks: 3
 <Machines mode="isx" class="mt-2" />
 
 <!--
-Same picture as the worktrees slide, on purpose: what was one shared machine at the bottom is now inside each box. Each branch has its own ports, ~/.m2, tools, services and IP, starts from the same clean template, and is destroyed rather than cleaned up.
-Click 3, the callback to worktrees: you keep the git workflow. Each machine is a git remote of your repository (isx://agent-1/~/shop), so git fetch, git push and git pull work as they do between any two repositories; isx adds and removes the remote for you when host-paths is configured. The details come on "Getting it back is just git".
+What would be one shared laptop for every agent is now inside each box. Each branch has its own ports, ~/.m2, tools, services and IP, starts from the same clean template, and is destroyed rather than cleaned up.
+Click 3: you keep the git workflow. Each machine is a git remote of your repository (isx://agent-1/~/shop), so git fetch, git push and git pull work as they do between any two repositories; isx adds and removes the remote for you when host-paths is configured. The details come on "Getting it back is just git".
 -->
 
 ---
@@ -349,60 +246,6 @@ Click 3, the callback to worktrees: you keep the git workflow. Each machine is a
 <!--
 Each square is a block of a machine's disk; the caption at the top narrates each step and the legend says how to read the squares. Git shares objects between branches. isx shares disk blocks between machines: the same trick, one layer down.
 Copy-on-write needs a storage pool that supports it (btrfs, ZFS, LVM thin); on one that doesn't, isx branch warns and makes a full copy.
--->
-
----
-clicks: 3
----
-
-## Set up once. <span class="accent">Every branch starts ready.</span>
-
-<TemplateRace />
-
-<p class="note pin">Templates compose: a <span class="kw">parent:</span> plus <span class="kw">tools:</span> picked by name, not <span class="kw">RUN</span> lines copied between Dockerfiles. <span class="kw">isx update-all</span> keeps them fresh: packages updated, repositories fetched.</p>
-
-<!--
-The slow part of any task is the setup. In isx it happens when the template is built, not when the agent starts: the repositories are already cloned, the tools installed, and the build has already run once, so the dependencies are downloaded and cached. A branch is a copy of that finished state, so the agent's first command is the useful one.
-Two separate approaches, one panel each, running the same three tasks. In each panel the dashed line is the moment the tasks start; left of it is ahead of time. Every task does the same real work (explore and patch, then test); only the setup in front of it differs. Keeping templates fresh (footnote): isx update-all updates system packages and git-fetches the repos in every template; --prime also re-runs each repo's prime command, so the cached dependencies catch up too. Between refreshes an agent can always git fetch in its branch; the build then downloads only what changed, as on your laptop after a git pull. The dependency step is deliberately modest: many people have some cache. Top, click 1: each task on a new, empty machine repeats the whole setup before its first test, and the counter shows the cost twice over: setup time three times, and three copies of the tools and dependencies on disk. Bottom, click 2: the template ran the setup once, ahead of time; each task is a branch of it and starts with the test. Time paid once; disk stored once and shared by copy-on-write. Click 3: the point.
-Honest framing if asked: a prebuilt container image also avoids repeating the setup; what isx adds is a whole machine, branched in seconds, sharing its disk, and branchable from a running machine (next slide).
-Composition (footnote): a template names one parent and a list of tools; isx builds it by copying the parent (copy-on-write) and adding only that layer's packages and tools, so shared layers are stored once too (BuildCommand: "Build an image by copying its parent and applying layers"). The YAML slide shows one.
-MEASURE before quoting any number: a real template build, and an isx branch plus the first mvn -q test, on this laptop. Until then it's "minutes" against "seconds", in words.
--->
-
----
-clicks: 3
----
-
-## Branch a <span class="accent">live</span> machine
-
-<p class="lead">Branch a machine mid-task, twice. Try fix A and fix B <span class="accent">at the same time</span>, from the same state, and nobody repeats the setup.</p>
-
-<LiveBranch class="mt-6" />
-
-<!--
-The story everyone has lived: a bug report comes in, and it takes an hour to reproduce. The agent checked out the version from the report, built it with the same dependencies, and wrote a test that fails every time. Now try two fixes from that exact state. Click 1: that machine. Click 2: two branches of it. Click 3: they go their own ways.
-What carries over: isx branch --from <instance> copies the instance's disk, and the branch boots its own systemd. The checkout, the build and the test come along; nothing in memory does.
-The demo's Postgres fork shows the same mechanism live.
--->
-
----
-
-
-
-## Drive isx <span class="accent">from other tools</span>
-
-<p class="lead">Who does all this branching? Not you, switching between five agents: <span class="accent">another program can.</span></p>
-
-<div class="cards three equal mt-4">
-  <div class="card"><h4>An agent delegates</h4><p><span class="kw">isx mcp</span>: an agent on your host branches machines from templates you approved, and hands whole tasks to Claude Code, Codex or Pi inside them.</p></div>
-  <div class="card"><h4>An orchestrator drives</h4><p><span class="kw">isx branch --owner</span>, <span class="kw">isx start</span>, <span class="kw">isx stop</span>, with <span class="kw">--format=json</span>: the SSH target and project root, for any tool.</p></div>
-  <div class="card"><h4>Your agent manager</h4><p>Add <span class="kw">herdr</span> or <span class="kw">orca</span> to a template: each instance registers itself on first start, and leaves on destroy.</p></div>
-</div>
-
-<p class="note pin">A tool may destroy only the instances it owns, and only if your <span class="kw">config.yaml</span> lets it. Off by default: <span class="kw">isx init</span> offers to set it up.</p>
-
-<!--
-Where it sits: right after the live branch. Fix A and fix B from one state is exactly the kind of fan-out you'd rather a program ran; then back to how a template is written. New in v0.5.0 (isx.run/docs/integrations; docs/MCP.md, docs/INTEGRATIONS.md). isx mcp is no longer experimental. A coordinator's reach is limited to templates both its own template and mcp.yaml approve; a coordinator can also run inside an instance (isx branch --mcp-client). isx shell <instance> --task opens the conversation of a delegated task. herdr: a stopped instance starts again when herdr reconnects to it. If asked whether the coordinator sees credentials: no, the same proxy rule applies to it as to any machine.
 -->
 
 ---
@@ -445,95 +288,7 @@ Don't say "deterministic" or "reproducible": the base image tracks the newest re
 clicks: 3
 ---
 
-## To cache, <span class="warn">or not to cache?</span>
-
-<div class="cards three equal dilemma mt-4">
-  <div class="card warn"><h4>"Cache it, obviously."</h4><p class="voice"><span class="s">Every build downloads the same internet again, and keeps its own copy.</span><span class="s">Builds share nothing, on the wire or on disk.</span><span class="s">Tests are affected by slow builds, rate limits and flaky networks.</span></p></div>
-  <div v-click="2" class="card you"><h4>Me</h4><p class="voice"><span class="s">"I don't have fibre.</span><span class="s">I can't download 1,500 dependencies again for every reproducer.</span><span class="s">And I don't want cache problems either.</span><span class="s">No agent should be able to poison another agent's Maven repository."</span></p></div>
-  <div v-click="1" class="card danger"><h4>"Never cache anything."</h4><p class="voice"><span class="s">Caches bite, in ways you can't predict.</span><span class="s">Remember Thursday afternoon: one shared <span class="kw">~/.m2</span> poisoned two days of evidence.</span><span class="s">You can't trust a build you can't reproduce.</span></p></div>
-</div>
-
-<h1 v-click="3" class="statement dilemma-q">Could we have <span class="accent">both</span>?</h1>
-
-<!--
-Play both colleagues straight: each is right. Left first, then right, then me, stuck in the middle. The first is the "Set up once" argument again: without a cache, every machine downloads its own copy and keeps it, so nothing is shared, not even on disk. The second is the one who lost Thursday afternoon. The middle card's last line is the requirement that ties them together: a cache shared by every machine must never let one agent poison another's dependencies (Thursday afternoon, but across machines). The next slide's first row answers it: the cache never touches anything that can change (SNAPSHOTs, metadata), and stores nothing upstream wouldn't send again. Then click: could we have both? The next slide is the answer.
--->
-
----
-clicks: 6
----
-
-## Both: <span class="accent">cached, and never stale</span>
-
-<p class="lead">One rule: a cached file is served <span class="accent">only if a fresh download would return the same bytes</span>.</p>
-
-<CacheFlow class="mt-6" />
-
-<p class="note pin">Container layers and tool downloads are keyed by their SHA-256 digest. And the last resort is a command: <span class="kw">isx clean cache</span> throws the whole cache away; all you lose is a download.</p>
-
-<!--
-The answer to the dilemma, as a story of how the design got here. Start with what a cache must never touch (row 1: anything that can change, and anything private, since the cache is shared by every machine). Then the obvious half (row 2): download once, but keep the copy only if the bytes match the checksum upstream sent with them; with no checksum, serve but don't store. Then the part that makes it safe (row 3): a hit doesn't trust the disk, it asks Central "is this still what you'd send?" with one HEAD and compares checksums; only a match serves the stored copy. Row 4 is why that matters: a republished or withdrawn artifact is evicted on the spot and fetched fresh, whichever build tool asks. Row 5 is the honest edge: with Central unreachable, the copy is served unconfirmed, and only then, with a 30-second backoff so a dead network doesn't cost a timeout per request.
-The efficiency claim, stated carefully: what's saved is the download, not the round trip; a hit still costs one HEAD. For Maven 3.9+ that HEAD replaces the .sha1 request the client would have made anyway. Don't quote the old ~2.8 ms vs ~177 ms figures (docs/PERFORMANCE-NOTES.md, 2026-08-28): they predate the HEAD per hit and the bench notes say they're not comparable any more.
-Then the second group, one click: OCI registries work the other way round. A layer is requested by its sha256 digest, so the name is the checksum: the proxy verifies the bytes against it before storing (MitmProxy, BLOB_DIGEST_PATTERN / finalizeCacheFile) and a hit is served from disk with nothing to ask; manifests, tags and auth tokens are relayed, never cached, because a tag can move. That's the contrast to say out loud: Maven names a coordinate, OCI names the bytes; the rule is the same, the check follows the protocol. Gradle (Plugin Portal, distributions) is Maven-like but has no checksum header, so a hit re-fetches the .sha1/.sha256 sidecar instead of a HEAD.
-Source: incus-spawn PR #792 (fixes #555, merged 2026-09-26, in v0.5.0), its DESIGN.md section "Maven/Gradle cache integrity"; OCI: proxy/MitmProxy.java (unchanged by #792). Scope: Maven Central, the Gradle Plugin Portal and Gradle distributions, and npm; other domains are never cached. npm tarballs follow the same rule (#787, in v0.5.0): a tarball is checked against the registry's dist.integrity (SHA-512) on store, and a version withdrawn upstream stops being served.
--->
-
----
-clicks: 2
----
-
-## Wednesday's choices
-
-<Blueprint :stage="3" :from="1" class="mt-2" />
-
-<!--
-Two more parts. Click: five agents on one laptop collide, so the choice is to branch the whole machine, not the checkout: a template, and copy-on-write branches of it. Click: five machines would download the same internet, so the choice is a cache that only serves what upstream would send again; it lives in the proxy, which appears here for the first time as "the point every request passes". The keys come on Friday.
--->
-
----
-layout: center
-class: divider
----
-
-<div class="ghost">03</div>
-
-# Friday: <span class="accent">code from strangers</span>
-
-<p>A reproducer, and your credentials</p>
-
----
-clicks: 3
----
-
-## "Reproducer attached: <span class="kw">mvn verify</span>"
-
-<p class="lead">A user files a bug and attaches a small project that reproduces it.</p>
-
-<p v-click="1" class="lead mt-6">You read the 40 lines of Java. Harmless.</p>
-
-<p v-click="2" class="lead mt-6">Did you read the <span class="kw">pom.xml</span>? The build plugin it pulls in? <span class="warn">That plugin's dependencies?</span></p>
-
-<p v-click="3" class="lead mt-6">You approved <span class="kw">mvn verify</span>. <span class="danger">Everything it runs, runs as you.</span></p>
-
-<p class="note pin">A sandbox doesn't help when you approved the run. On isx it runs on a throwaway branch; for code you believe is actively malicious, use <span class="kw">--type vm</span> (Linux).</p>
-
----
-clicks: 2
----
-
-## What that build <span class="danger">can see</span>
-
-<Term scene="secretsLaptop" class="mt-2" />
-
-<!--
-Values are truncated fakes. The point: the agent needs to clone, push and call the model, so the usual setup puts tokens where every process it starts can read them. A good model won't go looking; a dependency might.
--->
-
----
-clicks: 3
----
-
-## The same look, <span class="accent">from an isx machine</span>
+## What an agent sees <span class="accent">in an isx machine</span>
 
 <Term scene="secretsIsx" class="mt-2" />
 
@@ -556,125 +311,6 @@ To extend: show the request as an HTTP message with headers, and the x-api-key l
 -->
 
 ---
-
-
-
-## An old principle, <span class="accent">a new kind of <s class="struck">program</s> user</span>
-
-<div class="quote mt-2">"Every program and every user of the system should operate using the least set of privileges necessary to complete the job."<cite>Saltzer &amp; Schroeder, <em>The Protection of Information in Computer Systems</em>, 1975</cite></div>
-
-<div class="quote mt-6">"Implement authorization in downstream systems rather than relying on an LLM to decide if an action is allowed or not."<cite>OWASP Top 10 for LLM Applications 2025, LLM06: Excessive Agency</cite></div>
-
-<div class="quote mt-6">Private data, untrusted content, and a way to send data out: an agent with all three can be tricked into leaking it.<cite>Simon Willison, "The lethal trifecta", 2025 (paraphrased)</cite></div>
-
-<p class="note pin">isx applies them structurally: your credentials and files aren't in the machine, the host enforces the boundary rather than a model, and <span class="kw">--proxy-only</span> or <span class="kw">--airgap</span> cut the way out when the code itself is sensitive.</p>
-
-<!--
-The title's joke: is an agent a program or a user? It's a program that behaves like a user: it reads, decides, and acts with your permissions. Read the first quote slowly: "every program and every user". Saltzer and Schroeder covered both in 1975.
-The lethal trifecta is paraphrased, not quoted. isx removes your credentials and personal files from the machine; the repository it works on may still be private, which is what the network modes are for.
-The idea is spreading: credential-injecting proxies now appear in Claude Code's sandbox (mask mode) and Anthropic's cloud sessions. Mention as validation if asked.
-Sources: Saltzer & Schroeder 1975; genai.owasp.org/llmrisk/llm062025-excessive-agency; simonwillison.net/2025/Jun/16/the-lethal-trifecta.
--->
-
----
-layout: center
-clicks: 2
----
-
-<h1 class="statement giveup">It pushed at 3 a.m. <span class="kw">git blame</span> says: <span class="danger">you</span>.</h1>
-
-<h1 v-click="1" class="statement giveup">"My agent did it" is not a defence.</h1>
-
-<h1 v-click="2" class="statement giveup">Your name on work you never read<br>isn't delegation. <span class="warn">It's deception.</span></h1>
-
-<!--
-Beat by beat. "It pushed at 3 a.m. git blame says: you." Pause. Click: "My agent did it" is not a defence. Click: the point that matters more than blame: honesty. A commit, a PR, a review comment under your name that you never read misleads everyone downstream. Reviewers calibrate on the author; they lend your name your reputation and skim. The audit log shows one actor and can't tell which of you it was. Even when nothing breaks, the record is a lie, and your team is working from it.
-Accurate to isx: with your personal PAT, isx generates the container's git identity from your account, so commits and pushes really are authored as you. The next slide is the fix: a dedicated bot account, provided during isx init.
--->
-
----
-
-
-
-## The agent acts <span class="accent">as itself</span>
-
-<p class="lead">With your token, everything it does is you: every commit, every comment, every push. Honest work says who did it.</p>
-
-<div class="cards mt-6">
-  <div class="card"><h4>Its own account <span class="tag shipped">shipped</span></h4><p>Each instance can use its own bot account: commits are authored by it, and it can do only what you granted the bot. Its outward-facing work comes to you for review.</p></div>
-  <div class="card warn"><h4>Its own signature <span class="tag roadmap">roadmap</span></h4><p>Commit signing with a key that never leaves the host (#271).</p></div>
-</div>
-
-<p class="lead mt-8">An agent is <span class="accent">a principal</span>, not a process: it gets an identity, and the identity gets exactly the access it needs.</p>
-
----
-layout: center
----
-
-<p class="kicker">A fair question</p>
-
-<h1 class="statement">"Can I just mount the repo into my IDE?"</h1>
-
-<p class="lead mt-6">You want to watch the work happen, in your own editor. Of course you do.</p>
-
-<!--
-Ask it warmly, in the audience's voice: everyone asks this, and it's the natural thing to want. Don't answer it here. Pause, click, and let the man in the trench coat answer it for you. The realisation should be theirs, on the second slide, not yours on this one.
--->
-
----
-clicks: 3
----
-
-<UsbStranger class="mt-4" />
-
-<p v-click="3" class="lead mt-4">Your security training says never to plug in that stick. A read-write share is that stick: whatever the agent writes there, <span class="danger">your IDE, git hooks and build run next, on your laptop, with your permissions, your keys and your files.</span></p>
-
-<!--
-The oldest trick in security, retold. Let the first bubble land ("skip the git dance" is the pitch every read-write share makes: convenience). Click 1: "It's just… executable code. Trust me." Click 2, the afterthought: "Only some of it was downloaded from the internet." Let the laugh happen. Click 3: the plain version, and the hook the room already knows: every company's security awareness training has the found-USB-stick rule, and its policy on running unreviewed code. Ask: would your security team sign off on this folder? Then move on; the next slide shows the timing problem.
-It's accurate, not a caricature: a working tree is full of things your tools execute without asking (build scripts, the Gradle/Maven wrappers, git hooks, IDE run configurations, .envrc), and an agent that downloaded dependencies or scripts writes them there. Docker Sandboxes mounts your working tree read-write by default; process sandboxes run in it directly. The next slide shows the timing problem even with an honest agent.
--->
-
----
-layout: center
-clicks: 4
----
-
-<h1 class="statement">"It works on my machine."</h1>
-
-<p class="lead mt-6" style="opacity: 1">It does. On <em class="accent">its</em> machine. The trap: yours can say the same, <em>about something else</em>.</p>
-
-<ul class="works mt-8">
-  <li v-click="1"><b>Same command, different program.</b> Your <span class="kw">mvn test</span> runs your Maven, your JDK, your plugins.</li>
-  <li v-click="2"><b>Same name, different bytes.</b> <span class="kw">lib-1.2-SNAPSHOT</span> in your <span class="kw">~/.m2</span> is not the one it patched and built.</li>
-  <li v-click="3"><b>Same OS?</b> Fedora inside. Whatever you run, outside.</li>
-</ul>
-
-<p v-click="4" class="lead mt-8" style="text-align: center">The folder is half the picture. A green run in your IDE is <span class="warn">a different experiment with the same name.</span></p>
-
-<!--
-The second argument against the mount, and the subtler one: not danger from what it writes, but false confirmation of what it claims. The oldest excuse in the trade is literally true here: its build passed on its machine, with its toolchain, its ~/.m2, its OS. Now you open the mounted folder in your IDE and run the tests. Green. You feel you've verified it. You haven't: same command, but your Maven and your JDK; same dependency identifier, but a SNAPSHOT resolves to whatever your ~/.m2 holds, not the patched one it built (Wednesday's Thursday afternoon, in reverse); same OS, only by luck. Two green runs, two different experiments. A red run tells you even less: it may be failing for a reason the agent never saw.
-Say it plainly: the project folder is an incomplete view. Half of what ran lives outside it, and a mount only carries the half you can see. (The isx README's FAQ makes the same point: the agent's SNAPSHOTs and node_modules don't come through a mount.)
-And even reading the files isn't final: you open build.sh at 10:00 and it looks fine; the agent, still working, edits it at 10:01; at 10:02 you run the build, and it runs the version you never read, on your laptop, as you. Your IDE runs project configuration the moment you open the folder. (The race slide itself is at tag deck-v1-three-questions.)
-The fix is two slides on: what comes back is a commit, and you re-run its tests on a fresh branch of the same template. Same experiment, this time; and one anyone can rebuild.
--->
-
----
-clicks: 4
----
-
-## What comes back: <span class="accent">a commit</span>
-
-<div class="flow mt-6">
-  <div class="step">isx machine <b>agent-1</b><span>built and tested from <code>tpl-java</code></span></div>
-  <div v-click="1" class="step">commit <b>3f2a91c</b><span>immutable text</span></div>
-  <div v-click="2" class="step"><code>git fetch agent-1</code><span><code>git diff</code>: read it like any PR</span></div>
-  <div v-click="3" class="step">a fresh branch<span>re-run the tests from the same template</span></div>
-  <div v-click="4" class="step">cherry-pick<span>or throw it all away</span></div>
-</div>
-
-<p class="note pin">Want to watch it work? Your IDE connects <em>into</em> the machine (JetBrains Gateway, VS Code Remote), so nothing it writes runs on your laptop.</p>
-
----
 clicks: 3
 ---
 
@@ -688,26 +324,49 @@ Between click 0 and 1: the agent works inside agent-1 and commits. The remote ap
 
 ---
 layout: center
+class: divider
 ---
 
-<h1 class="statement">Review it like <span class="accent">any other pull request</span>.</h1>
+<div class="ghost">03</div>
 
-<p class="lead mt-8">isx doesn't make its code correct.<br>It makes it reviewable, and keeps it contained until you have.</p>
+# How it's built: <span class="accent">Quarkus all the way down</span>
+
+<p>Two native binaries, a Vert.x proxy, and a beta in production.</p>
+
+---
+clicks: 1
+---
+
+## Six problems, <span class="accent">six choices</span>
+
+<Blueprint :stage="6" :from="6" reveal class="mt-2" />
 
 <!--
-The three reasons come on the next slide, with the tick. Don't list them here too.
+The whole picture at once, as the bridge from what to how: each part answers a problem, and the rest of the talk is how those parts are built. Click: "This is isx." Then: let's open it up.
 -->
 
 ---
-clicks: 4
----
 
-## Friday's choices
 
-<Blueprint :stage="6" :from="3" reveal class="mt-2" />
+
+## Two native binaries, <span class="accent">three modules</span>
+
+<div class="cards three equal mt-4 modules">
+  <div class="card"><h4><span class="kw">isx</span> · cli</h4><p>Quarkus, with <a href="https://github.com/aeshell/aesh">Aesh</a> for the commands and <a href="https://tamboui.dev/">Tamboui</a> for the TUI, on Panama. The Incus REST client, the git remote helper, <span class="kw">isx mcp</span>.</p></div>
+  <div class="card"><h4>common</h4><p>Not a Quarkus app: a Jandex index, so both apps discover its CDI beans. Templates, tools, accounts, configuration, all read with jjq.</p></div>
+  <div class="card"><h4><span class="kw">isx-proxy</span></h4><p>Quarkus and Vert.x 5 on Netty 4.2: the MITM TLS proxy, the credential proofs, the caches. A service: systemd on Linux, launchd on macOS.</p></div>
+</div>
+
+<div class="built-on logos mt-6">
+  <img src="/logos/quarkus.svg" alt="Quarkus" class="word"><img src="/logos/graalvm.png" alt="GraalVM" class="word"><span class="tech"><img src="/logos/java.svg" alt="Java" class="mark"><span>Java 25</span></span><span class="tech"><img src="/logos/incus.png" alt="Incus" class="mark"><span>Incus</span></span><span class="tech"><img src="/logos/tamboui.svg" alt="Tamboui" class="mark"><span>Tamboui</span></span>
+</div>
+
+<p class="note pin">Quarkus 4.0.0.Beta3, GraalVM 25, Java 25. Splitting the proxy out took Vert.x out of the CLI: each binary carries only what it runs.</p>
 
 <!--
-The last three parts, then the reveal. Click: the machine has to log in, so the keys stay on your side and the proxy adds them on the way out. Click: everything it does would be in your name, so it gets an identity of its own. Click: getting the work back is a commit over git, not a mount; your repository has the machine as a remote. Click: "This is isx." Nothing on this picture arrived without a reason the room watched happen; that's the whole argument. The next two slides are the same picture exactly as built.
+Replaces the old "Built on" slide: the same thanks, now attached to what each part does. Sources: the three poms (cli: quarkus-arc, aesh, tamboui-panama-backend; proxy: quarkus-arc, quarkus-vertx; common: quarkus-core, Jandex plugin) and design/native-image.md "Module Structure".
+Native settings, if asked: the CLI uses the serial GC; the proxy G1 on Linux and serial on macOS (G1 measured on Apple Silicon and bought nothing, #1140). Both -O3 with PGO in release builds (later slide).
+Say thank you here: isx exists because the Incus, Quarkus, GraalVM, Tamboui and Aesh communities built the hard parts.
 -->
 
 ---
@@ -725,19 +384,43 @@ Click 3: git reaches a machine through Incus exec over a WebSocket.
 -->
 
 ---
-clicks: 3
----
 
-## The architecture, <span class="accent">on macOS</span>
 
-<Arch platform="macos" class="mt-1" />
+
+## The proxy: <span class="accent">a Vert.x 5 MITM server</span>
+
+<ol class="steps mt-2">
+  <li><span class="t">dnsmasq sends every intercepted domain to the host; a redirect takes <span class="kw">:443</span> to the proxy's <span class="kw">:18443</span></span></li>
+  <li><span class="t">SNI picks the certificate: a Vert.x <span class="kw">keyManagerFactoryMapper</span> mints one per name on first use, signed by a CA only the machines trust</span></li>
+  <li><span class="t">The request carries the machine's proof; the proxy checks it, adds the real credential, and re-encrypts upstream on pooled Vert.x clients</span></li>
+  <li><span class="t">Bodies stream through, with a budget for what's held in memory; WebSockets are relayed once the handshake is decided</span></li>
+</ol>
+
+<div class="quote mt-6">Vert.x 4 ran the WebSocket handler before Netty validated the handshake: a request Netty then refused had already had its credential injected. Vert.x 5 splits the handshake off: <span class="kw">accept()</span> or <span class="kw">reject()</span>, decided first.<cite>incus-spawn #972, fixed by the port to Vert.x 5</cite></div>
 
 <!--
-isx provisions a small Linux appliance: Alpine, a custom kernel with every driver built in, no initrd, no SSH, started by vfkit on Apple's Virtualization framework.
-Click 1: the CLI reaches Incus through a vsock tunnel (vm.incus.sock → virtio-vsock → socat → Incus). Why vsock: corporate VPN clients (e.g. Cisco AnyConnect) install socket filters that block unsigned binaries from TCP to the VM subnet; AF_VSOCK isn't TCP.
-Click 2: the proxy runs on the Mac (launchd); the VM DNATs port 443 from the bridge to the Mac's :18443.
-Click 3: a second vsock channel reaches isx-agent, a tiny shell agent that only accepts a fixed list of verbs (ping, version, socat-count, sshd-status, forwarder-restart, shutdown, btrfs-usage, btrfs-status, btrfs-rescan, btrfs-orphan-delete), never arbitrary commands. Three users: the automatic recovery in VmManager.recoverReachability() and isx doctor both compare host-side fds with the in-VM socat count to find a wedged forwarder and restart it, even when the Incus channel is stuck; and because the btrfs pool lives inside the VM, the TUI's pool-usage figures come through its btrfs-usage verb (on Linux the same read is a scoped sudoers rule instead).
-Sources: DESIGN.md (Incus Daemon Connection, macOS vsock robustness), appliance/DESIGN.md (Boot Backends, First-Boot Initialization, Control agent).
+Sources: design/proxy.md ("How it works"; "Certificates are chosen per SNI name, at any depth (#783)"; the WebSocket handshake section) and the Quarkus 4 port commit (b7330b7c).
+Details if asked: a name outside every intercepted domain, a client sending no SNI, or a name past MAX_SERVED_NAMES is refused, never answered with an unrelated certificate; the cap exists because Vert.x caches an SslContext per answered name and never evicts (reported upstream as V-T5). Vert.x 5 holds an undecided handshake open until the idle timeout, so every path must call accept() or reject().
+Bridge: the next slide is the proxy's second job, the cache.
+-->
+
+---
+clicks: 6
+---
+
+## Both: <span class="accent">cached, and never stale</span>
+
+<p class="lead">One rule: a cached file is served <span class="accent">only if a fresh download would return the same bytes</span>.</p>
+
+<CacheFlow class="mt-6" />
+
+<p class="note pin">Container layers and tool downloads are keyed by their SHA-256 digest. And the last resort is a command: <span class="kw">isx clean cache</span> throws the whole cache away; all you lose is a download.</p>
+
+<!--
+Here as the proxy's second job: every machine's Maven Central traffic passes it anyway, so it's the natural place for one shared cache. The catch everyone fears: a shared cache lets one agent poison another's dependencies. The story of how the design got here. Start with what a cache must never touch (row 1: anything that can change, and anything private, since the cache is shared by every machine). Then the obvious half (row 2): download once, but keep the copy only if the bytes match the checksum upstream sent with them; with no checksum, serve but don't store. Then the part that makes it safe (row 3): a hit doesn't trust the disk, it asks Central "is this still what you'd send?" with one HEAD and compares checksums; only a match serves the stored copy. Row 4 is why that matters: a republished or withdrawn artifact is evicted on the spot and fetched fresh, whichever build tool asks. Row 5 is the honest edge: with Central unreachable, the copy is served unconfirmed, and only then, with a 30-second backoff so a dead network doesn't cost a timeout per request.
+The efficiency claim, stated carefully: what's saved is the download, not the round trip; a hit still costs one HEAD. For Maven 3.9+ that HEAD replaces the .sha1 request the client would have made anyway. Don't quote the old ~2.8 ms vs ~177 ms figures (docs/PERFORMANCE-NOTES.md, 2026-08-28): they predate the HEAD per hit and the bench notes say they're not comparable any more.
+Then the second group, one click: OCI registries work the other way round. A layer is requested by its sha256 digest, so the name is the checksum: the proxy verifies the bytes against it before storing (MitmProxy, BLOB_DIGEST_PATTERN / finalizeCacheFile) and a hit is served from disk with nothing to ask; manifests, tags and auth tokens are relayed, never cached, because a tag can move. That's the contrast to say out loud: Maven names a coordinate, OCI names the bytes; the rule is the same, the check follows the protocol. Gradle (Plugin Portal, distributions) is Maven-like but has no checksum header, so a hit re-fetches the .sha1/.sha256 sidecar instead of a HEAD.
+Source: incus-spawn PR #792 (fixes #555, merged 2026-09-26, in v0.5.0), its DESIGN.md section "Maven/Gradle cache integrity"; OCI: proxy/MitmProxy.java (unchanged by #792). Scope: Maven Central, the Gradle Plugin Portal and Gradle distributions, and npm; other domains are never cached. npm tarballs follow the same rule (#787, in v0.5.0): a tarball is checked against the registry's dist.integrity (SHA-512) on store, and a version withdrawn upstream stops being served.
 -->
 
 ---
@@ -770,6 +453,73 @@ Shipped in v0.5.0: isx proxy activity shows, per instance, requests and bytes, w
 -->
 
 ---
+
+
+
+## Quarkus 4.0.0.Beta3, <span class="accent">in production</span>
+
+<div class="quote mt-2">"We are Quarkus maintainers, and we use this project to validate Quarkus 4 on a real application before it ships. So we treat the beta as a final release."<cite>docs/dev/QUARKUS-4.md, in the isx repository</cite></div>
+
+<table class="mt-4">
+  <thead><tr><th></th><th>Quarkus 3.40.1.1</th><th>Quarkus 4.0.0.Beta3</th></tr></thead>
+  <tbody>
+    <tr><td>Vert.x</td><td>4.5.35</td><td class="accent">5.2.3</td></tr>
+    <tr><td>Netty</td><td>4.1.139</td><td class="accent">4.2.20</td></tr>
+    <tr><td>GraalVM minimum</td><td>25.0</td><td class="warn">25.0.4: no more Intel Mac builds</td></tr>
+  </tbody>
+</table>
+
+<p class="lead mt-4">Only the proxy needed changes; the CLI and common compiled as they were. What came back: <span class="accent">8 notes for Quarkus, 13 for Vert.x</span>, each with its upstream issue.</p>
+
+<!--
+The port: commit b7330b7c (2026-11-04), 31 files. The WebSocket upgrade moves to webSocketHandshakeHandler; HttpClientRequest.getHost()/getPort() become authority(); sendHead() becomes writeHead(); the test doubles move to the Vert.x 5 WebSocket client.
+Feedback examples, from docs/dev/QUARKUS-4.md: Q-1, the async DNS resolver is back in native images, 2.2 MiB in the proxy (quarkusio/quarkus#58063, open); Q-3, Jackson 3 core always reachable in Vert.x native images, 0.87 MiB with no JSON in use; Q-12, GraalVM 25.0.4 minimum, and Oracle ships no macOS x64 build after 25.0.1. Vert.x: V-T1, a server's SNI key-manager lookup runs on the event loop by default (a regression; isx sets useWorkerThread); V-W1, Vert.x 5.2.2 dropped a frame pipelined with the upgrade request (eclipse-vertx/vert.x#6475, fixed in 5.2.3).
+This is the slide to hand to the hosts: what would they like to hear more about?
+-->
+
+---
+layout: center
+---
+
+<p class="kicker">Startup, measured</p>
+
+<h1 class="statement">Jackson databind took <span class="warn">108 ms</span><br>of a 194 ms CLI start.</h1>
+
+<p class="lead mt-8">So every YAML and JSON in isx goes through <span class="kw">jjq</span>, from Hyperfoil: generated mappings, no reflection, initialized at build time. <span class="kw">isx tools</span> went from 9.6 ms to <span class="accent">4.8 ms</span>.</p>
+
+<!--
+Source: design/native-image.md, "jjq rather than Jackson" (#1250). The 4.8 vs 9.6 ms is native, with 100 user tools defined. The JVM distribution no longer carries Jackson or SnakeYAML at all.
+Why it works in native without @RegisterForReflection: the generated @JqMapped mappings are registered explicitly (no ServiceLoader), and they're initialized at image-build time, so even the java.lang.reflect.Field lookups they need end up in the image heap. Enums are the exception: jjq reads their annotations by reflection, so they keep @RegisterForReflection, and a test fails for one without it.
+Honest footnote: Vert.x 5 still brings Jackson 3 core into the proxy (Q-3 on the previous slide).
+-->
+
+---
+
+
+
+## PGO, <span class="accent">in every release</span>
+
+<div class="stats mt-4">
+  <div class="stat"><b class="accent">−58%</b><span>proxy binary: 99 MB → 42 MB</span></div>
+  <div class="stat"><b class="accent">+19–83%</b><span>proxy throughput, by path</span></div>
+  <div class="stat"><b class="accent">−17–20%</b><span>CLI startup, every command</span></div>
+</div>
+
+<ol class="steps mt-6">
+  <li><span class="t">The release run builds instrumented binaries of the same commit</span></li>
+  <li><span class="t">It drives them with real workloads: Hyperfoil loads on the proxy (Maven, npm, Anthropic, Vertex, WebSockets), and the CLI's branch, shell, git and TUI flows</span></li>
+  <li><span class="t">It builds <span class="kw">-O3</span> with the merged profiles; a quality gate fails a build that didn't take its profile</span></li>
+</ol>
+
+<p class="note pin">Not <span class="kw">quarkus.native.pgo.enabled</span>: it ties the profile to the native integration tests, and an unrepresentative profile is worse than none.</p>
+
+<!--
+Source: design/native-image.md, "Profile-guided optimization" (#1637), and docs/dev/PERFORMANCE-NOTES.md "Phase 2" (interleaved A/B against the previous release flags). Idle RSS of the proxy also dropped 39%.
+Why the proxy shrinks: PGO compiles what the profile marks hot at full speed and everything else for size. About 20% of the proxy's methods and 15% of the CLI's have a profile. The cost: a path no workload reaches runs as cold code (host routes and the MCP bridge, today).
+Nothing is stored between releases: the profile always matches the released commit, and a failed collection fails the release.
+-->
+
+---
 layout: center
 class: glow-accent
 ---
@@ -777,45 +527,27 @@ class: glow-accent
 <h1 class="statement">Demo</h1>
 
 <!--
-Branch (seconds, from a primed template) → no secrets inside, yet everything authenticates → the agent fixes and commits alone → git fetch, review the diff, cherry-pick → isx destroy.
--->
-
----
-
-
-
-## Others are working on <span class="accent">the same problem</span>
-
-<div class="cards three equal mt-4">
-  <div class="card warn"><h4>Docker Sandboxes</h4><p>The closest: a microVM per agent on your machine, and a host-side proxy that adds API keys to requests. Your working tree is mounted in, read-write by default.</p></div>
-  <div class="card warn"><h4>Process sandboxes</h4><p>Claude Code's sandbox, Anthropic's srt, Nono, Lince. They confine the agent's commands on your laptop, next to your files and tools, rather than giving it a machine.</p></div>
-  <div class="card warn"><h4>Cloud sandboxes</h4><p>Anthropic's cloud sessions, E2B, Daytona. A machine per agent, on someone else's compute and account.</p></div>
-</div>
-
-<p class="lead mt-6">Where isx differs: a whole Linux machine, <span class="accent">branched in seconds</span> from a template you wrote, handing back <span class="accent">a commit</span> rather than editing a mount. On your hardware, for any agent: Claude Code, Codex, Pi, Gemini CLI, Copilot, Bob.</p>
-
-<!--
-On Docker Sandboxes, point at "read-write by default" and let the room remember the USB stick; no need to say more. (Docker also offers a clone mode and a mountless mode; say so if asked.)
-Not a ranking, and not a takedown: the point is that isolating agents is now a recognised problem, and the credential proxy in particular is not unique to isx. Docker Sandboxes is the one close match; the other two are different kinds of isolation.
-What the others don't do: branch the whole machine by copy-on-write from a template (or from a running machine: its disk, not its memory), templates as reviewed YAML, and a git remote instead of a mount.
-If asked about others: container-use (Dagger; a container and a git branch per agent, via MCP; experimental) and Sculptor (Imbue; a Mac app running Claude Code or Codex agents in Docker containers) also isolate agents, with different trade-offs.
-Cloud sessions detail, if asked: an Anthropic-managed VM, an egress allowlist, and a proxy that holds your GitHub token outside it; a paid subscription, and usually a GitHub account.
-Sources: docs.docker.com/ai/sandboxes/security ("The raw credential values never enter the VM"; "A direct mount is read-write"); code.claude.com/docs/en/sandbox-environments; github.com/anthropic-experimental/sandbox-runtime (srt); Nono (helpnetsecurity.com, 2026-07-27); lince.sh (Bubblewrap-based); github.com/dagger/container-use; imbue.com/sculptor. Re-check each wording against its current docs before presenting.
+On tpl-quarkus: branch (seconds, from a primed template, Maven cache warm) → no secrets inside, yet everything authenticates → the agent fixes and commits alone → git fetch, review the diff, cherry-pick → isx destroy.
 -->
 
 ---
 layout: center
-class: glow-accent
 ---
 
-<h1 class="statement"><span class="accent">Local-first.</span></h1>
+<p class="kicker">One more thing</p>
 
-<p class="lead mt-8 muted">Your hardware. Your network. Your repos.</p>
+<h1 class="statement">isx is built <span class="accent">by agents, inside isx</span>.</h1>
 
-<p class="lead mt-6">The cheapest machine is <span class="accent">the one you already own</span>.<br>Light enough to run multiple agents on it.</p>
+<div class="stats" style="margin-top: 44px">
+  <div class="stat"><b class="accent">2,239</b><span>of 2,636 commits on main, by an AI assistant, since March</span></div>
+  <div class="stat"><b class="accent">110k</b><span>lines of Java, and 124k more of tests</span></div>
+</div>
+
+<p class="lead mt-8">Reviewed like any other pull request. And because its machines are wiped, everything it learns goes in the repository: <span class="kw">CLAUDE.md</span>, <span class="kw">design/</span>, <span class="kw">.claude/rules/</span>.</p>
 
 <!--
-The cost point, said plainly: no per-minute cloud meter and no subscription for the machines; isx is open source, and a branch shares its template's disk and reserves no RAM up front, so a laptop holds several. How many depends on the workload and the RAM; don't quote a number without measuring it. Be honest if asked: the model's tokens still cost what they cost; isx doesn't change that.
+Figures from incus-spawn main on 2026-11-09: git log authors ("Sanne's AI assistant" 2,239; Sanne 212; Yoann Rodière 110; Peter Palaga's AI agent 6), first commit 2026-03-31; line counts of src/main and src/test Java. Re-count before presenting.
+The point for this audience: the Quarkus 4 port, the PGO pipeline and the jjq migration on the last slides were all done this way, by agents in isx machines, with a human reviewing.
 -->
 
 ---
@@ -833,49 +565,11 @@ The cost point, said plainly: no per-minute cloud meter and no subscription for 
 
 <div class="card mt-2"><h4>Ubuntu / Debian</h4><div class="cmd small">curl -fsSL https://sanne.github.io/isx-apt-releases/public.gpg \<br>&nbsp;&nbsp;| sudo gpg --yes --dearmor -o /usr/share/keyrings/incus-spawn.gpg<br>echo "deb [signed-by=/usr/share/keyrings/incus-spawn.gpg] https://sanne.github.io/isx-apt-releases stable main" \<br>&nbsp;&nbsp;| sudo tee /etc/apt/sources.list.d/incus-spawn.list<br>sudo apt update && sudo apt install incus-spawn</div></div>
 
-<p class="note pin">On macOS, isx runs its own small Linux VM: no Docker Desktop. Full instructions at <a class="kw" href="https://isx.run">isx.run</a>.</p>
+<p class="note mt-2">Then <span class="kw">isx init</span>, <span class="kw">isx build tpl-java</span>, <span class="kw">isx branch my-feature --from tpl-java</span>, or just <span class="kw">isx</span> for the TUI.</p>
 
 <!--
-Commands from the isx README (Quick Start), v0.5.0. On RHEL 9 the copr plugin is 'dnf-command(copr)'. JBang needs both apps, and jbang must stay on the PATH. Intel Macs: v0.4.2 was the last release built for them. Debian/Ubuntu updates come with apt upgrade; Fedora with dnf.
--->
-
----
-
-
-
-## Then: <span class="accent">isx init</span>
-
-<p class="lead">One command, interactive: it installs Incus (on macOS, the Linux VM), creates the storage pool, asks for your credentials, and sets up the proxy.</p>
-
-<div class="cmd hero mt-6">isx init</div>
-
-<div class="cards mt-6">
-  <div class="card"><h4>Then drive it from the CLI</h4><div class="cmd">isx build tpl-java<br>isx branch my-feature --from tpl-java</div></div>
-  <div class="card"><h4>Or live in the TUI</h4><div class="cmd">isx</div><p>No arguments needed.</p></div>
-</div>
-
-<!--
-Per the isx README: on Linux, isx init installs Incus through your package manager and creates a btrfs pool if needed; on macOS it provisions the vfkit VM. It prompts for the credentials the proxy will inject, and can install the proxy as a systemd user service (launchd on macOS). The real keys stay in ~/.config/incus-spawn/ on the host.
--->
-
----
-
-
-
-## Built on <span class="accent">great open source</span>
-
-<div class="cards three mt-4 built-on">
-  <div class="card"><div class="tech"><a href="https://linuxcontainers.org/incus/"><img src="/logos/incus.png" alt="Incus" class="mark"></a><span><a href="https://linuxcontainers.org/incus/">Incus</a></span></div><p>System containers and VMs: the machines themselves</p></div>
-  <div class="card"><div class="tech"><a href="https://quarkus.io/"><img src="/logos/quarkus.svg" alt="Quarkus" class="word"></a></div><p>The framework isx is written with, now on Quarkus 4</p></div>
-  <div class="card"><div class="tech"><a href="https://www.graalvm.org/"><img src="/logos/graalvm.png" alt="GraalVM" class="word"></a></div><p>Native binaries, profile-guided: instant startup, no JVM to install</p></div>
-  <div class="card"><div class="tech"><img src="/logos/java.svg" alt="Java" class="mark"><span>Java 25</span></div><p>The language, on the current LTS</p></div>
-  <div class="card"><div class="tech"><img src="/logos/tamboui.svg" alt="Tamboui" class="mark"><span><a href="https://tamboui.dev/">Tamboui</a> &amp; <a href="https://github.com/aeshell/aesh">Aesh</a></span></div><p>The terminal UI and the command engine</p></div>
-</div>
-
-<p class="note pin">Thank you to these communities: isx exists because they built the hard parts.</p>
-
-<!--
-v0.5.0 numbers, if asked (release notes, measured against the previous release flags): GraalVM PGO made the proxy binary 58% smaller (99 MB → 42 MB), idle RSS 39% lower, throughput up 19% to 83% depending on the path; CLI startup 17 to 20% faster. Quarkus 4 brought the proxy onto Vert.x 5 and Netty 4.2, and the toolchain onto GraalVM 25.
+Commands from the isx README (Quick Start), v0.5.0. On RHEL 9 the copr plugin is 'dnf-command(copr)'. JBang needs both apps, and jbang must stay on the PATH. Intel Macs: v0.4.2 was the last release built for them. Debian/Ubuntu updates come with apt upgrade; Fedora with dnf. On macOS, isx runs its own small Linux VM: no Docker Desktop. Full instructions at isx.run.
+isx init: Per the isx README: on Linux, isx init installs Incus through your package manager and creates a btrfs pool if needed; on macOS it provisions the vfkit VM. It prompts for the credentials the proxy will inject, and can install the proxy as a systemd user service (launchd on macOS). The real keys stay in ~/.config/incus-spawn/ on the host.
 -->
 
 ---
@@ -1017,4 +711,24 @@ clicks: 2
 <!--
 The hops: git sees an isx:// URL and runs git-remote-isx; that hands over to the native isx helper, which checks the machine exists and only allows the git service; Incus exec opens git-upload-pack inside the machine, and the pack stream flows through the WebSocket untouched.
 If asked why there's a bash shim in front of the native helper: git's helper protocol starts with a few text lines, then switches to binary on the same pipe. Java's buffered stdin would read ahead into the binary stream; bash answers the text lines, then execs, so the native helper inherits a clean pipe. (DESIGN.md, "Git remote helper: bash + Java split".)
+-->
+
+---
+
+
+
+## Drive isx <span class="accent">from other tools</span>
+
+<p class="lead">Who does all this branching? Not you, switching between five agents: <span class="accent">another program can.</span></p>
+
+<div class="cards three equal mt-4">
+  <div class="card"><h4>An agent delegates</h4><p><span class="kw">isx mcp</span>: an agent on your host branches machines from templates you approved, and hands whole tasks to Claude Code, Codex or Pi inside them.</p></div>
+  <div class="card"><h4>An orchestrator drives</h4><p><span class="kw">isx branch --owner</span>, <span class="kw">isx start</span>, <span class="kw">isx stop</span>, with <span class="kw">--format=json</span>: the SSH target and project root, for any tool.</p></div>
+  <div class="card"><h4>Your agent manager</h4><p>Add <span class="kw">herdr</span> or <span class="kw">orca</span> to a template: each instance registers itself on first start, and leaves on destroy.</p></div>
+</div>
+
+<p class="note pin">A tool may destroy only the instances it owns, and only if your <span class="kw">config.yaml</span> lets it. Off by default: <span class="kw">isx init</span> offers to set it up.</p>
+
+<!--
+Where it sits: right after the live branch. Fix A and fix B from one state is exactly the kind of fan-out you'd rather a program ran; then back to how a template is written. New in v0.5.0 (isx.run/docs/integrations; docs/MCP.md, docs/INTEGRATIONS.md). isx mcp is no longer experimental. A coordinator's reach is limited to templates both its own template and mcp.yaml approve; a coordinator can also run inside an instance (isx branch --mcp-client). isx shell <instance> --task opens the conversation of a delegated task. herdr: a stopped instance starts again when herdr reconnects to it. If asked whether the coordinator sees credentials: no, the same proxy rule applies to it as to any machine.
 -->
